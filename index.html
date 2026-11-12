@@ -104,6 +104,9 @@ button{font:inherit;color:inherit}
 .btn:active{transform:scale(.97)}
 .btn.icon{width:38px;padding:6px 0;font-size:16px;line-height:1}
 .btn.off{color:var(--faint);text-decoration:line-through}
+.btn b{margin-left:6px;font-family:var(--f-display);font-weight:800;color:var(--lumen);font-variant-numeric:tabular-nums}
+.btn.spent{color:var(--faint);border-color:var(--brass-faint)}
+.btn.spent b{color:var(--faint)}
 .btn.primary{background:var(--brass);color:var(--ink);border-color:var(--brass);font-weight:700}
 .btn.primary:hover{background:#d8bf87}
 
@@ -233,7 +236,7 @@ button{font:inherit;color:inherit}
     <p class="hint" id="hint"></p>
     <div class="gauge-wrap"><span class="lbl">混沌</span><div class="gauge" id="gauge"><i id="gaugeFill"></i></div><span class="gauge-pct" id="gaugePct">0%</span></div>
     <div class="btns">
-      <button class="btn" id="btnHint" type="button">ひらめき</button>
+      <button class="btn" id="btnHint" type="button">ひらめき<b id="hintN">3</b></button>
       <button class="btn icon" id="btnSound" type="button" aria-label="音のオン・オフ">♪</button>
       <button class="btn icon" id="btnMenu" type="button" aria-label="メニュー">≡</button>
     </div>
@@ -293,14 +296,15 @@ button{font:inherit;color:inherit}
     <div class="modes-grid">
       <div>
         <h3>クラシック</h3>
-        <p>時間無制限。連鎖が終わるまで、次の手は打てない。一手ごとに雫が一つ降る。<em>2回以上反応した手番には降らない。</em>盤上が6個以下になると、手詰まりのとき以外は降らない。</p>
-        <p>勝利：盤上をすべて消す<em>〈完全なる静寂〉</em>、または四元素すべての真理を作る<em>〈四元の真理〉</em>。光核は第8手、真理は第20手で封印が解ける。混沌ゲージが満ちたら終わり。</p>
+        <p>時間無制限。連鎖が終わるまで、次の手は打てない。反応が1回以下の手番には雫が二つ降り、2回目以降の反応一つごとに一つ減る。<em>3回以上反応した手番には降らない。</em>20手ごとに降る雫が一つ増える〈混沌の圧〉。盤上が6個以下になると、手詰まりのとき以外は降らない。</p>
+        <p>勝利：盤上をすべて消す<em>〈完全なる静寂〉</em>、または四元素すべての真理を作る<em>〈四元の真理〉</em>。光核は第8手、真理は第20手で封印が解ける。真理を作るたびにボーナス。混沌ゲージが満ちたら終わり。</p>
       </div>
       <div>
         <h3>サバイバル</h3>
-        <p>雫は絶えず降り、少しずつ速くなる。混沌ゲージが満ちたまま3秒で終わり。</p>
-        <p><em>連鎖の最中も、止まっている欠片は動かせる。</em>連鎖が続いているあいだに自分で合成や対消滅を起こすと〈介入〉になり、その反応の得点が1.5倍。つかんでいる欠片は重力に引かれない。</p>
-        <p><em>4チェイン以上で降下が止まる〈静止〉。</em>45秒ごとに光か闇が降る。真理を作るとボーナス。</p>
+        <p>雫は絶えず降り、少しずつ速くなる。30秒を過ぎると輝石が、1分半を過ぎると光核も降ってくる。混沌ゲージが満ちたまま3秒で終わり。</p>
+        <p><em>連鎖の最中も、止まっている欠片は動かせる。</em>引き寄せや反応が動いている最中に自分で合成や対消滅を起こすと〈介入〉になり、チェインが続いて、その反応の得点が1.5倍。連鎖が止まってから打った手は、新しいチェインの始まり。つかんでいる欠片は重力に引かれない。</p>
+        <p><em>4チェイン以上で降下が止まる〈静止〉。</em>長い連鎖ほど長く止まる。45秒ごとに光か闇が降る。真理を作るとボーナス。</p>
+        <p>どちらのモードも<em>〈ひらめき〉は1ゲーム3回まで。</em>真理を作ると一つ戻る（最大5回）。</p>
       </div>
     </div>
     <div class="panel-btns"><button class="btn primary" id="rulesClose" type="button">閉じる</button></div>
@@ -389,6 +393,8 @@ const SEP_GAP = 0.06;        // 重なり解消後のすき間
 const DENSITY_MAX = 0.6;     // 混沌ゲージ100%の占有率
 const CHAIN_WINDOW = 2000;   // チェイン判定（ms）
 const SEAL = { 3: 8, 4: 20 }; // クラシック：段階の封印が解ける手番
+const PRESSURE_STEP = 20;         // クラシック：降る雫が一つ増える間隔（手）
+const HINT_MAX = 3, HINT_CAP = 5; // ひらめき：1ゲームの回数と、真理で戻せる上限
 const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 
 /* ---------- 欠片の画像（一度だけ読み込み、以後はキャッシュから参照）----------
@@ -504,7 +510,7 @@ const S = {
   truths: [false, false, false, false], truthsDone: false, pendingTruths: false,
   bag: [], next: [], lastCap: 2,
   spawnTimer: 0, specialTimer: 45000, freezeUntil: 0, critStart: 0, tipClock: 0,
-  drag: null, hint: null, peek: null, tut: store.get('tut', 0), tipIdx: 0, baseHint: '',
+  drag: null, hint: null, peek: null, hints: HINT_MAX, tut: store.get('tut', 0), tipIdx: 0, baseHint: '',
 };
 
 /* ---------- DOM ---------- */
@@ -515,7 +521,7 @@ const el = {
   chain: $('#chain'), chainN: $('#chainN'), chainX: $('#chainX'), chainBar: $('#chainBar'),
   hint: $('#hint'), gauge: $('#gauge'), gaugeFill: $('#gaugeFill'), gaugePct: $('#gaugePct'),
   toast: $('#toast'), tip: $('#tip'), crit: $('#crit'), critN: $('#critN'),
-  btnHint: $('#btnHint'), btnSound: $('#btnSound'), btnMenu: $('#btnMenu'),
+  btnHint: $('#btnHint'), hintN: $('#hintN'), btnSound: $('#btnSound'), btnMenu: $('#btnMenu'),
   titleOv: $('#titleOv'), rulesOv: $('#rulesOv'), pauseOv: $('#pauseOv'), resultOv: $('#resultOv'),
 };
 
@@ -901,6 +907,7 @@ function findFreeSpot(r, minGap = .12, tries = 50, list = null) {
 }
 
 /* ---------- 反応の種類 ---------- */
+const pressure = () => 2 + Math.floor((S.turn - 1) / PRESSURE_STEP);
 function capTier() { if (S.mode !== 'classic') return 4; return S.turn >= SEAL[4] ? 4 : S.turn >= SEAL[3] ? 3 : 2; }
 function reactionOf(a, b) {
   if (a.kind === 'el' && b.kind === 'el') {
@@ -928,8 +935,9 @@ function genNext() {
   let tier = 1;
   if (S.mode === 'survival') {
     const t = S.elapsed / 1000, r = rand();
-    if (t > 120) { if (r < .04) tier = 3; else if (r < .27) tier = 2; }
-    else if (t > 45 && r < .15) tier = 2;
+    if (t > 200) { if (r < .08) tier = 3; else if (r < .34) tier = 2; }
+    else if (t > 90) { if (r < .04) tier = 3; else if (r < .25) tier = 2; }
+    else if (t > 30 && r < .15) tier = 2;
   }
   return { el: drawBag(), tier };
 }
@@ -987,7 +995,7 @@ function noteChain(x, y, quiet) {
     if (!quiet) popText(`チェイン ${S.chain}！`, x, y - .62, { size: .44, color: '#ffe3a0', glow: 'rgba(255,190,110,.85)', dur: 1200, rise: .5 });
     if (S.tut === 2) setTut(3);
     if (S.mode === 'survival' && S.chain >= 4) {
-      const until = S.now + Math.min(8, S.chain) * 1000;
+      const until = S.now + Math.min(5, S.chain - 2) * 1000;
       if (until > S.freezeUntil) { if (S.freezeUntil < S.now) toast(`静止 ― ${S.chain}チェインで降下が止まる`); S.freezeUntil = until; }
     }
   }
@@ -1093,6 +1101,8 @@ function truthAchieved(e, o) {
   renderTruths(e);
   toast(`${EL[e].name}の真理 ― 顕現`);
   popText('真理', o.x, o.y - o.r - .3, { size: .42, color: EL[e].light, glow: EL[e].color, dur: 1600 });
+  if (S.hints < HINT_CAP) { S.hints++; popText('ひらめき +1', o.x, o.y + o.r + .95, { size: .24, color: '#ffe3a0', dur: 1500 }); }
+  if (S.mode === 'classic') addScore(1000, o.x, o.y + o.r + .5, EL[e].light, true);
   if (S.mode === 'survival') {
     addScore(1500, o.x, o.y + o.r + .5, EL[e].light, true);
     if (S.truths.every(Boolean) && !S.truthsDone) { S.truthsDone = true; addScore(3000, o.x, o.y + o.r + .9, '#ffe3a0', true); toast('四元の真理 ― すべての真理が揃った'); }
@@ -1101,7 +1111,7 @@ function truthAchieved(e, o) {
 
 async function doSpecial(a, b, rk) {
   const tok = S.token;
-  S.stats.special++;
+  S.stats.special++; S.moveReactions++;
   if (rk === 'invert' || rk === 'lower') {
     const sp = a.kind === 'el' ? b : a, t = a.kind === 'el' ? a : b;
     sp.dying = true; t.touched = S.resId;
@@ -1249,9 +1259,10 @@ async function playerAct(o, target, rk) {
   S.moves++; S.acting++;
   if (!live) cv.classList.add('busy');
   o.touched = S.resId;
-  if (!live) { S.chain = 0; S.chainAt = -1e9; S.moveReactions = 0; }
-  // 連鎖が続いているあいだ（解決中、または最後の反応から2秒以内）に自分で起こした反応は〈介入〉
-  const chaining = live && S.chain >= 1 && (wasBusy || S.now - S.chainAt <= CHAIN_WINDOW);
+  // クラシックは毎手、サバイバルは連鎖が止まったあとの手で、新しいチェインが始まる
+  if (!live || !wasBusy) { S.chain = 0; S.chainAt = -1e9; S.moveReactions = 0; }
+  // 連鎖が動いている最中（引き寄せや反応の途中）に自分で起こした反応は〈介入〉。チェインも続く
+  const chaining = live && S.chain >= 1 && wasBusy;
   if (target) {
     target.touched = S.resId;
     S.pendingIv = chaining && (rk === 'merge' || rk === 'anni');
@@ -1270,11 +1281,14 @@ function afterMove() {
     S.turn++;
     const cap = capTier();
     if (cap > S.lastCap) { S.lastCap = cap; toast(`封印解放 ― ${TI[cap].full}を作れるようになった`); SFX.unlock(); }
-    let n = 1;
-    if (S.moveReactions >= 2) { n = 0; toast('連鎖が混沌を鎮めた ― 雫は降らない'); }
+    // 混沌の圧：降る雫の数。2から始まり、20手ごとに一つ増える。2回目以降の反応一つごとに一つ減る
+    const P = pressure();
+    if (P > S.lastPressure) { S.lastPressure = P; toast(`混沌が強まる ― 降る雫が${P}つに`); }
+    let n = Math.max(0, P - Math.max(0, S.moveReactions - 1));
+    if (!n) toast('連鎖が混沌を鎮めた ― 雫は降らない');
     const any = hasAnyMove();
     if (n && liveCount() <= 6 && any) n = 0;
-    if (!any) n = 1;
+    if (!any) n = Math.max(n, 1);
     for (let i = 0; i < n; i++) spawnNext();
     for (let g = 0; g < 8 && liveCount() > 0 && !hasAnyMove(); g++) spawnNext(); // 手詰まりは作らない
     if (gauge() >= 1) { endGame('overflow'); return; }
@@ -1317,8 +1331,8 @@ function resetCore(mode) {
     mode, screen: 'play', paused: false, orbs: [], id: 1, score: 0, shownScore: 0, turn: 1, moves: 0, now: 0, elapsed: 0,
     resolving: false, acting: 0, pendingIv: false, resId: 0, relaxAt: 0, chain: 0, chainAt: -1e9, maxChain: 0, moveReactions: 0,
     stats: { merge: 0, anni: 0, special: 0, harmony: 0, intervene: 0 }, truths: [false, false, false, false], truthsDone: false, pendingTruths: false,
-    bag: [], next: [], lastCap: 2, spawnTimer: 2600, specialTimer: 45000, freezeUntil: 0, critStart: 0, tipClock: 0,
-    drag: null, hint: null, peek: null,
+    bag: [], next: [], lastCap: 2, lastPressure: 2, spawnTimer: 2600, specialTimer: 45000, freezeUntil: 0, critStart: 0, tipClock: 0,
+    drag: null, hint: null, peek: null, hints: HINT_MAX,
   });
   hudCache = {};
   cv.classList.remove('busy', 'dragging');
@@ -1361,7 +1375,7 @@ function tick(dt) {
   else S.critStart = 0;
   if (S.tut >= 3) { S.tipClock += dt; if (S.tipClock > 10000) { S.tipClock = 0; S.tipIdx++; if (!S.drag) setBaseHint(defaultHint()); } }
 }
-const spawnInterval = () => Math.max(550, 1850 - (S.elapsed / 1000) * 8.5);
+const spawnInterval = () => { const t = S.elapsed / 1000; return t < 140 ? Math.max(500, 1500 - t * 7.2) : Math.max(320, 500 - (t - 140) * 1.2); };
 
 function endGame(kind) {
   if (S.screen !== 'play') return;
@@ -1375,7 +1389,7 @@ function endGame(kind) {
       const perfect = S.truths.every(Boolean);
       title = perfect ? '完全調律' : '完全なる静寂';
       sub = `${S.moves}手で、盤上のすべてが消え去った。`;
-      add('静寂', 5000); add('手数ボーナス', Math.max(0, 60 - S.moves) * 80);
+      add('静寂', 3000);
       if (perfect) add('四元の真理と静寂の両立', 5000);
       SFX.win();
     } else if (kind === 'truths') {
@@ -1471,7 +1485,9 @@ const TUT = [
 ];
 const TIPS = {
   classic: [
-    '2回以上反応した手番には、雫が降らない',
+    '反応1回以下の手番は雫が二つ。連鎖させるほど減り、3回で降らない',
+    '20手ごとに降る雫が一つ増える。長引くほど連鎖が要る',
+    'ひらめきは3回まで。真理を作ると一つ戻る',
     '欠片をタップすると、反応できる相手がわかる',
     '点線の円が重力の範囲。光の線は、次に反応が起きる組',
     '重ねる位置をずらすと、重力の中心も動く',
@@ -1481,10 +1497,10 @@ const TIPS = {
   ],
   survival: [
     '連鎖の最中も、止まっている欠片は動かせる',
-    '連鎖中に自分でつないだ反応は〈介入〉。得点1.5倍',
+    '連鎖が動いている最中に自分でつないだ反応は〈介入〉。得点1.5倍',
     'つかんでいる欠片は、重力に引かれない',
-    '4チェイン以上で〈静止〉。しばらく雫が降らない',
-    '反応から2秒以内に次の反応を起こせば、チェインが続く',
+    '4チェイン以上で〈静止〉。長い連鎖ほど長く雫が降らない',
+    '連鎖が止まる前に次の反応を差し込めば、チェインが続く',
     '光と闇を重ねる〈調律〉で、盤上を一掃できる',
     '光×光は空白を雫で満たす。混沌が一気に増すので注意',
     '混沌ゲージが満ちたまま3秒で終わり',
@@ -1769,12 +1785,18 @@ function hudFrame() {
     el.gauge.classList.toggle('warn', pct >= 70 && pct < 90); el.gauge.classList.toggle('crit', pct >= 90);
   }
   setText(el.count, 'count', String(liveCount()));
+  if (hudCache.hints !== S.hints) {
+    hudCache.hints = S.hints; el.hintN.textContent = S.hints;
+    el.btnHint.classList.toggle('spent', S.hints <= 0);
+    el.btnHint.setAttribute('aria-label', `ひらめき 残り${S.hints}回`);
+  }
   setText(el.progress, 'prog', S.mode === 'survival' ? fmtTime(S.elapsed) : `第 ${S.turn} 手`);
-  const active = S.chain >= 2 && (busy() || S.now - S.chainAt < CHAIN_WINDOW);
+  const fade = S.mode === 'survival' ? 700 : CHAIN_WINDOW; // サバイバルは連鎖が止まるとチェインも切れる
+  const active = S.chain >= 2 && (busy() || S.now - S.chainAt < fade);
   if (hudCache.chainOn !== active) { hudCache.chainOn = active; el.chain.classList.toggle('on', active); }
   if (active) {
     setText(el.chainN, 'cn', String(S.chain)); setText(el.chainX, 'cx', '×' + chainMult().toFixed(1));
-    el.chainBar.style.transform = `scaleX(${busy() ? 1 : clamp(1 - (S.now - S.chainAt) / CHAIN_WINDOW, 0, 1)})`;
+    el.chainBar.style.transform = `scaleX(${busy() ? 1 : clamp(1 - (S.now - S.chainAt) / fade, 0, 1)})`;
   }
   if (S.mode === 'survival') {
     const frozen = S.now < S.freezeUntil;
@@ -1794,8 +1816,11 @@ function renderTruths(popEl) {
   }
 }
 function renderSeals() {
-  if (S.mode !== 'classic') { el.seals.hidden = true; el.pace.hidden = false; return; }
-  el.seals.hidden = false; el.pace.hidden = true;
+  el.pace.hidden = false;
+  if (S.mode !== 'classic') { el.seals.hidden = true; return; }
+  el.seals.hidden = false;
+  const P = pressure(), nextAt = (P - 1) * PRESSURE_STEP + 1;
+  el.pace.textContent = `降る雫 ${P}`; el.pace.title = `反応が1回以下の手番に降る雫の数。第${nextAt}手から${P + 1}つ`;
   const cap = capTier();
   el.seals.innerHTML = '<span class="lbl">段階</span>' + [1, 2, 3, 4].map(t => t <= cap
     ? `<span class="seal">${TI[t].name}</span>`
@@ -1886,7 +1911,7 @@ function snapshot() {
     v: 1, screen: 'play', mode: S.mode, cols: S.cols, rows: S.rows,
     orbs: S.orbs.filter(o => !o.dying).map(o => ({ k: o.kind, e: o.el, t: o.tier, x: +o.x.toFixed(3), y: +o.y.toFixed(3) })),
     score: S.score, turn: S.turn, moves: S.moves, elapsed: S.elapsed, truths: S.truths.slice(), truthsDone: S.truthsDone,
-    stats: { ...S.stats }, maxChain: S.maxChain, next: S.next.slice(), bag: S.bag.slice(), spawnTimer: S.spawnTimer, specialTimer: S.specialTimer, lastCap: S.lastCap,
+    stats: { ...S.stats }, maxChain: S.maxChain, next: S.next.slice(), bag: S.bag.slice(), spawnTimer: S.spawnTimer, specialTimer: S.specialTimer, lastCap: S.lastCap, lastPressure: S.lastPressure, hints: S.hints,
   };
 }
 function restore(d) {
@@ -1901,7 +1926,8 @@ function restore(d) {
     score: d.score || 0, shownScore: d.score || 0, turn: d.turn || 1, moves: d.moves || 0, elapsed: d.elapsed || 0,
     truths: Array.isArray(d.truths) ? d.truths : S.truths, truthsDone: !!d.truthsDone, stats: { ...S.stats, ...(d.stats || {}) }, maxChain: d.maxChain || 0,
     next: Array.isArray(d.next) && d.next.length ? d.next : [genNext(), genNext()], bag: Array.isArray(d.bag) ? d.bag : [],
-    spawnTimer: d.spawnTimer || 2000, specialTimer: d.specialTimer || 45000, lastCap: d.lastCap || 2,
+    spawnTimer: d.spawnTimer || 2000, specialTimer: d.specialTimer || 45000, lastCap: d.lastCap || 2, lastPressure: d.lastPressure || 2,
+    hints: Number.isFinite(d.hints) ? clamp(d.hints, 0, HINT_CAP) : HINT_MAX,
   });
   renderAllHud(); setBaseHint(defaultHint());
   S.paused = true; el.pauseOv.hidden = false;
@@ -1944,9 +1970,10 @@ function bindUI() {
   el.btnSound.addEventListener('click', () => { SFX.on = !SFX.on; store.set('sound', SFX.on); if (SFX.on) SFX.init(); updateSoundBtn(); });
   el.btnHint.addEventListener('click', () => {
     if (S.screen !== 'play' || S.paused || !canActNow()) return;
+    if (S.hints <= 0) { toast('ひらめきは使い切った ― 真理を作ると一つ戻る'); return; }
     const h = findHint();
-    if (h) { S.hint = { a: h.a, b: h.b, until: performance.now() + 3200 }; setBaseHint(`ひらめき：${nameOf(h.a)} を ${nameOf(h.b)} に重ねてみよう`); }
-    else toast('いま反応できる組はない。動かして形を整えよう');
+    if (h) { S.hints--; S.hint = { a: h.a, b: h.b, until: performance.now() + 3200 }; setBaseHint(`ひらめき：${nameOf(h.a)} を ${nameOf(h.b)} に重ねてみよう（残り${S.hints}回）`); }
+    else toast('いま反応できる組はない。動かして形を整えよう'); // 見つからなければ回数は減らない
   });
   $('#pResume').addEventListener('click', resume);
   $('#pRestart').addEventListener('click', () => newGame(S.mode));
