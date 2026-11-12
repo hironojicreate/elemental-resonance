@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>元素調律 Ver.1</title>
+<title>元素調律</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -145,7 +145,6 @@ button{font:inherit;color:inherit}
 .mode-desc{font-size:12.5px;color:var(--muted);line-height:1.6}
 .mode-best{font-size:12px;color:var(--brass);font-variant-numeric:tabular-nums}
 .link{align-self:flex-start;background:none;border:0;padding:6px 2px;color:var(--brass);font-size:14px;cursor:pointer;text-decoration:underline;text-underline-offset:4px;text-decoration-color:var(--brass-dim)}
-.ver{margin:0;font-size:11px;letter-spacing:.08em;color:var(--faint)}
 .link:hover{text-decoration-color:var(--brass)}
 @media (max-width:600px){
   .title-inner{flex-direction:column;gap:18px}
@@ -259,7 +258,6 @@ button{font:inherit;color:inherit}
         <span class="mode-best">ベスト <b id="bestSurvival">—</b></span>
       </button>
       <button class="link" id="goRules" type="button">あそびかた</button>
-      <p class="ver">Ver.1 ・ 2026年11月12日版</p>
     </div>
   </div>
 </section>
@@ -295,12 +293,13 @@ button{font:inherit;color:inherit}
     <div class="modes-grid">
       <div>
         <h3>クラシック</h3>
-        <p>時間無制限。一手ごとに雫が一つ降る。<em>2回以上反応した手番には降らない。</em>盤上が6個以下になると、手詰まりのとき以外は降らない。</p>
+        <p>時間無制限。連鎖が終わるまで、次の手は打てない。一手ごとに雫が一つ降る。<em>2回以上反応した手番には降らない。</em>盤上が6個以下になると、手詰まりのとき以外は降らない。</p>
         <p>勝利：盤上をすべて消す<em>〈完全なる静寂〉</em>、または四元素すべての真理を作る<em>〈四元の真理〉</em>。光核は第8手、真理は第20手で封印が解ける。混沌ゲージが満ちたら終わり。</p>
       </div>
       <div>
         <h3>サバイバル</h3>
         <p>雫は絶えず降り、少しずつ速くなる。混沌ゲージが満ちたまま3秒で終わり。</p>
+        <p><em>連鎖の最中も、止まっている欠片は動かせる。</em>連鎖が続いているあいだに自分で合成や対消滅を起こすと〈介入〉になり、その反応の得点が1.5倍。つかんでいる欠片は重力に引かれない。</p>
         <p><em>4チェイン以上で降下が止まる〈静止〉。</em>45秒ごとに光か闇が降る。真理を作るとボーナス。</p>
       </div>
     </div>
@@ -489,6 +488,7 @@ const SFX = {
   over() { [7, 5, 3, 0].forEach((k, i) => this.tone(this.note(k), { type: 'triangle', dur: .6, gain: .07, at: i * .16 })); },
   win() { [5, 7, 9, 10, 12, 14].forEach((k, i) => this.bell(this.note(k), .08, i * .1, 1.6)); },
   tap() { this.tone(880, { dur: .06, gain: .03 }); },
+  intervene() { this.bell(this.note(12), .07); this.bell(this.note(14), .06, .06); this.noise(.18, 4200, 1800, .05); },
 };
 
 /* ================================================================
@@ -498,9 +498,9 @@ const S = {
   screen: 'title', mode: null, cols: 8, rows: 7, orbs: [], id: 1,
   score: 0, shownScore: 0, best: { classic: store.get('best.classic', 0), survival: store.get('best.survival', 0) },
   turn: 1, moves: 0, now: 0, elapsed: 0, paused: false,
-  resolving: false, resId: 0, token: 0, relaxAt: 0,
+  resolving: false, acting: 0, pendingIv: false, ivTip: store.get('ivTip', false), resId: 0, token: 0, relaxAt: 0,
   chain: 0, chainAt: -1e9, maxChain: 0, moveReactions: 0,
-  stats: { merge: 0, anni: 0, special: 0, harmony: 0 },
+  stats: { merge: 0, anni: 0, special: 0, harmony: 0, intervene: 0 },
   truths: [false, false, false, false], truthsDone: false, pendingTruths: false,
   bag: [], next: [], lastCap: 2,
   spawnTimer: 0, specialTimer: 45000, freezeUntil: 0, critStart: 0, tipClock: 0,
@@ -797,6 +797,13 @@ function orbVector(e, tier, size) {
    ================================================================ */
 const tweens = [];
 function tween(target, to, dur, ease = E.io) {
+  // 同じ欠片の同じ値を動かす古いトゥイーンは、新しいほうに引き継ぐ（二つの重力に同時に引かれても飛ばない）
+  for (let i = tweens.length - 1; i >= 0; i--) {
+    const tw = tweens[i]; if (tw.target !== target) continue;
+    let left = 0;
+    for (const k in tw.to) { if (k in to) { delete tw.to[k]; delete tw.from[k]; } else left++; }
+    if (!left) { tweens.splice(i, 1); tw.res(); }
+  }
   return new Promise(res => {
     const from = {}; for (const k in to) from[k] = target[k];
     tweens.push({ target, from, to, dur: Math.max(1, dur), t0: S.now, ease, res, token: S.token });
@@ -812,7 +819,15 @@ function updateTweens() {
     if (p >= 1) { tweens.splice(i, 1); tw.res(); }
   }
 }
-const dur = ms => ms * Math.max(.5, 1 - .06 * Math.max(0, S.chain - 1)); // 長い連鎖ほど少し速く
+// 長い連鎖ほど少し速く。サバイバルは介入する間を残すため、速くなりすぎない
+const dur = ms => ms * Math.max(S.mode === 'survival' ? .72 : .5, 1 - .06 * Math.max(0, S.chain - 1));
+const busy = () => S.resolving || S.acting > 0;
+const heldOrb = () => S.drag ? S.drag.o : null; // つかんでいる欠片は重力にも連鎖にも巻き込まれない
+function isLocked(o) { // 消えている途中・動いている最中・現れたばかりの欠片はつかめない
+  if (o.dying || o.locked || o.drop > .02 || o.scale < .9) return true;
+  for (const tw of tweens) if (tw.target === o && 'x' in tw.to) return true;
+  return false;
+}
 
 /* ================================================================
    エフェクト
@@ -950,7 +965,21 @@ function addScore(base, x, y, color, flat) {
   popText('+' + fmt(pts), x, y, { size: .3, color, latin: true, rise: .5, dur: 1000 });
   return pts;
 }
+const IV_TIP = '連鎖の最中も動かせる。つないで〈介入〉しよう';
 function registerReaction(x, y, quiet) {
+  const iv = S.pendingIv; S.pendingIv = false;
+  const k = noteChain(x, y, quiet);
+  if (iv && S.chain >= 2) { // 介入：その反応の得点が1.5倍
+    S.stats.intervene++;
+    popText('介入！', x, y - 1.05, { size: .38, color: '#bdf0ff', glow: 'rgba(80,200,255,.9)', dur: 1200, rise: .45 });
+    SFX.intervene();
+    if (!S.ivTip) { S.ivTip = true; store.set('ivTip', true); setBaseHint(defaultHint()); }
+    return 1.5;
+  }
+  if (S.mode === 'survival' && S.chain >= 2 && !S.ivTip && S.tut >= 3 && S.baseHint !== IV_TIP) setBaseHint(IV_TIP);
+  return k;
+}
+function noteChain(x, y, quiet) {
   if (S.chain > 0 && S.now - S.chainAt <= CHAIN_WINDOW) S.chain++; else S.chain = 1;
   S.chainAt = S.now; S.moveReactions++;
   if (S.chain > S.maxChain) S.maxChain = S.chain;
@@ -962,6 +991,7 @@ function registerReaction(x, y, quiet) {
       if (until > S.freezeUntil) { if (S.freezeUntil < S.now) toast(`静止 ― ${S.chain}チェインで降下が止まる`); S.freezeUntil = until; }
     }
   }
+  return 1;
 }
 
 async function doMerge(a, b) {
@@ -969,7 +999,7 @@ async function doMerge(a, b) {
   const P = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
   const e = a.el, tier = a.tier + 1, c = EL[e];
   a.dying = b.dying = true;
-  registerReaction(P.x, P.y);
+  const k = registerReaction(P.x, P.y);
   S.stats.merge++;
   SFX.merge(tier, S.chain);
   if (S.tut === 0) setTut(1);
@@ -982,7 +1012,7 @@ async function doMerge(a, b) {
   tween(n, { scale: 1, flash: 0 }, dur(320), E.back);
   ring(n.x, n.y, n.r * .7, n.r * 2.3, c.light, 460, 2);
   burst(n.x, n.y, [c.light, c.color], partN(10 + tier * 4), { speed: 1.6, life: 520, size: 2.4 });
-  addScore(TI[tier].merge, n.x, n.y + n.r + .1, c.light);
+  addScore(TI[tier].merge * k, n.x, n.y + n.r + .1, c.light);
   if (tier === 4) truthAchieved(e, n);
   await wait(dur(110));
 }
@@ -992,7 +1022,7 @@ async function doAnni(a, b) {
   const P = contactPoint(a, b);
   const tier = a.tier, ea = a.el, eb = b.el, ca = EL[ea], cb = EL[eb];
   a.dying = b.dying = true;
-  registerReaction(P.x, P.y);
+  const k = registerReaction(P.x, P.y);
   S.stats.anni++;
   SFX.anni(tier, S.chain);
   if (S.tut < 2) setTut(2);
@@ -1002,7 +1032,7 @@ async function doAnni(a, b) {
   burst(P.x, P.y, [ca.color, cb.color, ca.light, cb.light, '#ffffff'], partN(16 + tier * 10), { speed: 2.6 + tier * .5, life: 900, size: 3, suck: true });
   ring(P.x, P.y, .1, TI[tier].gR * .9, '#ffffff', 420, 2.5);
   popText('対消滅！', P.x, P.y - .05, { size: .34 + tier * .04, color: '#ffffff', glow: 'rgba(160,120,255,.95)', dur: 1100, rise: .3 });
-  addScore(TI[tier].anni, P.x, P.y + .45, '#d9ccff');
+  addScore(TI[tier].anni * k, P.x, P.y + .45, '#d9ccff');
   shake(2 + tier * 1.5);
   await wait(d * .45);
   if (tok !== S.token) return;
@@ -1016,7 +1046,7 @@ async function doAnni(a, b) {
 function predictPull(P, tier, skip) {
   const R = TI[tier].gR, D = TI[tier].gD, out = [];
   for (const c of S.orbs) {
-    if (c.dying || c.kind !== 'el' || skip.includes(c)) continue;
+    if (c.dying || c.kind !== 'el' || skip.includes(c) || c === heldOrb()) continue;
     const dx = P.x - c.x, dy = P.y - c.y, dd = Math.hypot(dx, dy);
     if (dd > R || dd < 1e-4) continue;
     const tr = Math.min(D, dd - c.r); // 消滅地点の手前で止まる（自分の大きさを考慮）
@@ -1142,7 +1172,8 @@ async function doHarmony(P) {
   SFX.harmony();
   toast('光と闇が交わる ― 調律');
   popText('調律', P.x, P.y - .2, { size: .72, color: '#ffffff', glow: 'rgba(255,227,160,.9)', dur: 1900, rise: .2 });
-  const els = S.orbs.filter(o => !o.dying && o.kind === 'el');
+  const els = S.orbs.filter(o => !o.dying && o.kind === 'el' && o !== heldOrb());
+  for (const o of els) o.locked = true; // 調律に巻き込まれた欠片は、対が降るまでつかめない
   if (els.length) {
     well(P.x, P.y, Math.hypot(S.cols, S.rows) * .6, 1500);
     shake(6);
@@ -1179,11 +1210,11 @@ async function rainPair(o, delay, tok) {
 
 // 引き寄せ後：合成を先に、つぎに対消滅（重なりの上にあるものを優先）
 function findReaction() {
-  const L = S.orbs; let merge = null, anni = null;
+  const L = S.orbs, held = heldOrb(); let merge = null, anni = null;
   for (let i = L.length - 1; i >= 0 && !merge; i--) {
-    const a = L[i]; if (a.dying || a.kind !== 'el') continue;
+    const a = L[i]; if (a.dying || a.kind !== 'el' || a === held) continue;
     for (let j = i - 1; j >= 0; j--) {
-      const b = L[j]; if (b.dying || b.kind !== 'el') continue;
+      const b = L[j]; if (b.dying || b.kind !== 'el' || b === held) continue;
       if (a.touched !== S.resId && b.touched !== S.resId) continue;
       if (dist(a, b) > a.r + b.r + CONTACT) continue;
       const r = reactionOf(a, b);
@@ -1195,32 +1226,42 @@ function findReaction() {
   if (anni) return { a: anni[0], b: anni[1], kind: 'anni' };
   return null;
 }
-async function cascade(tok) {
-  for (let g = 0; g < 300; g++) {
+// 連鎖の解決役：反応が起きなくなり、プレイヤーの操作も終わるまで回り続ける
+async function runResolver(tok) {
+  if (S.resolving) return; // すでに回っていれば、そちらが拾う
+  S.resolving = true;
+  for (let g = 0; g < 5000; g++) {
     if (tok !== S.token || S.screen !== 'play') return;
-    const r = findReaction(); if (!r) return;
-    if (r.kind === 'merge') await doMerge(r.a, r.b); else await doAnni(r.a, r.b);
+    const r = findReaction();
+    if (r) { if (r.kind === 'merge') await doMerge(r.a, r.b); else await doAnni(r.a, r.b); continue; }
+    if (S.acting > 0) { await wait(50); continue; } // 介入した反応の重力が終わるのを待つ
+    break;
   }
+  if (tok !== S.token) return;
+  S.resolving = false; S.relaxAt = S.now + 120;
+  cv.classList.remove('busy');
+  afterMove();
 }
 async function playerAct(o, target, rk) {
-  const tok = S.token;
-  S.resolving = true; S.resId++; S.moves++;
-  cv.classList.add('busy');
+  const tok = S.token, live = S.mode === 'survival';
+  const wasBusy = busy();
+  if (!wasBusy) S.resId++;
+  S.moves++; S.acting++;
+  if (!live) cv.classList.add('busy');
   o.touched = S.resId;
-  if (S.mode === 'classic') { S.chain = 0; S.chainAt = -1e9; }
-  S.moveReactions = 0;
+  if (!live) { S.chain = 0; S.chainAt = -1e9; S.moveReactions = 0; }
+  // 連鎖が続いているあいだ（解決中、または最後の反応から2秒以内）に自分で起こした反応は〈介入〉
+  const chaining = live && S.chain >= 1 && (wasBusy || S.now - S.chainAt <= CHAIN_WINDOW);
   if (target) {
     target.touched = S.resId;
+    S.pendingIv = chaining && (rk === 'merge' || rk === 'anni');
     if (rk === 'merge') await doMerge(o, target);
     else if (rk === 'anni') await doAnni(o, target);
     else await doSpecial(o, target, rk);
   } else { SFX.place(); await wait(60); }
   if (tok !== S.token) return;
-  await cascade(tok);
-  if (tok !== S.token) return;
-  S.resolving = false; S.relaxAt = S.now + 120;
-  cv.classList.remove('busy');
-  afterMove();
+  S.acting--;
+  runResolver(tok);
 }
 function afterMove() {
   if (S.screen !== 'play') return;
@@ -1246,7 +1287,7 @@ function afterMove() {
 
 /* ---------- 重なりを「すーっと」解く ---------- */
 function relax(dt) {
-  if (S.resolving || S.now < S.relaxAt) return;
+  if (busy() || S.now < S.relaxAt) return;
   const L = S.orbs, dragged = S.drag && S.drag.moved ? S.drag.o : null;
   const k = 1 - Math.pow(1 - .14, dt / 16.7);
   for (let i = 0; i < L.length; i++) {
@@ -1274,8 +1315,8 @@ function resetCore(mode) {
   toastQ.length = 0;
   Object.assign(S, {
     mode, screen: 'play', paused: false, orbs: [], id: 1, score: 0, shownScore: 0, turn: 1, moves: 0, now: 0, elapsed: 0,
-    resolving: false, resId: 0, relaxAt: 0, chain: 0, chainAt: -1e9, maxChain: 0, moveReactions: 0,
-    stats: { merge: 0, anni: 0, special: 0, harmony: 0 }, truths: [false, false, false, false], truthsDone: false, pendingTruths: false,
+    resolving: false, acting: 0, pendingIv: false, resId: 0, relaxAt: 0, chain: 0, chainAt: -1e9, maxChain: 0, moveReactions: 0,
+    stats: { merge: 0, anni: 0, special: 0, harmony: 0, intervene: 0 }, truths: [false, false, false, false], truthsDone: false, pendingTruths: false,
     bag: [], next: [], lastCap: 2, spawnTimer: 2600, specialTimer: 45000, freezeUntil: 0, critStart: 0, tipClock: 0,
     drag: null, hint: null, peek: null,
   });
@@ -1357,31 +1398,39 @@ function pickOrb(p) {
   for (let i = S.orbs.length - 1; i >= 0; i--) { const o = S.orbs[i]; if (o.dying) continue; if (Math.hypot(o.x - p.x, o.y - p.y) <= o.r + pad) return o; }
   return null;
 }
+// サバイバルでは連鎖の最中も操作できる（介入）。クラシックは連鎖が終わるまで待つ
+const canActNow = () => S.mode === 'survival' || !busy();
+const canGrab = o => !!o && !isLocked(o) && canActNow();
+function refreshPartners(d) {
+  d.partners = [];
+  for (const b of S.orbs) { if (b === d.o || b.dying) continue; const rk = reactionOf(d.o, b); if (rk) d.partners.push({ o: b, rk }); }
+  d.pt = S.now;
+}
 function onDown(e) {
   SFX.init();
   if (S.screen !== 'play' || S.paused || S.drag) return;
   hideTip();
   const p = toField(e), o = pickOrb(p);
-  if (!o) return;
-  if (S.resolving) return;
+  if (!o || !canActNow()) return;
+  if (isLocked(o)) { setHintText('動いている欠片は、止まってからつかめる', ''); return; }
   e.preventDefault();
   try { cv.setPointerCapture(e.pointerId); } catch (_) {}
   bringToFront(o);
-  const partners = [];
-  for (const b of S.orbs) { if (b === o || b.dying) continue; const rk = reactionOf(o, b); if (rk) partners.push({ o: b, rk }); }
-  S.drag = { o, pid: e.pointerId, offx: o.x - p.x, offy: o.y - p.y, sx: o.x, sy: o.y, cx: e.clientX, cy: e.clientY, t0: performance.now(), moved: false, target: null, rk: null, sealed: null, partners };
+  S.drag = { o, pid: e.pointerId, offx: o.x - p.x, offy: o.y - p.y, sx: o.x, sy: o.y, cx: e.clientX, cy: e.clientY, t0: performance.now(), moved: false, target: null, rk: null, sealed: null, partners: [] };
+  refreshPartners(S.drag);
   S.hint = null; S.peek = null;
   cv.classList.add('dragging');
 }
 function onMove(e) {
   const d = S.drag;
-  if (!d) { if (e.pointerType === 'mouse' && S.screen === 'play' && !S.paused) cv.classList.toggle('can-grab', !!pickOrb(toField(e)) && !S.resolving); return; }
+  if (!d) { if (e.pointerType === 'mouse' && S.screen === 'play' && !S.paused) cv.classList.toggle('can-grab', canGrab(pickOrb(toField(e)))); return; }
   if (e.pointerId !== d.pid) return;
   if (!d.moved && Math.hypot(e.clientX - d.cx, e.clientY - d.cy) > 6) d.moved = true;
   if (!d.moved) return;
   const p = toField(e), o = d.o;
   o.x = clamp(p.x + d.offx, o.r * .6, S.cols - o.r * .6);
   o.y = clamp(p.y + d.offy, o.r * .6, S.rows - o.r * .6);
+  if (busy()) refreshPartners(d); // 連鎖中は盤が変わり続けるので相手を数え直す
   let best = null, bestOv = 0, bestRk = null, sealed = null;
   for (const pt of d.partners) {
     const b = pt.o; if (b.dying) continue;
@@ -1398,7 +1447,11 @@ function onUp(e) {
   const o = d.o;
   setHintText(S.baseHint, '');
   if (!d.moved) { if (performance.now() - d.t0 < 450) showTip(o); return; }
-  if (S.screen !== 'play' || S.paused || S.resolving) { o.x = d.sx; o.y = d.sy; return; }
+  if (S.screen !== 'play' || S.paused || !canActNow()) { o.x = d.sx; o.y = d.sy; return; }
+  if (d.target) { // 離すまでに相手が消えたり変わったりしていないか確かめる
+    const rk = d.target.dying ? null : reactionOf(o, d.target);
+    if (!rk || rk === 'sealed' || dist(o, d.target) > o.r + d.target.r + CONTACT) { d.target = null; d.rk = null; } else d.rk = rk;
+  }
   if (!d.target && Math.hypot(o.x - d.sx, o.y - d.sy) < .18) { o.x = d.sx; o.y = d.sy; return; }
   clampIn(o);
   playerAct(o, d.target, d.rk);
@@ -1427,6 +1480,9 @@ const TIPS = {
     '光と闇を重ねると〈調律〉。すべての元素が対と出会って消える',
   ],
   survival: [
+    '連鎖の最中も、止まっている欠片は動かせる',
+    '連鎖中に自分でつないだ反応は〈介入〉。得点1.5倍',
+    'つかんでいる欠片は、重力に引かれない',
     '4チェイン以上で〈静止〉。しばらく雫が降らない',
     '反応から2秒以内に次の反応を起こせば、チェインが続く',
     '光と闇を重ねる〈調律〉で、盤上を一掃できる',
@@ -1483,7 +1539,7 @@ function hideTip() { el.tip.hidden = true; S.peek = null; }
 
 /* ---------- ひらめき ---------- */
 function findHint() {
-  const L = S.orbs.filter(o => !o.dying); let best = null, bs = -1;
+  const L = S.orbs.filter(o => !isLocked(o) && o !== heldOrb()); let best = null, bs = -1;
   for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) {
     const a = L[i], b = L[j], rk = reactionOf(a, b);
     if (!rk || rk === 'sealed') continue;
@@ -1714,11 +1770,11 @@ function hudFrame() {
   }
   setText(el.count, 'count', String(liveCount()));
   setText(el.progress, 'prog', S.mode === 'survival' ? fmtTime(S.elapsed) : `第 ${S.turn} 手`);
-  const active = S.chain >= 2 && (S.resolving || S.now - S.chainAt < CHAIN_WINDOW);
+  const active = S.chain >= 2 && (busy() || S.now - S.chainAt < CHAIN_WINDOW);
   if (hudCache.chainOn !== active) { hudCache.chainOn = active; el.chain.classList.toggle('on', active); }
   if (active) {
     setText(el.chainN, 'cn', String(S.chain)); setText(el.chainX, 'cx', '×' + chainMult().toFixed(1));
-    el.chainBar.style.transform = `scaleX(${S.resolving ? 1 : clamp(1 - (S.now - S.chainAt) / CHAIN_WINDOW, 0, 1)})`;
+    el.chainBar.style.transform = `scaleX(${busy() ? 1 : clamp(1 - (S.now - S.chainAt) / CHAIN_WINDOW, 0, 1)})`;
   }
   if (S.mode === 'survival') {
     const frozen = S.now < S.freezeUntil;
@@ -1790,7 +1846,7 @@ function showResult({ title, sub, lines, cont, rec }) {
   $('#resLines').innerHTML = lines.map(([l, p]) => `<li><span>${l}</span><span>+${fmt(p)}</span></li>`).join('');
   const st = S.mode === 'classic'
     ? [['手数', `${S.moves}`], ['最大チェイン', S.maxChain], ['真理', `${S.truths.filter(Boolean).length}/4`], ['合成', S.stats.merge], ['対消滅', S.stats.anni], ['経過', fmtTime(S.elapsed)]]
-    : [['生存', fmtTime(S.elapsed)], ['最大チェイン', S.maxChain], ['真理', `${S.truths.filter(Boolean).length}/4`], ['合成', S.stats.merge], ['対消滅', S.stats.anni], ['光と闇', S.stats.special]];
+    : [['生存', fmtTime(S.elapsed)], ['最大チェイン', S.maxChain], ['介入', S.stats.intervene || 0], ['真理', `${S.truths.filter(Boolean).length}/4`], ['対消滅', S.stats.anni], ['光と闇', S.stats.special]];
   $('#resStats').innerHTML = st.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
   $('#resContinue').hidden = !cont;
   el.resultOv.hidden = false;
@@ -1843,7 +1899,7 @@ function restore(d) {
   }
   Object.assign(S, {
     score: d.score || 0, shownScore: d.score || 0, turn: d.turn || 1, moves: d.moves || 0, elapsed: d.elapsed || 0,
-    truths: Array.isArray(d.truths) ? d.truths : S.truths, truthsDone: !!d.truthsDone, stats: d.stats || S.stats, maxChain: d.maxChain || 0,
+    truths: Array.isArray(d.truths) ? d.truths : S.truths, truthsDone: !!d.truthsDone, stats: { ...S.stats, ...(d.stats || {}) }, maxChain: d.maxChain || 0,
     next: Array.isArray(d.next) && d.next.length ? d.next : [genNext(), genNext()], bag: Array.isArray(d.bag) ? d.bag : [],
     spawnTimer: d.spawnTimer || 2000, specialTimer: d.specialTimer || 45000, lastCap: d.lastCap || 2,
   });
@@ -1860,7 +1916,10 @@ function frame(t) {
   const clock = (S.screen === 'play' || S.screen === 'result') && !S.paused;
   if (clock) S.now += dt;
   updateTweens();
-  if (S.screen === 'play' && !S.paused) { tick(dt); relax(dt); }
+  if (S.screen === 'play' && !S.paused) {
+    tick(dt); relax(dt);
+    if (S.drag && busy() && S.now - (S.drag.pt || 0) > 150) refreshPartners(S.drag); // 手を止めていても輪を最新に
+  }
   if (S.screen === 'title') updateDemo(dt);
   updParts(clock ? dt : 0);
   FX.shake *= Math.pow(.002, dt / 1000);
@@ -1884,7 +1943,7 @@ function bindUI() {
   el.btnMenu.addEventListener('click', pause);
   el.btnSound.addEventListener('click', () => { SFX.on = !SFX.on; store.set('sound', SFX.on); if (SFX.on) SFX.init(); updateSoundBtn(); });
   el.btnHint.addEventListener('click', () => {
-    if (S.screen !== 'play' || S.paused || S.resolving) return;
+    if (S.screen !== 'play' || S.paused || !canActNow()) return;
     const h = findHint();
     if (h) { S.hint = { a: h.a, b: h.b, until: performance.now() + 3200 }; setBaseHint(`ひらめき：${nameOf(h.a)} を ${nameOf(h.b)} に重ねてみよう`); }
     else toast('いま反応できる組はない。動かして形を整えよう');
