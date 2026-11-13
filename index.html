@@ -28,7 +28,7 @@ body{height:100%;margin:0;color:var(--text);font-family:var(--f-body);font-size:
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--brass);outline-offset:2px}
 
-#app{height:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:6px;padding-block:8px 16px;
+#app{height:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:6px;padding-block:8px 22px;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .on-title .hud,.on-title .subhud,.on-title .foot{visibility:hidden}
 
@@ -110,7 +110,7 @@ button{font:inherit;color:inherit}
 .btn.primary{background:var(--brass);color:var(--ink);border-color:var(--brass);font-weight:700}
 .btn.primary:hover{background:#d8bf87}
 /* バージョン表記：右下に控えめに。操作の邪魔をしない */
-.ver{position:fixed;z-index:30;right:max(10px,env(safe-area-inset-right,0px));bottom:max(3px,env(safe-area-inset-bottom,0px));pointer-events:none;font-family:var(--f-latin);font-style:italic;font-size:11px;line-height:1;letter-spacing:.06em;color:var(--faint);opacity:.6}
+.ver{position:fixed;z-index:30;right:max(10px,env(safe-area-inset-right,0px));bottom:max(3px,env(safe-area-inset-bottom,0px));pointer-events:none;font-family:var(--f-latin);font-style:italic;font-weight:600;font-size:15px;line-height:1;letter-spacing:.06em;color:var(--muted);opacity:.9}
 
 /* Overlays */
 .overlay{position:fixed;inset:0;z-index:20;display:grid;place-items:center;overflow:auto;background:var(--scrim);
