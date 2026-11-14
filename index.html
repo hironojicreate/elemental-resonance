@@ -233,6 +233,225 @@ button{font:inherit;color:inherit}
   .gauge.crit i{animation:none}
   .overlay.slow,.overlay.slow .panel{animation-duration:.4s}
 }
+
+/* ================= 錬成の書（デッキ構築ローグライト）=================
+   盤（canvas）は使わない、札の画面。上＝器と旅の状態／中＝敵・坩堝・手札／下＝山札と手数 */
+.alch{position:fixed;inset:0;z-index:15;display:flex;flex-direction:column;gap:8px;overflow:hidden;
+  background-color:var(--ink);background-image:radial-gradient(120% 70% at 50% 0%,var(--ink-2) 0%,var(--ink) 62%);
+  padding-top:calc(env(safe-area-inset-top,0px) + 8px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 22px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.alch>.al-top,.alch>.al-main{width:100%;max-width:780px;margin-inline:auto}
+.al-top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding-bottom:8px;border-bottom:1px solid var(--brass-faint)}
+.al-hp{display:flex;align-items:center;gap:7px;flex:1 1 150px;min-width:0}
+.al-bar{flex:1;min-width:48px;height:8px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid var(--brass-faint);overflow:hidden}
+.al-bar i{display:block;height:100%;width:100%;transition:width .35s ease}
+.al-hp .al-bar i{background:linear-gradient(90deg,#b8455a,var(--danger))}
+.al-hp b,.al-num{font-family:var(--f-display);font-weight:800;font-size:15px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.al-hp.hit b{animation:alHit .5s ease}
+@keyframes alHit{0%,100%{color:var(--text)}30%{color:var(--danger);transform:scale(1.15)}}
+.al-where{font-family:var(--f-display);font-weight:600;font-size:14px;white-space:nowrap}
+.al-echo{font-size:12px;color:var(--muted);white-space:nowrap}
+.al-echo b{font-family:var(--f-display);font-weight:800;font-size:15px;color:var(--lumen);margin-left:3px}
+.al-tbtns{display:flex;gap:6px;margin-left:auto}
+.al-relics{display:flex;flex-wrap:wrap;gap:4px;flex:1 1 100%}
+.al-relics:empty{display:none}
+.al-relic{height:26px;min-width:30px;padding:0 8px;border-radius:999px;border:1px solid var(--brass-dim);background:rgba(201,173,114,.08);
+  color:var(--brass);font-family:var(--f-display);font-weight:800;font-size:12px;cursor:pointer;white-space:nowrap}
+.al-relic:hover{border-color:var(--brass)}
+.al-main{flex:1 1 auto;min-height:0;overflow:auto;display:flex;flex-direction:column;-webkit-overflow-scrolling:touch}
+.al-toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 214px);transform:translateX(-50%);z-index:40;pointer-events:none;padding:7px 16px;border-radius:999px;
+  background:var(--scrim);border:1px solid var(--brass-dim);font-family:var(--f-display);font-weight:600;font-size:14px;max-width:calc(100% - 32px);text-align:center;opacity:0}
+.al-toast.show{animation:toast 2.3s ease forwards}
+
+/* 戦闘 */
+.al-battle{display:flex;flex-direction:column;gap:10px;flex:1 1 auto;min-height:0}
+.al-enemy{position:relative;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;padding:12px 14px;border-radius:16px;
+  border:1px solid rgba(255,82,114,.28);background:linear-gradient(160deg,rgba(255,82,114,.08),rgba(255,255,255,.01))}
+.al-enemy.boss{border-color:rgba(255,82,114,.5);box-shadow:0 0 24px rgba(255,82,114,.12)}
+.al-emblem{grid-row:1 / span 3;display:grid;place-items:center;width:58px;height:58px}
+.al-ename{font-family:var(--f-display);font-weight:800;font-size:19px;line-height:1.2;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.al-ename small{font-family:var(--f-body);font-weight:500;font-size:11px;color:var(--danger);letter-spacing:.1em}
+.al-ehp{display:flex;align-items:center;gap:8px}
+.al-ehp .al-bar i{background:linear-gradient(90deg,var(--gauge-b),var(--danger))}
+.al-intent{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;font-size:12px;color:var(--muted);min-height:26px}
+.al-int{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:999px;border:1px solid rgba(255,82,114,.38);color:var(--text);line-height:1.5;white-space:nowrap}
+.al-int .oi{width:18px;height:18px}
+.al-intent .later{opacity:.5}
+.al-warn{color:var(--danger);font-weight:700}
+.al-fx{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.al-float{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);font-family:var(--f-display);font-weight:800;font-size:28px;color:var(--lumen);
+  text-shadow:0 0 18px rgba(255,227,160,.6);animation:alFloat 1.1s ease-out forwards;white-space:nowrap}
+.al-float.big{font-size:40px}
+.al-float.hurt{color:var(--danger);text-shadow:0 0 18px rgba(255,82,114,.6)}
+@keyframes alFloat{0%{opacity:0;transform:translate(-50%,-30%) scale(.7)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-140%) scale(1)}}
+.al-enemy.shake{animation:alShake .35s ease}
+@keyframes alShake{0%,100%{transform:none}25%{transform:translateX(-5px)}50%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
+
+.al-cru{position:relative;padding:22px 18px 6px;border-radius:18px;border:1px solid var(--brass-dim);
+  background:radial-gradient(120% 140% at 50% 0%,rgba(201,173,114,.09),rgba(0,0,0,.22))}
+.al-cru-lbl{position:absolute;left:14px;top:5px;font-size:11px;letter-spacing:.14em;color:var(--muted)}
+.al-cru-lbl b{color:var(--text);font-family:var(--f-display);margin-left:4px;letter-spacing:0}
+.al-chain{position:absolute;right:14px;top:3px;font-family:var(--f-display);font-weight:800;font-size:14px;color:var(--lumen);opacity:0;transition:opacity .2s}
+.al-chain.on{opacity:1}
+.al-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.al-row,.al-marks{max-width:560px;margin-inline:auto}
+.al-sock{position:relative;aspect-ratio:1;border-radius:50%;border:1px dashed var(--brass-faint);background:rgba(0,0,0,.28);display:grid;place-items:center;
+  padding:0;margin:0;color:inherit;font:inherit;cursor:default;-webkit-appearance:none;appearance:none}
+.al-sock.own{border:2px solid var(--brass)}
+.al-sock.foe{border:2px dashed var(--danger)}
+.al-sock .oi{width:70%;height:70%;transition:transform .2s}
+.al-sock.t2 .oi{width:78%;height:78%}
+.al-sock.t3 .oi{width:86%;height:86%}
+.al-sock.t4 .oi{width:94%;height:94%}
+.al-sock.sp .oi{width:72%;height:72%}
+.al-sock.can{cursor:pointer;box-shadow:0 0 0 2px var(--lumen),0 0 18px rgba(255,227,160,.55);animation:alBreathe 1.2s ease-in-out infinite alternate}
+.al-sock.can.anni{box-shadow:0 0 0 2px var(--umbra),0 0 18px rgba(185,163,255,.6)}
+.al-sock.put{cursor:pointer;border:2px solid var(--lumen);background:rgba(255,227,160,.08)}
+.al-sock.put::after{content:"＋";color:var(--lumen);font-size:18px}
+.al-sock.info{cursor:pointer}
+@keyframes alBreathe{from{transform:scale(1)}to{transform:scale(1.05)}}
+.al-sock .tp{position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);font-size:9px;line-height:1.3;padding:0 4px;border-radius:999px;background:var(--ink);border:1px solid var(--brass-dim);color:var(--lumen);white-space:nowrap}
+.al-marks{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;height:30px;margin-top:4px}
+.al-mark{justify-self:start;width:26px;height:26px;padding:0;border-radius:50%;border:1px solid var(--lumen);background:rgba(255,227,160,.12);color:var(--lumen);
+  font-size:15px;line-height:1;cursor:pointer;transform:translateX(calc(-50% - 3px))}
+.al-mark:hover{background:rgba(255,227,160,.26)}
+.al-legend{display:flex;justify-content:center;gap:14px;font-size:11px;color:var(--faint);margin-top:2px}
+.al-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.al-legend .o{border:2px solid var(--brass)}
+.al-legend .f{border:2px dashed var(--danger)}
+.born .oi{animation:alBorn .38s cubic-bezier(.2,1.4,.4,1)}
+.pop .oi{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+.fuse .oi{animation:alFuse .24s ease forwards}
+.vanish .oi{animation:alVanish .3s ease forwards}
+.flip .oi{animation:alFlip .4s ease}
+@keyframes alBorn{from{transform:translateY(-16px) scale(.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes alFuse{to{transform:scale(.55);filter:brightness(1.8)}}
+@keyframes alVanish{to{transform:scale(1.55);opacity:0;filter:brightness(2.2)}}
+@keyframes alFlip{50%{transform:scaleX(0)}}
+
+.al-info{min-height:1.6em;margin:0;font-size:13px;line-height:1.6;color:var(--text);opacity:.92;text-align:center;text-wrap:balance}
+.al-info.warn{color:var(--danger)}
+.al-hand{display:flex;justify-content:center;align-items:flex-end;gap:6px;min-height:124px;padding-top:14px;margin-top:auto}
+.al-card{--c:var(--brass);--cg:rgba(201,173,114,.18);--cb:rgba(201,173,114,.45);position:relative;flex:0 1 76px;min-width:0;max-width:96px;aspect-ratio:5 / 7;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:2px;padding:9px 3px 7px;margin:0;border-radius:12px;
+  border:1px solid var(--cb);background:linear-gradient(180deg,var(--cg),rgba(14,17,38,.96) 72%);color:var(--text);font:inherit;cursor:pointer;
+  transition:transform .15s,box-shadow .15s,opacity .2s;-webkit-appearance:none;appearance:none}
+.al-card:hover{transform:translateY(-4px)}
+.al-card.sel{transform:translateY(-14px);box-shadow:0 0 0 2px var(--lumen),0 12px 26px rgba(0,0,0,.5)}
+.al-card.dim{opacity:.45}
+.al-card .oi{width:60%;height:auto;aspect-ratio:1}
+.al-card.t3 .oi{width:66%}
+.al-card.t4 .oi{width:72%}
+.al-cn{font-family:var(--f-display);font-weight:800;font-size:12px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.al-cs{font-size:9.5px;line-height:1.3;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.al-card .pips{display:flex;gap:2px}
+.al-card .pips i{width:5px;height:5px;border-radius:50%;background:var(--c);opacity:.9}
+.al-card.tmp::after{content:"仮";position:absolute;top:3px;right:5px;font-size:9px;color:var(--lumen)}
+.al-bfoot{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;font-size:12px;color:var(--muted);padding-top:6px;border-top:1px solid var(--brass-faint)}
+.al-piles{display:flex;gap:12px}
+.al-pile{background:none;border:0;padding:2px 0;color:var(--muted);font:inherit;font-size:12px;cursor:pointer}
+.al-pile b{color:var(--text);font-family:var(--f-display);font-weight:800;font-size:15px;margin-left:3px;font-variant-numeric:tabular-nums}
+.al-plays{display:flex;align-items:center;gap:4px}
+.al-plays i{width:13px;height:13px;border-radius:50%;border:1px solid var(--lumen);opacity:.5}
+.al-plays i.on{background:var(--lumen);opacity:1;box-shadow:0 0 8px rgba(255,227,160,.6)}
+.al-chip{padding:1px 8px;border-radius:999px;border:1px solid var(--brass-dim);color:var(--text);font-size:11.5px;white-space:nowrap}
+.al-chip.harm{border-color:rgba(255,227,160,.6);color:var(--lumen)}
+.al-bfoot .btn{margin-left:auto}
+.btn.al-go{animation:alGlow 1.4s ease-in-out infinite alternate}
+@keyframes alGlow{from{box-shadow:0 0 0 rgba(201,173,114,0)}to{box-shadow:0 0 18px rgba(201,173,114,.55)}}
+
+/* 地図 */
+.al-maphead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:4px 0 2px}
+.al-maphead h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(20px,4.6vw,26px)}
+.al-maphead p{margin:0;font-size:12px;color:var(--muted)}
+.al-map{position:relative;flex:none;margin:6px auto 0;width:min(100%,460px)}
+.al-map svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.al-map line{stroke:var(--brass-faint);stroke-width:2;stroke-dasharray:3 5}
+.al-map line.done{stroke:var(--brass);stroke-dasharray:none}
+.al-map line.open{stroke:var(--brass-dim);stroke-dasharray:none}
+.al-node{position:absolute;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;padding:0;display:grid;place-items:center;
+  border:1px solid var(--brass-faint);background:var(--panel-b);color:var(--muted);font-family:var(--f-display);font-weight:800;font-size:17px;cursor:default;opacity:.6}
+.al-node.boss{width:62px;height:62px;font-size:22px;border-color:rgba(255,82,114,.5);color:var(--danger)}
+.al-node.elite{color:var(--danger)}
+.al-node.rest{color:var(--wind)}
+.al-node.shop{color:var(--lumen)}
+.al-node.event{color:var(--umbra)}
+.al-node.done{opacity:1;background:rgba(201,173,114,.18);border-color:var(--brass)}
+.al-node.here{box-shadow:0 0 0 3px var(--brass),0 0 18px rgba(201,173,114,.5)}
+.al-node.reach{opacity:1;cursor:pointer;border:2px solid var(--lumen);color:var(--text);animation:alBreathe 1s ease-in-out infinite alternate}
+.al-node.reach:hover{background:rgba(255,227,160,.14)}
+.al-mlegend{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 14px;font-size:11.5px;color:var(--muted);margin:10px 0 4px}
+.al-mlegend b{font-family:var(--f-display);margin-right:3px}
+
+/* 報酬・泉・市・出来事 */
+.al-page{display:flex;flex-direction:column;align-items:center;gap:12px;padding:10px 0 20px;text-align:center}
+.al-page h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:clamp(24px,5.4vw,32px);line-height:1.25}
+.al-page .eyebrow{margin-top:6px}
+.al-page p{margin:0;max-width:44ch;color:var(--muted);font-size:13.5px}
+.al-page p em{font-style:normal;color:var(--text)}
+.al-offer{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;width:100%}
+.al-offer .al-card{flex:0 0 92px;max-width:92px}
+.al-offer .al-card.taken{opacity:.3;pointer-events:none}
+.al-buy{display:flex;flex-direction:column;align-items:center;gap:4px}
+.al-price{font-family:var(--f-display);font-weight:800;font-size:13px;color:var(--lumen)}
+.al-price.no{color:var(--faint)}
+.al-rel-offer{display:grid;gap:8px;width:min(420px,100%)}
+.al-rel-btn{display:grid;grid-template-columns:auto 1fr auto;gap:2px 12px;align-items:center;text-align:left;padding:10px 14px;border-radius:14px;
+  border:1px solid var(--brass-dim);background:rgba(201,173,114,.06);color:var(--text);font:inherit;cursor:pointer}
+.al-rel-btn:hover{border-color:var(--brass)}
+.al-rel-btn[disabled]{opacity:.4;cursor:default}
+.al-rel-btn .al-relic{pointer-events:none}
+.al-rel-btn b{font-family:var(--f-display);font-weight:800;font-size:15px}
+.al-rel-btn small{grid-column:2;color:var(--muted);font-size:12px}
+.al-choices{display:grid;gap:8px;width:min(420px,100%)}
+.al-choices .btn{white-space:normal;min-height:44px;line-height:1.5}
+.al-gain{font-family:var(--f-display);font-weight:800;font-size:18px;color:var(--lumen)}
+.al-badge{display:inline-block;padding:2px 10px;border-radius:999px;background:var(--lumen);color:var(--ink);font-size:12px;font-weight:700;letter-spacing:.06em}
+.al-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(440px,100%);padding:12px 0;border-block:1px solid var(--brass-faint);margin:4px 0}
+.al-stats div{display:flex;flex-direction:column;gap:2px}
+.al-stats dt{font-size:11px;color:var(--muted)}
+.al-stats dd{margin:0;font-family:var(--f-display);font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
+
+/* 札の一覧 */
+.al-deck{width:min(640px,100%)}
+.al-deck-sum{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+.al-deck-sum b{color:var(--text)}
+.al-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:8px;margin:0 0 16px}
+.al-grid .al-card{max-width:none;width:100%}
+.al-grid .al-card .n{position:absolute;top:4px;left:6px;font-family:var(--f-display);font-weight:800;font-size:12px;color:var(--lumen)}
+.al-grid.pick .al-card{cursor:pointer}
+.al-sec{font-family:var(--f-display);font-weight:800;font-size:14px;margin:4px 0 6px;color:var(--brass)}
+.al-rules p{font-size:13px;color:var(--muted)}
+.al-rules p em{font-style:normal;color:var(--text)}
+.al-rules h3{margin-top:14px}
+.al-rules table{border-collapse:collapse;font-size:12.5px;margin:4px 0 8px}
+.al-rules td,.al-rules th{padding:3px 10px 3px 0;text-align:left;color:var(--muted);font-weight:400}
+.al-rules th{color:var(--text)}
+.oi.al-pure{background:radial-gradient(circle at 38% 34%,#ffffff 0%,#dcdce6 45%,#8d8da3 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.5),0 0 10px rgba(255,255,255,.25)}
+.oi.al-pure.t2{background:radial-gradient(circle at 38% 34%,#fff 0%,#d0d0de 40%,#6f6f88 100%)}
+.oi.al-pure.t3,.oi.al-pure.t4{background:radial-gradient(circle at 38% 34%,#fff 0%,#c4c4d6 35%,#55556e 100%)}
+.al-ic{position:relative;display:block;width:52px;height:52px}
+.al-ic i{position:absolute;top:8px;width:26px;height:36px;border-radius:5px;border:1px solid var(--brass-dim);background:linear-gradient(180deg,rgba(201,173,114,.2),var(--panel-b));display:grid;place-items:center}
+.al-ic i:nth-child(1){left:2px;transform:rotate(-14deg)}
+.al-ic i:nth-child(2){left:13px;top:4px;z-index:1}
+.al-ic i:nth-child(3){left:24px;transform:rotate(14deg)}
+.al-ic .oi{width:18px!important;height:18px!important}
+@media (max-width:420px){
+  .al-hand{gap:4px}
+  .al-card{padding:7px 2px 5px}
+  .al-cn{font-size:11px}
+  .al-row,.al-marks{gap:4px}
+  .al-mark{transform:translateX(calc(-50% - 2px))}
+  .al-enemy{padding:10px 12px}
+  .al-emblem{width:48px;height:48px}
+}
+@media (max-height:640px){
+  .al-hand{min-height:108px;padding-top:12px}
+  .al-card{max-width:78px}
+}
+@media (prefers-reduced-motion:reduce){
+  .al-sock.can,.al-node.reach,.btn.al-go{animation:none}
+}
 </style>
 
 <div id="app" class="on-title">
@@ -289,6 +508,12 @@ button{font:inherit;color:inherit}
         <span class="mode-desc">降りそそぐ雫に抗い、混沌が満ちるまで生き延びる。</span>
         <span class="mode-best">ベスト <b id="bestSurvival">—</b></span>
       </button>
+      <button class="mode" id="goAlchemy" type="button">
+        <span class="mode-ic" id="icAlchemy"></span>
+        <span class="mode-name">錬成の書<small>Alchemy</small></span>
+        <span class="mode-desc">札を坩堝に重ねて錬成する。三幕の混沌を鎮める、デッキ構築の旅。</span>
+        <span class="mode-best">記録 <b id="bestAlchemy">—</b></span>
+      </button>
       <div class="links"><button class="link" id="goRules" type="button">あそびかた</button><button class="link" id="goTune" type="button">バランス調整</button></div>
     </div>
   </div>
@@ -338,6 +563,10 @@ button{font:inherit;color:inherit}
         <p><em>4チェイン以上で降下が止まる〈静止〉。</em>長い連鎖ほど長く止まる。45秒ごとに光か闇が降る。真理を作るとボーナス。</p>
         <p>どちらのモードも<em>〈ひらめき〉は1ゲーム3回まで。</em>真理を作ると一つ戻る（最大5回）。</p>
       </div>
+      <div>
+        <h3>錬成の書</h3>
+        <p>欠片が<em>札</em>になる、デッキ構築の旅。手札の札を<em>7マスの坩堝</em>に重ねて合成・対消滅させ、敵の混沌を鎮める。坩堝から溢れた札だけが器を削る。三幕を越えれば成就。くわしくは錬成の書のメニューの「あそびかた」で。</p>
+      </div>
     </div>
     <div class="panel-btns"><button class="btn primary" id="rulesClose" type="button">閉じる</button></div>
   </div>
@@ -383,7 +612,86 @@ button{font:inherit;color:inherit}
   </div>
 </section>
 
-<div class="ver" aria-hidden="true">v1.20.0</div>
+<section class="alch" id="alch" hidden aria-label="錬成の書">
+  <header class="al-top">
+    <div class="al-hp" id="alHp"><span class="lbl">器</span><div class="al-bar"><i id="alHpBar"></i></div><b id="alHpN">40/40</b></div>
+    <span class="al-where" id="alWhere">第一幕</span>
+    <span class="al-echo">残響<b id="alEcho">0</b></span>
+    <div class="al-tbtns">
+      <button class="btn" id="alDeckBtn" type="button">札<b id="alDeckN">12</b></button>
+      <button class="btn icon" id="alSound" type="button" aria-label="音のオン・オフ">♪</button>
+      <button class="btn icon" id="alMenuBtn" type="button" aria-label="メニュー">≡</button>
+    </div>
+    <div class="al-relics" id="alRelics"></div>
+  </header>
+  <main class="al-main" id="alMain"></main>
+  <div class="al-toast" id="alToast" role="status" aria-live="polite"></div>
+
+  <section class="overlay" id="alMenuOv" hidden>
+    <div class="panel pause" role="dialog" aria-modal="true" aria-labelledby="alMenuH">
+      <p class="eyebrow">Alchemy</p>
+      <h2 id="alMenuH">錬成の書</h2>
+      <div class="stack">
+        <button class="btn primary" id="alResume" type="button">続ける</button>
+        <button class="btn" id="alRulesBtn" type="button">あそびかた</button>
+        <button class="btn" id="alGiveUp" type="button">この冒険をあきらめる</button>
+        <button class="btn" id="alToTitle" type="button">タイトルへ（冒険は保存される）</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="overlay" id="alDeckOv" hidden>
+    <div class="panel al-deck" role="dialog" aria-modal="true" aria-labelledby="alDeckH">
+      <p class="eyebrow" id="alDeckEy">Deck</p>
+      <h2 id="alDeckH">札</h2>
+      <div id="alDeckBody"></div>
+      <div class="panel-btns"><button class="btn primary" id="alDeckClose" type="button">閉じる</button></div>
+    </div>
+  </section>
+
+  <section class="overlay" id="alRulesOv" hidden>
+    <div class="panel rules al-rules" role="dialog" aria-modal="true" aria-labelledby="alRulesH">
+      <p class="eyebrow">How to play</p>
+      <h2 id="alRulesH">錬成の書 あそびかた</h2>
+      <p class="rules-lede">手札を一枚選び、坩堝の札に重ねるか、坩堝に置く。三幕の混沌を鎮めれば冒険は成就。</p>
+      <h3>坩堝と手番</h3>
+      <p>坩堝は<em>7マス</em>の一列。あなたの札（金の縁）も混沌の札（赤い点線の縁）も、左に詰めて並ぶ。坩堝の札は<em>動かせない</em>。手番の始めに5枚引き、<em>手数は3</em>。1手で手札の1枚を、坩堝の札に<em>重ねる</em>か、好きな位置（札と札の間も）に<em>置く</em>。残った手札は捨て札へ。そのあと敵が予告どおりに動き、混沌の札を坩堝の右端に降らせる。</p>
+      <p><em>入りきらずに溢れた札だけが、あなたの器を削る</em>（雫2・輝石4・光核8・真理16）。器が0になれば冒険は終わり。</p>
+      <h3>合成と対消滅</h3>
+      <p>同じ元素・同じ段階を重ねると<em>合成</em>：一つ上の段階の札になる。あなたの札に起きた変化（合成・反転・分かつ）は、<em>冒険の最後まで残る</em>。混沌の札に自分の札を合成すれば、できた札はあなたのもの〈取り込み〉。</p>
+      <p>反対の元素（火と水、風と土）を同じ段階で重ねると<em>対消滅</em>：両方消えて、敵に<em>調律力</em>（ダメージ）を与える。</p>
+      <table><tr><th>段階</th><td>雫</td><td>輝石</td><td>光核</td><td>真理</td></tr><tr><th>調律力</th><td>3</td><td>8</td><td>20</td><td>50</td></tr></table>
+      <p>消えたあなたの札は、その戦闘の間だけ除外され、戦闘が終われば戻ってくる。</p>
+      <h3>連鎖</h3>
+      <p><em>隣り合っただけでは反応しない。</em>反応するのは、重ねたとき・変化した札が隣と出会ったとき・札が消えて<em>すき間が詰まり、新しく隣り合ったとき</em>。連鎖の<em>k回目の反応は調律力×k</em>（合成も1回に数える）。置き方で連鎖を仕込もう。</p>
+      <h3>光・闇・無垢</h3>
+      <p><em>光</em>：元素に重ねると反対の元素へ反転。無垢に重ねると<em>浄化</em>（山札から永久に消える）。<em>闇</em>：段階を一つ下げる。あなたの札なら二つに<em>分かつ</em>（雫なら消散）。<em>光と闇</em>を重ねる（または隣り合わせる）と〈調律〉：坩堝の反対の元素・同じ段階の組がすべて一斉に対消滅する。光と闇は使うと捨て札に戻る。</p>
+      <p><em>無垢</em>は敵が混ぜてくる呪いの札。無垢どうしでしか合成できない。</p>
+      <h3>真理の力</h3>
+      <p>あなたの真理が坩堝にある間、その元素の力が働く。<em>火〈烈火〉</em>対消滅の調律力×1.5／<em>水〈慈雨〉</em>手番の終わりに器を3回復／<em>風〈疾風〉</em>引く札+1／<em>土〈不動〉</em>手数+1。真理どうしの対消滅は〈真理解放〉。</p>
+      <h3>調和</h3>
+      <p>戦闘の始めに、山札の四元素の量（雫に換算。輝石2・光核4・真理8）を比べる。いちばん多い元素と少ない元素の差が2以下なら<em>〈調和〉：調律力×1.25</em>。真理を持つ元素は計算に入らない。</p>
+      <h3>旅</h3>
+      <p>一幕は分かれ道のある地図。<em>戦</em>戦闘・<em>精</em>精鋭・<em>泉</em>休息・<em>市</em>買い物・<em>謎</em>出来事・<em>主</em>幕の主。勝てば札を1枚選んで山札に加えられる。精鋭や主からは<em>音叉</em>（ずっと効く道具）。最後の一撃で坩堝が空になれば〈完全なる静寂〉で報酬が増える。</p>
+      <div class="panel-btns"><button class="btn primary" id="alRulesClose" type="button">閉じる</button></div>
+    </div>
+  </section>
+</section>
+
+<section class="overlay" id="alStartOv" hidden>
+  <div class="panel pause" role="dialog" aria-modal="true" aria-labelledby="alStartH">
+    <p class="eyebrow">Alchemy</p>
+    <h2 id="alStartH">錬成の書</h2>
+    <p class="res-sub" id="alStartSub"></p>
+    <div class="stack">
+      <button class="btn primary" id="alContinue" type="button">続きから</button>
+      <button class="btn" id="alNewRun" type="button">新しい冒険を始める</button>
+      <button class="btn" id="alStartBack" type="button">戻る</button>
+    </div>
+  </div>
+</section>
+
+<div class="ver" aria-hidden="true">v1.21.0</div>
 
 <script id="genso-images">window.GENSO_IMAGES = {
   "fire-1": "data:image/jpeg;base64,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",
@@ -2899,6 +3207,7 @@ let rulesBack = null;
 function hideOverlays() { el.titleOv.hidden = el.rulesOv.hidden = el.pauseOv.hidden = el.resultOv.hidden = true; $('#tuneOv').hidden = true; }
 function showScreen() { hideOverlays(); app.classList.remove('on-title'); }
 function showTitle() {
+  ALCH.hide();
   S.token++; tweens.length = 0; S.screen = 'title'; S.paused = false; S.drag = null; S.orbs = [];
   FX.parts.length = FX.rings.length = FX.wells.length = FX.texts.length = FX.beams.length = 0;
   hideOverlays(); hideTip(); el.crit.hidden = true;
@@ -3033,11 +3342,929 @@ function restore(d) {
 }
 
 /* ================================================================
+   錬成の書（デッキ構築ローグライト）
+   山札＝自分の欠片。坩堝（7マス）に札を重ねて、合成・対消滅・連鎖。
+   冒険の状態 R は、そのまま JSON で保存できる形に保つ（関数を持たせない）
+   ================================================================ */
+const ALCH = (() => {
+// 拡張に備えた設定
+const CFG = {
+  SLOTS: 7, HAND: 5, PLAYS: 3, HP: 40, ACTS: 3, ROWS: 7, LANES: 3, HAND_MAX: 10,
+  moveInCrucible: false,   // 坩堝の札を動かせるか（いまは動かせない。将来の拡張用）
+  exhaustSpecial: false,   // 光・闇を使い切りにするか（いまは捨て札に戻る。将来の拡張用）
+  ANNI: [0, 3, 8, 20, 50], // 対消滅の調律力（段階ごと）
+  OVER: [0, 2, 4, 8, 16],  // 溢れた札が器を削る量（段階ごと。無垢・光・闇は2）
+  HARM_GAP: 2, HARM_MULT: 1.25,
+  STEP: RM ? 140 : 360,    // 連鎖一段の間（ms）
+};
+const OPP = e => EL[e].opp;
+const DROPEQ = [0, 1, 2, 4, 8];
+const ACT_NAME = ['', '揺らぎの野', '巡りの谷', '混沌の淵'];
+const ACT_KAN = ['', '一', '二', '三'];
+const TRUTH_POW = [
+  { name: '烈火', desc: '対消滅の調律力×1.5' },
+  { name: '慈雨', desc: '手番の終わりに器を3回復' },
+  { name: '疾風', desc: '手番の始めに引く札+1' },
+  { name: '不動', desc: '手数+1' },
+];
+const RELICS = {
+  fw:     { ic: '火水', name: '火水の音叉', desc: '火と水の対消滅の調律力+3' },
+  we:     { ic: '風土', name: '風土の音叉', desc: '風と土の対消滅の調律力+3' },
+  res:    { ic: '共', name: '共鳴叉', desc: '連鎖2回目からの倍率+1' },
+  bell:   { ic: '鈴', name: '静寂の鈴', desc: '坩堝を空にして手番を終えると、次の手番の手数+1' },
+  cradle: { ic: '籃', name: '揺籃', desc: '戦闘の始めに、山札の雫を1枚坩堝に置く' },
+  heavy:  { ic: '重', name: '重い器', desc: '器の最大+12。引く札−1' },
+  deep:   { ic: '懐', name: '深い懐', desc: '引く札+1。器の最大−6' },
+  scale:  { ic: '秤', name: '調和の天秤', desc: '〈調和〉の条件がゆるむ（差3まで）' },
+  echo:   { ic: '響', name: '残響の器', desc: '戦闘に勝つたび、器を4回復' },
+  seed:   { ic: '種', name: '光の種', desc: '戦闘の始めに、その戦闘だけの光を1枚手札に加える' },
+  eye:    { ic: '眼', name: '先見の眼', desc: '敵の意図が2手先まで見える' },
+  spoon:  { ic: '匙', name: '錬金の匙', desc: '合成するたびに調律力2' },
+  sand:   { ic: '砂', name: '鎮めの砂', desc: '溢れた札が器を削る量−1（最小1）' },
+};
+// 意図の部品：d=降らす [[元素,段階],…]（元素 'r' は無作為）, c=無垢を捨て札へ, p=無垢を坩堝へ, inv=坩堝を反転, g=混沌の札が育つ, l/k=光/闇を降らす
+const F = 0, A = 1, W = 2, T = 3, X = 'r';
+const ENEMIES = {
+  hiyura: { name: '火の揺らぎ', hp: 22, ic: [F, 2], pat: [[{ d: [[F, 1], [F, 1]] }], [{ d: [[F, 1]] }]] },
+  doro:   { name: '泥の塊', hp: 28, ic: [T, 2], pat: [[{ d: [[T, 2]] }], [{ d: [[T, 1], [T, 1]] }]] },
+  kiri:   { name: '霧の子', hp: 24, ic: [W, 2], pat: [[{ d: [[W, 1], [A, 1]] }], [{ d: [[W, 1], [W, 1]] }]] },
+  awa:    { name: '泡の群れ', hp: 20, ic: [A, 2], pat: [[{ d: [[A, 1], [A, 1]] }], [{ d: [[A, 1]] }, { c: 1 }]] },
+  muku:   { name: '無垢の番人', hp: 48, ic: ['pure', 3], pat: [[{ c: 2 }, { d: [[X, 1]] }], [{ p: 1 }, { d: [[X, 1]] }], [{ d: [[X, 1], [X, 1]] }]] },
+  kaen:   { name: '業火の獣', hp: 52, ic: [F, 3], pat: [[{ d: [[F, 1], [F, 1]] }], [{ d: [[F, 2]] }], [{ g: 1 }, { d: [[F, 1]] }]] },
+  arashi: { name: '二重の嵐', hp: 85, ic: [W, 4], rage: '嵐が荒れ狂う ― 降る量が増える',
+            pat: [[{ d: [[W, 1], [W, 1]] }], [{ d: [[A, 1], [A, 1]] }], [{ d: [[W, 2], [A, 1]] }]],
+            pat2: [[{ d: [[W, 1], [W, 1], [A, 1]] }], [{ d: [[A, 1], [A, 1], [W, 1]] }], [{ d: [[W, 2], [A, 2]] }]] },
+  shaku:  { name: '灼熱の核', hp: 48, ic: [F, 3], pat: [[{ d: [[F, 2], [F, 1]] }], [{ d: [[F, 1], [F, 1]] }]] },
+  shinen: { name: '深淵の水', hp: 46, ic: [A, 3], pat: [[{ d: [[A, 2]] }, { c: 1 }], [{ d: [[A, 1], [A, 1]] }]] },
+  sajin:  { name: '砂塵', hp: 50, ic: [T, 3], pat: [[{ d: [[T, 1], [W, 1]] }], [{ d: [[T, 2]] }], [{ d: [[W, 2]] }]] },
+  hyomu:  { name: '氷霧', hp: 44, ic: [W, 3], pat: [[{ d: [[A, 1], [W, 1]] }], [{ d: [[A, 2], [W, 1]] }]] },
+  kagami: { name: '反転の鏡', hp: 95, ic: ['light', 0], pat: [[{ d: [[X, 1], [X, 1]] }], [{ inv: 1 }, { d: [[X, 1]] }], [{ d: [[X, 2]] }]] },
+  hoshi:  { name: '星喰い', hp: 100, ic: ['dark', 0], pat: [[{ d: [[X, 2]] }], [{ g: 1 }, { d: [[X, 1]] }], [{ c: 2 }, { d: [[X, 1]] }]] },
+  shiki:  { name: '四季の巡り', hp: 170, ic: [T, 4], rage: '季節が乱れる ― 無垢が混ざりはじめる',
+            pat: [[{ d: [[F, 2], [F, 1]] }], [{ d: [[W, 2], [W, 1]] }], [{ d: [[A, 2], [A, 1]] }], [{ d: [[T, 2], [T, 1]] }]],
+            pat2: [[{ d: [[F, 2], [F, 1]] }, { c: 1 }], [{ d: [[W, 2], [W, 1]] }, { c: 1 }], [{ d: [[A, 2], [A, 1]] }, { c: 1 }], [{ d: [[T, 2], [T, 1]] }, { c: 1 }]] },
+  ryusei: { name: '流星の欠片', hp: 72, ic: [F, 4], pat: [[{ d: [[F, 2], [A, 2]] }], [{ d: [[X, 3]] }]] },
+  kongo:  { name: '金剛の殻', hp: 85, ic: [T, 4], pat: [[{ d: [[T, 3]] }], [{ d: [[T, 2], [T, 1]] }], [{ g: 1 }]] },
+  senpu:  { name: '旋風', hp: 70, ic: [W, 4], pat: [[{ d: [[W, 1], [W, 1], [W, 1]] }], [{ d: [[W, 2], [T, 1]] }]] },
+  kuro:   { name: '黒い潮', hp: 76, ic: [A, 4], pat: [[{ d: [[A, 2], [A, 2]] }], [{ p: 2 }]] },
+  hikari: { name: '光喰い', hp: 150, ic: ['dark', 0], pat: [[{ k: 1 }, { d: [[X, 2]] }], [{ c: 2 }, { d: [[X, 1]] }], [{ inv: 1 }, { d: [[X, 2]] }]] },
+  futago: { name: '双子の影', hp: 160, ic: ['light', 0], pat: [[{ d: [[F, 2], [A, 2]] }], [{ d: [[W, 2], [T, 2]] }], [{ g: 1 }, { d: [[X, 1]] }]] },
+  konton: { name: '混沌そのもの', hp: 300, ic: ['dark', 0], rage: '混沌が目を覚ます ― 坩堝が反転しはじめる',
+            pat: [[{ d: [[X, 1], [X, 2], [X, 1]] }], [{ l: 1 }, { d: [[X, 2]] }], [{ k: 1 }, { d: [[X, 2], [X, 1]] }], [{ c: 2 }, { d: [[X, 3]] }]],
+            pat2: [[{ inv: 1 }, { d: [[X, 2], [X, 2]] }], [{ d: [[X, 3], [X, 1]] }], [{ g: 1 }, { d: [[X, 1]] }], [{ c: 2 }, { d: [[X, 2], [X, 2]] }]] },
+};
+const POOL = {
+  1: { fight: ['hiyura', 'doro', 'kiri', 'awa'], elite: ['muku', 'kaen'], boss: ['arashi'] },
+  2: { fight: ['shaku', 'shinen', 'sajin', 'hyomu'], elite: ['kagami', 'hoshi'], boss: ['shiki'] },
+  3: { fight: ['ryusei', 'kongo', 'senpu', 'kuro'], elite: ['hikari', 'futago'], boss: ['konton'] },
+};
+const NODE = {
+  fight: { ch: '戦', name: '戦闘' }, elite: { ch: '精', name: '精鋭' }, rest: { ch: '泉', name: '泉' },
+  shop: { ch: '市', name: '市' }, event: { ch: '謎', name: '出来事' }, boss: { ch: '主', name: '幕の主' },
+};
+
+/* ---------- 小道具 ---------- */
+const pick = a => a[Math.floor(rand() * a.length)];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const has = id => !!R && R.relics.includes(id);
+const cname = c => c.k === 'el' ? `${EL[c.e].name}の${TI[c.t].name}` : c.k === 'pure' ? `無垢の${TI[c.t].name}` : c.k === 'light' ? '光' : '闇';
+const ccolor = c => c.k === 'el' ? EL[c.e].color : c.k === 'light' ? '#ffd36b' : c.k === 'dark' ? '#9b7bff' : '#c9c9d6';
+const sameKind = (a, b) => a.k === b.k && a.t === b.t && (a.k !== 'el' || a.e === b.e);
+let R = null, B = null;             // 冒険と戦闘（B は R.battle と同じもの）
+let SEL = null, BUSY = false;       // 選んでいる手札の位置、反応の最中
+let CH = { k: 0, dmg: 0 };          // いまの手の連鎖
+const MARK = new Map();             // 札id → 一度だけ付ける見た目の印（born/pop/fuse/vanish/flip）
+const save = () => { if (R) store.set('alch.run', R); };
+const ui = id => document.getElementById(id);
+
+function mk(k, e, t, own = true) { return { id: R.nid++, k, e, t, own }; }
+function orbHTML(c) {
+  if (c.k === 'pure') return `<span class="oi al-pure t${c.t}" aria-hidden="true"></span>`;
+  const key = c.k === 'el' ? `${EL[c.e].id}-${c.t}` : c.k;
+  if (!IMG_SRC[key]) return orbVector(c.k === 'el' ? c.e : c.k, c.t, 40);
+  return `<span class="oi im-${key}" style="--oi-glow:${rgba(ccolor(c), .55)}" aria-hidden="true"></span>`;
+}
+function iconOf(ic, size) { // 敵の紋章
+  const [e, t] = ic;
+  if (e === 'pure') return `<span class="oi al-pure t${t}" style="width:${size}px;height:${size}px"></span>`;
+  return orbIcon(e, t, size);
+}
+function cardSub(c) {
+  if (c.k === 'el' && c.t === 4) return `〈${TRUTH_POW[c.e].name}〉`;
+  if (c.k === 'light') return '反転・浄化';
+  if (c.k === 'dark') return '段階を下げる';
+  if (c.k === 'pure') return '呪い';
+  return EL[c.e].en;
+}
+function cardHTML(c, attrs = '', cls = '') {
+  const col = ccolor(c);
+  const pips = c.k === 'el' || c.k === 'pure' ? `<span class="pips">${'<i></i>'.repeat(c.t)}</span>` : '<span class="pips"></span>';
+  return `<button type="button" class="al-card t${c.t || 0}${c.tmp ? ' tmp' : ''} ${cls}" style="--c:${col};--cg:${rgba(col.startsWith('#') ? col : '#c9c9d6', .22)};--cb:${rgba(col.startsWith('#') ? col : '#c9c9d6', .5)}" ${attrs} aria-label="${cname(c)}">
+    ${orbHTML(c)}<span class="al-cn">${cname(c)}</span><span class="al-cs">${cardSub(c)}</span>${pips}</button>`;
+}
+
+/* ---------- 冒険 ---------- */
+function newRun() {
+  R = { v: 1, act: 1, hp: CFG.HP, maxHp: CFG.HP, echo: 0, nid: 1, deck: [], relics: [], map: null, pos: null, path: [], removeCost: 50, lastFoe: null,
+    stats: { wins: 0, maxChain: 0, maxHit: 0, dmg: 0, truths: 0, silences: 0, steps: 0 }, phase: 'map', battle: null, reward: null, rest: null, shop: null, event: null, end: null };
+  for (let e = 0; e < 4; e++) for (let i = 0; i < 3; i++) R.deck.push(mk('el', e, 1));
+  R.map = genMap();
+  B = null; save();
+}
+function genMap() {
+  const N = CFG.ROWS, L = CFG.LANES, nodes = {}, edges = new Set();
+  const id = (r, l) => `${r}-${l}`;
+  const starts = [0, 1, 2, Math.floor(rand() * L)];
+  for (const s of starts) {
+    let l = s;
+    for (let r = 0; r < N; r++) {
+      nodes[id(r, l)] = true;
+      if (r === N - 1) break;
+      const opts = [-1, 0, 1].filter(d => l + d >= 0 && l + d < L && !(d && edges.has(`${r}:${l + d}>${l}`)));
+      const nl = l + pick(opts);
+      edges.add(`${r}:${l}>${nl}`); l = nl;
+    }
+  }
+  const out = {};
+  for (const k in nodes) {
+    const [r, l] = k.split('-').map(Number);
+    let type;
+    if (r === 0) type = 'fight';
+    else if (r === N - 1) type = 'rest';
+    else if (r === 1) type = pick(['fight', 'fight', 'fight', 'event', 'event', 'shop']);
+    else {
+      const w = [['fight', 40], ['event', 20], ['elite', 15], ['shop', 12], ['rest', 13]];
+      let x = rand() * 100; type = 'fight';
+      for (const [t, p] of w) { if ((x -= p) < 0) { type = t; break; } }
+    }
+    out[k] = { id: k, r, l, type, next: [], jx: Math.round((rand() - .5) * 10), jy: Math.round((rand() - .5) * 12) };
+  }
+  for (const e of edges) { const [r, rest] = e.split(':'); const [a, b] = rest.split('>'); out[id(+r, +a)].next.push(id(+r + 1, +b)); }
+  for (const k in out) if (out[k].r === N - 1) out[k].next = ['boss'];
+  out.boss = { id: 'boss', r: N, l: 1, type: 'boss', next: [], jx: 0, jy: 0 };
+  // 第一歩に、休息や精鋭が続きすぎないように：精鋭のあとすぐの精鋭は戦闘に
+  for (const k in out) { const n = out[k]; if (n.type === 'elite') for (const m of n.next) if (out[m] && out[m].type === 'elite') out[m].type = 'fight'; }
+  return out;
+}
+const reachable = () => R.pos == null ? Object.values(R.map).filter(n => n.r === 0).map(n => n.id) : R.map[R.pos].next;
+function enterNode(nid) {
+  if (BUSY || R.phase !== 'map' || !reachable().includes(nid)) return;
+  SFX.tap();
+  R.pos = nid; R.path.push(nid); R.stats.steps++;
+  const n = R.map[nid];
+  if (n.type === 'fight' || n.type === 'elite' || n.type === 'boss') startBattle(n.type);
+  else if (n.type === 'rest') { R.phase = 'rest'; R.rest = { done: null }; save(); render(); }
+  else if (n.type === 'shop') { R.phase = 'shop'; R.shop = genShop(); save(); render(); }
+  else { R.phase = 'event'; R.event = { key: pickEvent(), res: null }; save(); render(); }
+}
+function gainRelic(id) {
+  if (R.relics.includes(id)) return;
+  R.relics.push(id);
+  if (id === 'heavy') { R.maxHp += 12; R.hp += 12; }
+  if (id === 'deep') { R.maxHp = Math.max(10, R.maxHp - 6); R.hp = Math.min(R.hp, R.maxHp); }
+  toast(`音叉〈${RELICS[id].name}〉― ${RELICS[id].desc}`);
+}
+const relicPool = () => Object.keys(RELICS).filter(k => !R.relics.includes(k));
+function heal(n) { const b = R.hp; R.hp = Math.min(R.maxHp, R.hp + n); return R.hp - b; }
+
+/* ---------- 戦闘の準備 ---------- */
+function harmonyOf(deck) {
+  const amt = [0, 0, 0, 0], truth = [false, false, false, false];
+  for (const c of deck) if (c.k === 'el') { amt[c.e] += DROPEQ[c.t]; if (c.t === 4) truth[c.e] = true; }
+  const v = amt.filter((_, e) => !truth[e]);
+  const gap = v.length ? Math.max(...v) - Math.min(...v) : 0;
+  return { amt, truth, gap, ok: gap <= CFG.HARM_GAP + (has('scale') ? 1 : 0) };
+}
+function startBattle(kind) {
+  const pool = POOL[R.act][kind];
+  let key = pick(pool);
+  if (pool.length > 1 && key === R.lastFoe) key = pick(pool.filter(k => k !== R.lastFoe));
+  R.lastFoe = key;
+  const D = ENEMIES[key];
+  B = R.battle = { kind, en: { key, hp: D.hp, max: D.hp, step: 0, ph: 1 }, draw: shuffle(R.deck.map(c => ({ ...c }))), hand: [], disc: [], exile: [], cru: [],
+    plays: 0, turn: 0, bell: false, harm: harmonyOf(R.deck).ok, intents: [] };
+  B.intents = [nextIntent(), nextIntent()];
+  R.phase = 'battle'; SEL = null;
+  if (has('cradle')) { const i = B.draw.findIndex(c => c.k === 'el' && c.t === 1); if (i >= 0) { const c = B.draw.splice(i, 1)[0]; B.cru.push(c); MARK.set(c.id, 'born'); } }
+  render(true);
+  toast(kind === 'boss' ? `幕の主〈${D.name}〉が現れた` : kind === 'elite' ? `精鋭〈${D.name}〉が立ちはだかる` : `〈${D.name}〉が現れた`);
+  if (B.harm) setTimeout(() => toast('山札が整っている ―〈調和〉調律力×1.25'), 900);
+  startTurn();
+}
+function nextIntent() {
+  const D = ENEMIES[B.en.key], pat = B.en.ph === 2 && D.pat2 ? D.pat2 : D.pat;
+  const raw = pat[B.en.step % pat.length]; B.en.step++;
+  return raw.map(p => p.d ? { d: p.d.map(([e, t]) => [e === X ? Math.floor(rand() * 4) : e, t]) } : { ...p });
+}
+function truthPow() { // 坩堝にあるあなたの真理の力
+  const f = [false, false, false, false];
+  if (B) for (const c of B.cru) if (c.own && c.k === 'el' && c.t === 4) f[c.e] = true;
+  return f;
+}
+function drawN(n) {
+  for (let i = 0; i < n && B.hand.length < CFG.HAND_MAX; i++) {
+    if (!B.draw.length) { if (!B.disc.length) break; B.draw = shuffle(B.disc); B.disc = []; }
+    B.hand.push(B.draw.pop());
+  }
+}
+function startTurn() {
+  B.turn++;
+  const tp = truthPow();
+  B.plays = CFG.PLAYS + (tp[3] ? 1 : 0) + (B.bell ? 1 : 0);
+  if (B.bell) toast('静寂の鈴 ― 手数+1');
+  B.bell = false;
+  drawN(CFG.HAND + (tp[2] ? 1 : 0) + (has('deep') ? 1 : 0) - (has('heavy') ? 1 : 0));
+  if (B.turn === 1 && has('seed')) { const c = mk('light', -1, 0, true); c.tmp = true; B.hand.push(c); }
+  SEL = null; render(); save();
+}
+
+/* ---------- 反応 ---------- */
+function stackKind(H, Tc) { // 手札 H を坩堝の Tc に重ねたら
+  if (!H || !Tc) return null;
+  if (H.k === 'el' && Tc.k === 'el') { if (H.t !== Tc.t) return null; if (H.e === Tc.e) return H.t < 4 ? 'merge' : null; return H.e === OPP(Tc.e) ? 'anni' : null; }
+  if (H.k === 'pure' && Tc.k === 'pure') return H.t === Tc.t && H.t < 4 ? 'merge' : null;
+  if (H.k === 'light') return Tc.k === 'el' ? 'invert' : Tc.k === 'pure' ? 'purify' : Tc.k === 'dark' ? 'tune' : null;
+  if (H.k === 'dark') return Tc.k === 'el' ? 'lower' : Tc.k === 'light' ? 'tune' : null;
+  return null;
+}
+function pairKind(a, b) { // 坩堝で隣り合った二枚（新しく隣り合ったとき・変化したとき）
+  if (!a || !b) return null;
+  if (a.k === 'el' && b.k === 'el' && a.t === b.t) { if (a.e === b.e) return a.t < 4 ? 'merge' : null; if (a.e === OPP(b.e)) return 'anni'; }
+  if (a.k === 'pure' && b.k === 'pure' && a.t === b.t && a.t < 4) return 'merge';
+  if ((a.k === 'light' && b.k === 'dark') || (a.k === 'dark' && b.k === 'light')) return 'tune';
+  return null;
+}
+function calcDmg(t, e) {
+  let base = CFG.ANNI[t];
+  if (has('fw') && (e === F || e === A)) base += 3;
+  if (has('we') && (e === W || e === T)) base += 3;
+  let m = CH.k + (has('res') && CH.k >= 2 ? 1 : 0);
+  if (B.harm) m *= CFG.HARM_MULT;
+  if (truthPow()[F]) m *= 1.5;
+  return Math.round(base * m);
+}
+function deal(n, big) {
+  if (n <= 0 || !B) return;
+  const was = B.en.hp;
+  B.en.hp = Math.max(0, B.en.hp - n); CH.dmg += n; R.stats.dmg += n;
+  floatText(`${n}`, big ? 'big' : '');
+  const en = document.querySelector('.al-enemy'); if (en) { en.classList.remove('shake'); void en.offsetWidth; en.classList.add('shake'); }
+  const D = ENEMIES[B.en.key];
+  if (D.pat2 && B.en.ph === 1 && B.en.hp > 0 && B.en.hp <= B.en.max / 2 && was > B.en.max / 2) {
+    B.en.ph = 2; B.en.step = 0; B.intents = [nextIntent(), nextIntent()];
+    setTimeout(() => toast(D.rage), 400);
+  }
+}
+function toExile(c) { MARK.delete(c.id); if (c.own) B.exile.push(c); }
+function toDiscard(c) { MARK.delete(c.id); if (!c.own) return; if (CFG.exhaustSpecial && (c.k === 'light' || c.k === 'dark')) B.exile.push(c); else B.disc.push(c); }
+async function show(ms) { renderBattle(); if (ms) await sleep(ms); }
+function chainNote() {
+  const n = ui('alChain'); if (!n) return;
+  if (CH.k >= 2) { n.textContent = `連鎖 ${CH.k} ・ 調律力 ${CH.dmg}`; n.classList.add('on'); }
+}
+function truthBorn(c) {
+  if (c.own && c.k === 'el' && c.t === 4) { R.stats.truths++; toast(`${EL[c.e].name}の真理〈${TRUTH_POW[c.e].name}〉― ${TRUTH_POW[c.e].desc}`); SFX.win(); }
+}
+// 合成：坩堝の i にある a に、b を重ねる（pair=true なら b は i+1 にある）
+async function fuse(i, a, b, pair) {
+  CH.k++;
+  MARK.set(a.id, 'fuse'); if (pair) MARK.set(b.id, 'fuse');
+  await show(CFG.STEP * .55);
+  const N = mk(a.k, a.e, a.t + 1, a.own || b.own);
+  B.cru[i] = N; if (pair) B.cru.splice(i + 1, 1);
+  MARK.set(N.id, 'pop');
+  SFX.merge(N.t, CH.k);
+  if (has('spoon')) deal(2);
+  chainNote(); await show(CFG.STEP * .5);
+  truthBorn(N);
+  return N;
+}
+// 対消滅：cs の二枚が消える（坩堝にあるものも、手札から重ねたものも）
+async function annihilate(cs) {
+  CH.k++;
+  const t = cs[0].t, e = cs[0].e;
+  const dmg = calcDmg(t, e);
+  for (const c of cs) MARK.set(c.id, 'vanish');
+  await show(CFG.STEP * .55);
+  const idx = cs.map(c => B.cru.indexOf(c)).filter(i => i >= 0).sort((x, y) => x - y);
+  const L = B.cru[idx[0] - 1], Rr = B.cru[idx[idx.length - 1] + 1];
+  for (const c of cs) { const i = B.cru.indexOf(c); if (i >= 0) B.cru.splice(i, 1); toExile(c); }
+  SFX.anni(t, CH.k);
+  if (t === 4) { toast('〈真理解放〉'); SFX.nova(4); }
+  deal(dmg, t >= 3 || CH.k >= 3);
+  chainNote(); await show(CFG.STEP * .45);
+  return L && Rr ? [{ g: [L, Rr] }] : [];
+}
+// 光×闇〈調律〉：坩堝の反対の元素・同じ段階の組が、すべて一斉に対消滅する
+async function tune(sp) {
+  for (const c of sp) MARK.set(c.id, 'vanish');
+  SFX.harmony(); toast('光と闇が出会う ―〈調律〉');
+  await show(CFG.STEP * .7);
+  const before = B.cru.slice();
+  for (const c of sp) { const i = B.cru.indexOf(c); if (i >= 0) B.cru.splice(i, 1); toDiscard(c); }
+  const els = B.cru.filter(c => c.k === 'el'), used = new Set(), pairs = [];
+  for (const a of els) {
+    if (used.has(a)) continue;
+    const b = els.find(x => x !== a && !used.has(x) && x.t === a.t && x.e === OPP(a.e));
+    if (b) { used.add(a); used.add(b); pairs.push([a, b]); }
+  }
+  if (pairs.length) {
+    for (const [a, b] of pairs) { MARK.set(a.id, 'vanish'); MARK.set(b.id, 'vanish'); }
+    await show(CFG.STEP * .6);
+    let maxT = 1;
+    for (const [a, b] of pairs) { CH.k++; deal(calcDmg(a.t, a.e), true); maxT = Math.max(maxT, a.t); }
+    for (const [a, b] of pairs) for (const c of [a, b]) { B.cru.splice(B.cru.indexOf(c), 1); toExile(c); }
+    SFX.anni(maxT, CH.k);
+    chainNote();
+  }
+  await show(CFG.STEP * .5);
+  // 新しく隣り合った組を確かめる
+  const q = [];
+  for (let i = 0; i + 1 < B.cru.length; i++) {
+    const a = B.cru[i], b = B.cru[i + 1];
+    if (before.indexOf(b) - before.indexOf(a) !== 1) q.push({ g: [a, b] });
+  }
+  return q;
+}
+async function pairReact(i, kind) {
+  const a = B.cru[i], b = B.cru[i + 1];
+  if (kind === 'merge') { const N = await fuse(i, a, b, true); return [{ c: N }]; }
+  if (kind === 'anni') return annihilate([a, b]);
+  if (kind === 'tune') return tune([a, b]);
+  return [];
+}
+// 連鎖：変化した札（c）と、すき間が詰まって新しく隣り合った組（g）を順に確かめる
+async function chainFrom(q) {
+  let guard = 0;
+  while (q.length && guard++ < 60) {
+    const f = q.shift(); let hit = null;
+    if (f.g) {
+      const [a, b] = f.g, i = B.cru.indexOf(a);
+      if (i >= 0 && B.cru[i + 1] === b) { const k = pairKind(a, b); if (k) hit = [i, k]; }
+    } else {
+      const i = B.cru.indexOf(f.c); if (i < 0) continue;
+      if (f.side !== 'R') { const k = pairKind(B.cru[i - 1], f.c); if (k) hit = [i - 1, k]; }
+      if (!hit && f.side !== 'L') { const k = pairKind(f.c, B.cru[i + 1]); if (k) hit = [i, k]; }
+    }
+    if (hit) q.push(...await pairReact(hit[0], hit[1]));
+  }
+}
+async function doStack(H, i, kind) {
+  const Tc = B.cru[i];
+  let q = [];
+  if (kind === 'merge') { const N = await fuse(i, Tc, H, false); q = [{ c: N }]; }
+  else if (kind === 'anni') q = await annihilate([Tc, H]);
+  else if (kind === 'tune') q = await tune([Tc, H]);
+  else if (kind === 'invert') {
+    SFX.light(); Tc.e = OPP(Tc.e); MARK.set(Tc.id, 'flip'); toDiscard(H);
+    await show(CFG.STEP * .7); q = [{ c: Tc }];
+  } else if (kind === 'purify') {
+    SFX.light(); MARK.set(Tc.id, 'vanish'); await show(CFG.STEP * .55);
+    const L = B.cru[i - 1], Rr = B.cru[i + 1];
+    B.cru.splice(i, 1); toDiscard(H);
+    toast(Tc.own ? '無垢を浄化した ― 山札から消える' : '混沌の無垢を浄化した');
+    await show(CFG.STEP * .4); q = L && Rr ? [{ g: [L, Rr] }] : [];
+  } else if (kind === 'lower') {
+    SFX.dark(); toDiscard(H);
+    if (Tc.own && Tc.t >= 2) { // 分かつ：二つの下位の札に
+      MARK.set(Tc.id, 'fuse'); await show(CFG.STEP * .45);
+      const n1 = mk('el', Tc.e, Tc.t - 1, true), n2 = mk('el', Tc.e, Tc.t - 1, true);
+      B.cru.splice(i, 1, n1); MARK.set(n1.id, 'pop');
+      if (B.cru.length < CFG.SLOTS) { B.cru.splice(i + 1, 0, n2); MARK.set(n2.id, 'pop'); q = [{ c: n1, side: 'L' }, { c: n2, side: 'R' }]; }
+      else { B.disc.push(n2); q = [{ c: n1 }]; toast('坩堝が満ちている ― 分かれた片方は捨て札へ'); }
+      await show(CFG.STEP * .5);
+    } else if (Tc.t <= 1) { // 消散
+      MARK.set(Tc.id, 'vanish'); await show(CFG.STEP * .55);
+      const L = B.cru[i - 1], Rr = B.cru[i + 1];
+      B.cru.splice(i, 1); toExile(Tc);
+      await show(CFG.STEP * .4); q = L && Rr ? [{ g: [L, Rr] }] : [];
+    } else { Tc.t--; MARK.set(Tc.id, 'pop'); await show(CFG.STEP * .6); q = [{ c: Tc }]; }
+  }
+  await chainFrom(q);
+}
+async function play(hi, tgt) {
+  if (BUSY || !B || B.plays <= 0) return;
+  const H = B.hand[hi]; if (!H) return;
+  let kind = null;
+  if (tgt.s != null) { kind = stackKind(H, B.cru[tgt.s]); if (!kind) return; }
+  else if (B.cru.length >= CFG.SLOTS || tgt.p == null) return;
+  SFX.init();
+  BUSY = true; SEL = null; B.plays--; B.hand.splice(hi, 1);
+  CH = { k: 0, dmg: 0 };
+  try {
+    if (tgt.p != null) { B.cru.splice(Math.min(tgt.p, B.cru.length), 0, H); MARK.set(H.id, 'born'); SFX.place(); await show(CFG.STEP * .4); }
+    else await doStack(H, tgt.s, kind);
+  } catch (err) { console.error(err); }
+  if (CH.k >= 2) toast(`${CH.k}連鎖 ― 調律力 ${CH.dmg}`);
+  R.stats.maxChain = Math.max(R.stats.maxChain, CH.k); R.stats.maxHit = Math.max(R.stats.maxHit, CH.dmg);
+  BUSY = false;
+  const n = ui('alChain'); if (n) n.classList.remove('on');
+  if (B.en.hp <= 0) { await sleep(CFG.STEP); return victory(); }
+  render(); save();
+}
+async function endTurn() {
+  if (BUSY || !B) return;
+  BUSY = true; SEL = null; SFX.init();
+  B.disc.push(...B.hand); B.hand = [];
+  if (truthPow()[A]) { const h = heal(3); if (h) floatText(`+${h}`, 'heal', true); }
+  if (has('bell') && B.cru.length === 0) B.bell = true;
+  await show(200);
+  try { await enemyTurn(); } catch (err) { console.error(err); }
+  BUSY = false;
+  if (R.hp <= 0) return defeat();
+  startTurn();
+}
+async function dropIn(c) {
+  if (B.cru.length < CFG.SLOTS) { B.cru.push(c); MARK.set(c.id, 'born'); SFX.spawn(); }
+  else {
+    const dmg = Math.max(1, (c.k === 'el' ? CFG.OVER[c.t] : 2) - (has('sand') ? 1 : 0));
+    R.hp = Math.max(0, R.hp - dmg); SFX.knock(1);
+    floatText(`−${dmg}`, 'hurt', true);
+    const hp = ui('alHp'); hp.classList.remove('hit'); void hp.offsetWidth; hp.classList.add('hit');
+  }
+  renderTop(); await show(CFG.STEP * .6);
+}
+async function enemyTurn() {
+  const it = B.intents.shift(); B.intents.push(nextIntent());
+  for (const p of it) {
+    if (p.d) for (const [e, t] of p.d) await dropIn(mk('el', e, t, false));
+    if (p.p) for (let i = 0; i < p.p; i++) await dropIn(mk('pure', -1, 1, false));
+    if (p.l) await dropIn(mk('light', -1, 0, false));
+    if (p.k) await dropIn(mk('dark', -1, 0, false));
+    if (p.c) { for (let i = 0; i < p.c; i++) B.disc.push(mk('pure', -1, 1, true)); toast(`無垢が${p.c}枚、捨て札に混ざった`); SFX.dark(); await show(CFG.STEP); }
+    if (p.inv) { for (const c of B.cru) if (c.k === 'el') { c.e = OPP(c.e); MARK.set(c.id, 'flip'); } toast('坩堝の元素が、すべて反転した'); SFX.light(); await show(CFG.STEP * 1.2); }
+    if (p.g) { let n = 0; for (const c of B.cru) if (!c.own && c.k === 'el' && c.t < 3) { c.t++; n++; MARK.set(c.id, 'pop'); } toast(n ? '混沌の札が育った' : '混沌がうごめく'); SFX.lvUp(); await show(CFG.STEP * 1.2); }
+    if (R.hp <= 0) return;
+  }
+}
+
+/* ---------- 勝ち・負け・報酬 ---------- */
+function offerCards(n, bump) {
+  const w = R.act === 1 ? [['1', 72], ['2', 20], ['light', 4], ['dark', 4]]
+    : R.act === 2 ? [['1', 55], ['2', 30], ['3', 5], ['light', 5], ['dark', 5]]
+    : [['1', 45], ['2', 32], ['3', 11], ['light', 6], ['dark', 6]];
+  const out = [];
+  for (let tries = 0; out.length < n && tries < 40; tries++) {
+    let x = rand() * 100, kind = '1';
+    for (const [k, p] of w) { if ((x -= p) < 0) { kind = k; break; } }
+    const c = kind === 'light' || kind === 'dark' ? { k: kind, e: -1, t: 0 } : { k: 'el', e: Math.floor(rand() * 4), t: +kind };
+    if (out.some(o => sameKind(o, c))) continue;
+    out.push(c);
+  }
+  if (bump) { const c = out.find(o => o.k === 'el' && o.t < 3); if (c) c.t++; }
+  return out;
+}
+function victory() {
+  const silent = B.cru.length === 0, kind = B.kind, D = ENEMIES[B.en.key];
+  R.stats.wins++; if (silent) R.stats.silences++;
+  R.deck = [...B.draw, ...B.hand, ...B.disc, ...B.exile, ...B.cru].filter(c => c.own && !c.tmp).map(({ id, k, e, t }) => ({ id, k, e, t, own: true }));
+  if (has('echo')) heal(4);
+  R.battle = null; B = null; MARK.clear();
+  SFX.win();
+  if (kind === 'boss' && R.act >= CFG.ACTS) return runWon(silent);
+  let echo = kind === 'boss' ? 40 + R.act * 5 : kind === 'elite' ? 25 + R.act * 5 : 10 + R.act * 4 + Math.floor(rand() * 5);
+  if (silent) echo += 8;
+  R.echo += echo;
+  const pool = shuffle(relicPool());
+  R.reward = { name: D.name, kind, silent, echo, cards: offerCards(3, silent), took: false, relic: kind === 'elite' && pool.length ? pool[0] : null, relicChoice: kind === 'boss' ? pool.slice(0, 3) : null, relicTaken: false };
+  if (R.reward.relic) gainRelic(R.reward.relic);
+  R.phase = 'reward'; save(); render(true);
+}
+function leaveReward() {
+  const boss = R.reward && R.reward.kind === 'boss';
+  R.reward = null;
+  if (boss) { // 次の幕へ：失った器の半分が戻る
+    R.act++; R.map = genMap(); R.pos = null; R.path = [];
+    const h = heal(Math.ceil((R.maxHp - R.hp) / 2));
+    toast(`第${ACT_KAN[R.act]}幕〈${ACT_NAME[R.act]}〉${h ? ` ― 器が${h}戻った` : ''}`);
+  }
+  toMap();
+}
+function toMap() { R.phase = 'map'; R.rest = R.shop = R.event = null; save(); render(true); }
+function progressScore() { return (R.act - 1) * (CFG.ROWS + 1) + (R.pos ? (R.pos === 'boss' ? CFG.ROWS + 1 : R.map[R.pos].r + 1) : 0); }
+function recordEnd(won) {
+  const best = store.get('alch.best', { prog: 0, act: 1, step: 0, wins: 0 });
+  const prog = won ? 99 : progressScore();
+  if (prog > best.prog) { best.prog = prog; best.act = R.act; best.step = R.pos ? (R.pos === 'boss' ? CFG.ROWS + 1 : R.map[R.pos].r + 1) : 0; }
+  if (won) best.wins = (best.wins || 0) + 1;
+  store.set('alch.best', best);
+  store.set('alch.run', null);
+}
+function defeat() {
+  SFX.over();
+  const D = B ? ENEMIES[B.en.key] : null;
+  R.end = { won: false, by: D ? D.name : '' };
+  recordEnd(false);
+  R.battle = null; B = null; R.phase = 'end'; MARK.clear();
+  render(true);
+}
+function runWon(silent) {
+  const h = harmonyOf(R.deck);
+  R.end = { won: true, silent, four: h.truth.every(Boolean) };
+  recordEnd(true);
+  R.phase = 'end'; render(true);
+}
+
+/* ---------- 泉・市・出来事 ---------- */
+function genShop() {
+  const m = 1 + .1 * (R.act - 1);
+  const price = c => Math.round((c.k === 'el' ? [0, 22, 48, 95][c.t] : 60) * m);
+  return {
+    cards: offerCards(4, false).map(c => ({ c, price: price(c), sold: false })),
+    relics: shuffle(relicPool()).slice(0, 2).map(id => ({ id, price: 110 + Math.floor(rand() * 4) * 10, sold: false })),
+    removed: false,
+  };
+}
+const EVENTS = {
+  izumi: { name: '反転の泉', text: '澄んだ泉。水面に札を映すと、色が裏返るという。',
+    opts: () => [{ label: '札を1枚選び、反対の元素に反転する', pick: c => c.k === 'el', title: '反転する札を選ぶ', act: c => { c.e = OPP(c.e); return `${cname(c)}になった。`; } }, { label: '立ち去る' }] },
+  sasayaki: { name: '混沌の囁き', text: '「器を少し差し出せば、古い音叉をやろう」',
+    opts: () => [{ label: '器を7失い、音叉を得る', ok: R.hp > 7 && relicPool().length > 0, run: () => { R.hp -= 7; const id = pick(relicPool()); gainRelic(id); return `〈${RELICS[id].name}〉を得た。`; } }, { label: '立ち去る' }] },
+  sho: { name: '古い錬成書', text: '埃をかぶった錬成書。頁の間に、何かが挟まっている。',
+    opts: () => [{ label: '輝石を1枚得る（元素は運）。無垢の雫も1枚混ざる', run: () => { const c = mk('el', Math.floor(rand() * 4), 2); R.deck.push(c, mk('pure', -1, 1)); return `${cname(c)}と、無垢の雫を得た。`; } }, { label: '立ち去る' }] },
+  mayoi: { name: '迷い雫', text: '行き場をなくした雫が、あなたの周りを漂っている。一つだけ迎え入れられそうだ。',
+    opts: () => [0, 1, 2, 3].map(e => ({ label: `${EL[e].name}の雫を迎える`, run: () => { R.deck.push(mk('el', e, 1)); return `${EL[e].name}の雫が山札に加わった。`; } })) },
+  hokora: { name: '静寂の祠', text: '音のない祠。ここでは混沌も眠る。',
+    opts: () => [{ label: '無垢をすべて取り除く', ok: R.deck.some(c => c.k === 'pure'), run: () => { const n = R.deck.filter(c => c.k === 'pure').length; R.deck = R.deck.filter(c => c.k !== 'pure'); return `無垢を${n}枚、取り除いた。`; } },
+      { label: '器を8回復する', run: () => `器が${heal(8)}戻った。` }] },
+  yuigon: { name: '錬金師の遺言', text: '「残響を捧げれば、札をひとつ育ててやろう」',
+    opts: () => [{ label: '残響30を捧げ、札を1枚一段上げる（光核まで）', ok: R.echo >= 30 && R.deck.some(c => c.k === 'el' && c.t < 3), pick: c => c.k === 'el' && c.t < 3, title: '育てる札を選ぶ', act: c => { R.echo -= 30; c.t++; return `${cname(c)}になった。`; } }, { label: '立ち去る' }] },
+};
+function pickEvent() { return pick(Object.keys(EVENTS)); }
+
+/* ---------- 描画 ---------- */
+function renderTop() {
+  if (!R) return;
+  ui('alHpBar').style.width = `${Math.max(0, R.hp / R.maxHp * 100)}%`;
+  ui('alHpN').textContent = `${R.hp}/${R.maxHp}`;
+  const step = R.pos ? (R.pos === 'boss' ? '主' : `${R.map[R.pos].r + 1}歩`) : '旅立ち';
+  ui('alWhere').textContent = `第${ACT_KAN[R.act]}幕・${step}`;
+  ui('alEcho').textContent = fmt(R.echo);
+  ui('alDeckN').textContent = B ? B.draw.length + B.hand.length + B.disc.length + B.exile.length + B.cru.filter(c => c.own).length : R.deck.length;
+  const rel = R.relics.map(id => `<button type="button" class="al-relic" data-relic="${id}" title="${RELICS[id].name}：${RELICS[id].desc}">${RELICS[id].ic}</button>`).join('');
+  const box = ui('alRelics'); if (box.dataset.k !== rel) { box.dataset.k = rel; box.innerHTML = rel; }
+  ui('alSound').classList.toggle('off', !SFX.on);
+}
+function render(scrollTop) {
+  if (!R) return;
+  renderTop();
+  const main = ui('alMain');
+  if (R.phase !== 'battle') main.dataset.view = '';
+  if (R.phase === 'battle') renderBattle();
+  else if (R.phase === 'map') renderMap();
+  else if (R.phase === 'reward') renderReward();
+  else if (R.phase === 'rest') renderRest();
+  else if (R.phase === 'shop') renderShop();
+  else if (R.phase === 'event') renderEvent();
+  else if (R.phase === 'end') renderEnd();
+  if (scrollTop && R.phase !== 'map') main.scrollTop = 0;
+}
+function intentHTML(it, later) {
+  const parts = [];
+  for (const p of it) {
+    if (p.d) parts.push(`<span class="al-int">降らす ${p.d.map(([e, t]) => orbIcon(e, t, 18)).join('')}</span>`);
+    if (p.p) parts.push(`<span class="al-int">無垢を降らす ${'<span class="oi al-pure t1"></span>'.repeat(p.p)}</span>`);
+    if (p.l) parts.push(`<span class="al-int">${orbIcon('light', 0, 18)} 光を降らす</span>`);
+    if (p.k) parts.push(`<span class="al-int">${orbIcon('dark', 0, 18)} 闇を降らす</span>`);
+    if (p.c) parts.push(`<span class="al-int">無垢を山札へ ×${p.c}</span>`);
+    if (p.inv) parts.push('<span class="al-int">坩堝を反転</span>');
+    if (p.g) parts.push('<span class="al-int">混沌の札が育つ</span>');
+  }
+  return `<span class="${later ? 'later' : ''}">${parts.join(' ')}</span>`;
+}
+function overflowOf(it) { // 予告どおり降ったら、どれだけ溢れるか
+  const cs = [];
+  for (const p of it) { if (p.d) for (const [, t] of p.d) cs.push(CFG.OVER[t]); for (let i = 0; i < (p.p || 0) + (p.l || 0) + (p.k || 0); i++) cs.push(2); }
+  const free = CFG.SLOTS - B.cru.length;
+  return cs.slice(Math.max(0, free)).reduce((s, v) => s + Math.max(1, v - (has('sand') ? 1 : 0)), 0);
+}
+function renderBattle() {
+  const main = ui('alMain');
+  if (main.dataset.view !== 'battle') {
+    main.dataset.view = 'battle';
+    main.innerHTML = `<div class="al-battle">
+      <section class="al-enemy" id="alEnemy"><div class="al-fx" id="alFx"></div></section>
+      <section class="al-cru" aria-label="坩堝"><span class="al-cru-lbl">坩堝<b id="alCruN"></b></span><span class="al-chain" id="alChain"></span>
+        <div class="al-row" id="alRow"></div><div class="al-marks" id="alMarks"></div>
+        <div class="al-legend"><span><i class="o"></i>あなたの札</span><span><i class="f"></i>混沌の札</span></div></section>
+      <p class="al-info" id="alInfo"></p>
+      <section class="al-hand" id="alHand" aria-label="手札"></section>
+      <footer class="al-bfoot" id="alBFoot"></footer></div>`;
+  }
+  if (!B) return;
+  const D = ENEMIES[B.en.key];
+  // 敵
+  const en = ui('alEnemy');
+  en.classList.toggle('boss', B.kind === 'boss');
+  const tag = B.kind === 'boss' ? '幕の主' : B.kind === 'elite' ? '精鋭' : '';
+  const intents = intentHTML(B.intents[0]) + (has('eye') ? ` <span class="later">→</span> ${intentHTML(B.intents[1], true)}` : '');
+  const over = BUSY ? 0 : overflowOf(B.intents[0]);
+  const body = `<div class="al-emblem">${iconOf(D.ic, B.kind === 'boss' ? 58 : 50)}</div>
+    <div class="al-ename">${D.name}${tag ? `<small>${tag}</small>` : ''}</div>
+    <div class="al-ehp"><div class="al-bar"><i style="width:${B.en.hp / B.en.max * 100}%"></i></div><b class="al-num">${B.en.hp}/${B.en.max}</b></div>
+    <div class="al-intent"><span class="lbl">次</span>${intents}${over ? `<span class="al-warn">溢れる 器−${over}</span>` : ''}</div>`;
+  let bodyBox = en.querySelector('.al-ebody');
+  if (!bodyBox) { bodyBox = document.createElement('div'); bodyBox.className = 'al-ebody'; bodyBox.style.display = 'contents'; en.prepend(bodyBox); }
+  bodyBox.innerHTML = body;
+  // 坩堝
+  const H = SEL != null ? B.hand[SEL] : null;
+  const canAct = !BUSY && B.plays > 0;
+  let row = '';
+  for (let i = 0; i < CFG.SLOTS; i++) {
+    const c = B.cru[i];
+    if (c) {
+      const k = H && canAct ? stackKind(H, c) : null;
+      const m = MARK.get(c.id) || '';
+      const tp = c.own && c.k === 'el' && c.t === 4 ? `<span class="tp">${TRUTH_POW[c.e].name}</span>` : '';
+      row += `<button type="button" class="al-sock ${c.own ? 'own' : 'foe'} ${c.k === 'el' || c.k === 'pure' ? 't' + c.t : 'sp'} ${k ? 'can' : 'info'} ${k === 'anni' || k === 'tune' ? 'anni' : ''} ${m}" data-s="${i}" aria-label="${c.own ? 'あなたの' : '混沌の'}${cname(c)}">${orbHTML(c)}${tp}</button>`;
+    } else {
+      const put = H && canAct && i === B.cru.length;
+      row += `<button type="button" class="al-sock ${put ? 'put' : ''}" ${put ? `data-p="${i}" aria-label="右端に置く"` : 'tabindex="-1" aria-hidden="true"'}></button>`;
+    }
+  }
+  ui('alRow').innerHTML = row;
+  for (const [id, m] of MARK) if (m === 'born' || m === 'pop' || m === 'flip') MARK.delete(id); // 一度描いたら消す（fuse/vanish は反応の中で消える）
+  let marks = '';
+  if (H && canAct && B.cru.length < CFG.SLOTS) for (let p = 0; p < CFG.SLOTS; p++) marks += p < B.cru.length ? `<span><button type="button" class="al-mark" data-p="${p}" aria-label="${p + 1}番目の前に置く">＋</button></span>` : '<span></span>';
+  ui('alMarks').innerHTML = marks;
+  ui('alCruN').textContent = `${B.cru.length}/${CFG.SLOTS}`;
+  // 手札
+  ui('alHand').innerHTML = B.hand.map((c, i) => cardHTML(c, `data-h="${i}"`, (SEL === i ? 'sel' : '') + (!canAct ? ' dim' : ''))).join('');
+  // 下段
+  const tp = truthPow();
+  const pw = tp.map((on, e) => on ? `<span class="al-chip" title="${TRUTH_POW[e].desc}">${EL[e].name}〈${TRUTH_POW[e].name}〉</span>` : '').join('');
+  ui('alBFoot').innerHTML = `<div class="al-piles"><button type="button" class="al-pile" data-pile="draw">山札<b>${B.draw.length}</b></button><button type="button" class="al-pile" data-pile="disc">捨て札<b>${B.disc.length}</b></button><button type="button" class="al-pile" data-pile="exile">除外<b>${B.exile.length}</b></button></div>
+    <div class="al-plays" aria-label="手数 ${B.plays}"><span class="lbl">手数</span>${Array.from({ length: Math.max(B.plays, CFG.PLAYS) }, (_, i) => `<i class="${i < B.plays ? 'on' : ''}"></i>`).join('')}</div>
+    ${B.harm ? '<span class="al-chip harm" title="調律力×1.25">調和</span>' : ''}${pw}
+    <button type="button" class="btn ${B.plays === 0 && !BUSY ? 'primary al-go' : ''}" id="alEnd" ${BUSY ? 'disabled' : ''}>手番を終える</button>`;
+  // 案内
+  const info = ui('alInfo'); info.classList.remove('warn');
+  if (BUSY) info.textContent = '';
+  else if (B.plays <= 0) info.textContent = '手数を使い切った。手番を終えよう';
+  else if (H) {
+    const n = B.cru.filter(c => stackKind(H, c)).length;
+    const room = B.cru.length < CFG.SLOTS;
+    const tip = H.k === 'light' ? '光：元素に重ねて反転／無垢に重ねて浄化／闇に重ねて〈調律〉' : H.k === 'dark' ? '闇：重ねた札の段階を一つ下げる（あなたの札は二つに分かつ）／光に重ねて〈調律〉' : H.k === 'pure' ? '無垢：無垢どうしでしか合成できない' : cname(H);
+    info.textContent = `${tip}${n ? ' ― 光る札に重ねる' : ''}${room ? '／＋の位置に置く' : '／坩堝は満ちている'}`;
+  } else info.textContent = `手札を1枚選ぶ（手数 ${B.plays}）`;
+}
+function floatText(s, cls, onHp) {
+  const box = onHp ? document.querySelector('.al-cru') : ui('alFx'); if (!box) return;
+  const n = document.createElement('span'); n.className = `al-float ${cls || ''}`; n.textContent = s;
+  if (onHp) { n.style.top = '30%'; }
+  box.appendChild(n); setTimeout(() => n.remove(), 1200);
+}
+function renderMap() {
+  const main = ui('alMain'), M = R.map, Hh = 66, height = (CFG.ROWS + 1) * Hh + 26;
+  const reach = new Set(reachable()), done = new Set(R.path);
+  const P = n => ({ x: n.id === 'boss' ? 50 : [17, 50, 83][n.l] + n.jx, y: height - 34 - n.r * Hh + (n.id === 'boss' ? 6 : n.jy) });
+  let lines = '', nodes = '';
+  for (const n of Object.values(M)) for (const m of n.next) {
+    const a = P(n), b = P(M[m]);
+    const cls = done.has(n.id) && done.has(m) && R.path.indexOf(m) === R.path.indexOf(n.id) + 1 ? 'done' : n.id === R.pos ? 'open' : '';
+    lines += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="${cls}" vector-effect="non-scaling-stroke"/>`;
+  }
+  for (const n of Object.values(M)) {
+    const p = P(n), cls = [n.type, done.has(n.id) ? 'done' : '', n.id === R.pos ? 'here' : '', reach.has(n.id) ? 'reach' : ''].join(' ');
+    nodes += `<button type="button" class="al-node ${cls}" style="left:${p.x}%;top:${p.y}px" ${reach.has(n.id) ? `data-node="${n.id}"` : 'tabindex="-1"'} aria-label="${NODE[n.type].name}" title="${NODE[n.type].name}">${NODE[n.type].ch}</button>`;
+  }
+  main.innerHTML = `<div class="al-maphead"><h2>第${ACT_KAN[R.act]}幕〈${ACT_NAME[R.act]}〉</h2><p>光る印を選んで進む。いちばん上に幕の主が待つ。</p></div>
+    <div class="al-map" style="height:${height}px"><svg viewBox="0 0 100 ${height}" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>${nodes}</div>
+    <div class="al-mlegend">${['fight', 'elite', 'rest', 'shop', 'event', 'boss'].map(t => `<span><b>${NODE[t].ch}</b>${NODE[t].name}</span>`).join('')}</div>`;
+  requestAnimationFrame(() => { const r = main.querySelector('.al-node.reach'); if (r) r.scrollIntoView({ block: 'center' }); });
+}
+function renderReward() {
+  const W = R.reward;
+  const cards = W.cards.map((c, i) => cardHTML(c, `data-take="${i}"`, W.took ? 'taken' : '')).join('');
+  const rel = W.relic ? `<p>音叉〈<em>${RELICS[W.relic].name}</em>〉を得た ― ${RELICS[W.relic].desc}</p>` : '';
+  const relC = W.relicChoice && W.relicChoice.length ? `<p class="eyebrow">Tuning fork</p><p>音叉を一つ選ぶ</p><div class="al-rel-offer">${W.relicChoice.map(id => relicBtn(id, `data-rc="${id}"`, W.relicTaken)).join('')}</div>` : '';
+  ui('alMain').innerHTML = `<div class="al-page"><p class="eyebrow">Victory</p><h2>〈${W.name}〉を鎮めた</h2>
+    ${W.silent ? '<span class="al-badge">完全なる静寂</span><p>最後の一撃で坩堝が空になった。報酬が増える。</p>' : ''}
+    <p class="al-gain">残響 +${W.echo}</p>${rel}${relC}
+    <p>${W.took ? '札を山札に加えた。' : '札を1枚選んで、山札に加える'}</p><div class="al-offer">${cards}</div>
+    <div class="al-choices"><button type="button" class="btn ${W.took || W.relicChoice ? 'primary' : ''}" id="alLeave">${W.took ? '先へ' : '札を加えずに先へ'}</button></div></div>`;
+}
+function relicBtn(id, attrs, dis, price) {
+  const r = RELICS[id];
+  return `<button type="button" class="al-rel-btn" ${attrs} ${dis ? 'disabled' : ''}><span class="al-relic">${r.ic}</span><b>${r.name}</b>${price != null ? `<span class="al-price ${R.echo < price ? 'no' : ''}">${price}</span>` : '<span></span>'}<small>${r.desc}</small></button>`;
+}
+function renderRest() {
+  const S2 = R.rest, amt = Math.ceil(R.maxHp * .3);
+  const canMerge = R.deck.some(c => (c.k === 'el' || c.k === 'pure') && c.t < 4 && R.deck.filter(d => sameKind(c, d)).length >= 2);
+  ui('alMain').innerHTML = `<div class="al-page"><p class="eyebrow">Spring</p><h2>泉</h2>
+    <p>澄んだ水が湧いている。<em>一つだけ</em>選べる。</p>
+    ${S2.done ? `<p class="al-gain">${S2.done}</p><div class="al-choices"><button type="button" class="btn primary" id="alLeave">先へ</button></div>`
+    : `<div class="al-choices">
+      <button type="button" class="btn" id="alRestHeal">器を${amt}回復する（いま ${R.hp}/${R.maxHp}）</button>
+      <button type="button" class="btn" id="alRestMerge" ${canMerge ? '' : 'disabled'}>同じ札を2枚、合成する</button>
+      <button type="button" class="btn" id="alRestRemove" ${R.deck.length > 1 ? '' : 'disabled'}>札を1枚取り除く</button>
+      <button type="button" class="btn" id="alLeave">何もせずに先へ</button></div>`}</div>`;
+}
+function renderShop() {
+  const S2 = R.shop;
+  const cards = S2.cards.map((o, i) => `<div class="al-buy">${cardHTML(o.c, o.sold ? '' : `data-buy="${i}"`, o.sold ? 'taken' : '')}<span class="al-price ${R.echo < o.price ? 'no' : ''}">${o.sold ? '売約' : o.price}</span></div>`).join('');
+  const rels = S2.relics.map((o, i) => relicBtn(o.id, `data-buyr="${i}"`, o.sold || R.echo < o.price, o.sold ? null : o.price)).join('');
+  ui('alMain').innerHTML = `<div class="al-page"><p class="eyebrow">Market</p><h2>市</h2><p>残響 <em>${R.echo}</em> で取り引きできる。</p>
+    <div class="al-offer">${cards}</div>
+    ${rels ? `<div class="al-rel-offer">${rels}</div>` : ''}
+    <div class="al-choices"><button type="button" class="btn" id="alShopRemove" ${S2.removed || R.echo < R.removeCost || R.deck.length <= 1 ? 'disabled' : ''}>札を1枚取り除く（${S2.removed ? '済み' : R.removeCost}）</button>
+    <button type="button" class="btn primary" id="alLeave">市を出る</button></div></div>`;
+}
+function renderEvent() {
+  const Ev = EVENTS[R.event.key];
+  const opts = Ev.opts();
+  ui('alMain').innerHTML = `<div class="al-page"><p class="eyebrow">Encounter</p><h2>${Ev.name}</h2><p>${Ev.text}</p>
+    ${R.event.res ? `<p class="al-gain">${R.event.res}</p><div class="al-choices"><button type="button" class="btn primary" id="alLeave">先へ</button></div>`
+    : `<div class="al-choices">${opts.map((o, i) => `<button type="button" class="btn" data-ev="${i}" ${o.ok === false ? 'disabled' : ''}>${o.label}</button>`).join('')}</div>`}</div>`;
+}
+function renderEnd() {
+  const E2 = R.end, s = R.stats;
+  const title = E2.won ? '調律の完成' : '器が砕けた';
+  const sub = E2.won ? '三幕の混沌は鎮まり、世界に静寂が戻った。' : `第${ACT_KAN[R.act]}幕〈${ACT_NAME[R.act]}〉で、〈${E2.by}〉の混沌に呑まれた。`;
+  const badges = E2.won ? [E2.four ? '<span class="al-badge">四元の真理</span>' : '', E2.silent ? '<span class="al-badge">完全なる静寂</span>' : ''].join(' ') : '';
+  ui('alMain').innerHTML = `<div class="al-page"><p class="eyebrow">${E2.won ? 'Harmony' : 'Shattered'}</p><h2>${title}</h2><p>${sub}</p>${badges ? `<div>${badges}</div>` : ''}
+    <dl class="al-stats"><div><dt>鎮めた顕現</dt><dd>${s.wins}</dd></div><div><dt>最大連鎖</dt><dd>${s.maxChain}</dd></div><div><dt>最大の一手</dt><dd>${fmt(s.maxHit)}</dd></div>
+    <div><dt>調律力の合計</dt><dd>${fmt(s.dmg)}</dd></div><div><dt>生んだ真理</dt><dd>${s.truths}</dd></div><div><dt>完全なる静寂</dt><dd>${s.silences}</dd></div></dl>
+    <div class="al-choices"><button type="button" class="btn primary" id="alAgain">新しい冒険へ</button><button type="button" class="btn" id="alEndTitle">タイトルへ</button></div></div>`;
+}
+
+/* ---------- 札の一覧・選択 ---------- */
+let pickCb = null;
+function groupCards(list) {
+  const g = [];
+  const order = c => (c.k === 'el' ? c.e * 10 + c.t : c.k === 'light' ? 50 : c.k === 'dark' ? 60 : 70 + c.t);
+  for (const c of list.slice().sort((a, b) => order(a) - order(b))) { const x = g.find(y => sameKind(y.c, c) && !!y.c.tmp === !!c.tmp); if (x) x.n++; else g.push({ c, n: 1 }); }
+  return g;
+}
+function openDeck(title, list, opts = {}) {
+  const ov = ui('alDeckOv');
+  ui('alDeckH').textContent = title;
+  ui('alDeckEy').textContent = opts.pick ? 'Choose' : 'Deck';
+  let sum = '';
+  if (opts.summary) {
+    const h = harmonyOf(list);
+    sum = `<p class="al-deck-sum">${[0, 1, 2, 3].map(e => `${EL[e].name} <b>${h.amt[e]}</b>${h.truth[e] ? '（真理）' : ''}`).join('・')} ― 差 <b>${h.gap}</b>：${h.ok ? '<b>〈調和〉調律力×1.25</b>' : `〈調和〉には差${CFG.HARM_GAP + (has('scale') ? 1 : 0)}以下`}<br>四元素の量は雫に換算（輝石2・光核4・真理8）。真理を持つ元素は数えない。</p>`;
+  }
+  const g = groupCards(list);
+  pickCb = opts.pick || null;
+  ui('alDeckBody').innerHTML = sum + (g.length ? `<div class="al-grid ${opts.pick ? 'pick' : ''}">${g.map(({ c, n }) => {
+    const ok = !opts.filter || opts.filter(c);
+    return cardHTML(c, ok && opts.pick ? `data-pick="${c.id}"` : '', ok ? '' : 'dim').replace('</button>', `${n > 1 ? `<span class="n">×${n}</span>` : ''}</button>`);
+  }).join('')}</div>` : '<p class="al-deck-sum">札はない。</p>');
+  ov.hidden = false; ui('alDeckClose').focus();
+}
+function closeDeck() { ui('alDeckOv').hidden = true; pickCb = null; }
+
+/* ---------- 入力 ---------- */
+function onMain(e) {
+  const t = e.target.closest('button'); if (!t || t.disabled) return;
+  const d = t.dataset;
+  if (R.phase === 'battle' && B) {
+    if (d.h != null) { if (BUSY) return; SFX.init(); SEL = SEL === +d.h ? null : +d.h; SFX.tap(); renderBattle(); return; }
+    if (d.s != null) {
+      const c = B.cru[+d.s];
+      if (SEL != null && stackKind(B.hand[SEL], c)) { play(SEL, { s: +d.s }); return; }
+      if (c) { const s = `${c.own ? 'あなたの札' : '混沌の札'}：${cname(c)}${c.own && c.k === 'el' && c.t === 4 ? `〈${TRUTH_POW[c.e].name}〉${TRUTH_POW[c.e].desc}` : ''}`; ui('alInfo').textContent = s; }
+      return;
+    }
+    if (d.p != null && SEL != null) { play(SEL, { p: +d.p }); return; }
+    if (d.pile) { const list = B[d.pile]; openDeck({ draw: '山札（順番は伏せてある）', disc: '捨て札', exile: '除外（戦闘が終われば戻る）' }[d.pile], list); return; }
+    if (t.id === 'alEnd') { endTurn(); return; }
+    return;
+  }
+  if (d.node) { enterNode(d.node); return; }
+  if (R.phase === 'reward') {
+    const W = R.reward;
+    if (d.take != null && !W.took) { const o = W.cards[+d.take]; const c = mk(o.k, o.e, o.t); R.deck.push(c); W.took = true; SFX.unlock(); toast(`${cname(c)}を山札に加えた`); save(); render(); return; }
+    if (d.rc && !W.relicTaken) { gainRelic(d.rc); W.relicTaken = true; W.relicChoice = [d.rc]; SFX.unlock(); save(); render(); return; }
+    if (t.id === 'alLeave') { if (W.relicChoice && W.relicChoice.length > 1 && !W.relicTaken) { toast('音叉を一つ選ぼう'); return; } leaveReward(); }
+    return;
+  }
+  if (R.phase === 'rest') {
+    if (t.id === 'alLeave') return toMap();
+    if (t.id === 'alRestHeal') { const h = heal(Math.ceil(R.maxHp * .3)); R.rest.done = `器が${h}戻った。`; SFX.relief(); save(); render(); return; }
+    if (t.id === 'alRestMerge') {
+      const ok = c => (c.k === 'el' || c.k === 'pure') && c.t < 4 && R.deck.filter(x => sameKind(c, x)).length >= 2;
+      openDeck('合成する札を選ぶ', R.deck, { filter: ok, pick: id => {
+        const c = R.deck.find(x => x.id === id); const two = R.deck.filter(x => sameKind(c, x)).slice(0, 2);
+        R.deck = R.deck.filter(x => !two.includes(x)); const N = mk(c.k, c.e, c.t + 1); R.deck.push(N);
+        R.rest.done = `${cname(c)}2枚が、${cname(N)}になった。`; SFX.merge(N.t, 1); truthBornDeck(N); save(); render();
+      } });
+      return;
+    }
+    if (t.id === 'alRestRemove') { openDeck('取り除く札を選ぶ', R.deck, { pick: id => { const c = R.deck.find(x => x.id === id); R.deck = R.deck.filter(x => x !== c); R.rest.done = `${cname(c)}を取り除いた。`; SFX.dark(); save(); render(); } }); return; }
+    return;
+  }
+  if (R.phase === 'shop') {
+    const S2 = R.shop;
+    if (d.buy != null) { const o = S2.cards[+d.buy]; if (o.sold) return; if (R.echo < o.price) { toast('残響が足りない'); return; } R.echo -= o.price; o.sold = true; const c = mk(o.c.k, o.c.e, o.c.t); R.deck.push(c); SFX.unlock(); toast(`${cname(c)}を手に入れた`); save(); render(); return; }
+    if (d.buyr != null) { const o = S2.relics[+d.buyr]; if (o.sold || R.echo < o.price) return; R.echo -= o.price; o.sold = true; gainRelic(o.id); SFX.unlock(); save(); render(); return; }
+    if (t.id === 'alShopRemove') { openDeck('取り除く札を選ぶ', R.deck, { pick: id => { const c = R.deck.find(x => x.id === id); R.deck = R.deck.filter(x => x !== c); R.echo -= R.removeCost; R.removeCost += 25; S2.removed = true; toast(`${cname(c)}を取り除いた`); SFX.dark(); save(); render(); } }); return; }
+    if (t.id === 'alLeave') toMap();
+    return;
+  }
+  if (R.phase === 'event') {
+    if (t.id === 'alLeave') return toMap();
+    if (d.ev != null) {
+      const o = EVENTS[R.event.key].opts()[+d.ev];
+      if (o.pick) { openDeck(o.title, R.deck, { filter: o.pick, pick: id => { const c = R.deck.find(x => x.id === id); R.event.res = o.act(c); SFX.unlock(); save(); render(); } }); return; }
+      R.event.res = o.run ? o.run() : '何もせずに立ち去った。'; SFX.tap(); save(); render();
+    }
+    return;
+  }
+  if (R.phase === 'end') {
+    if (t.id === 'alAgain') { newRun(); render(true); toast('新しい冒険が始まる'); }
+    if (t.id === 'alEndTitle') { R = null; showTitle(); }
+  }
+}
+function truthBornDeck(c) { if (c.k === 'el' && c.t === 4) { R.stats.truths++; toast(`${EL[c.e].name}の真理〈${TRUTH_POW[c.e].name}〉が生まれた`); } }
+
+/* ---------- 通知 ---------- */
+const toastQ = []; let toastBusy = false;
+function toast(msg) { toastQ.push(msg); if (toastQ.length > 3) toastQ.shift(); if (!toastBusy) nextToast(); }
+function nextToast() {
+  const n = ui('alToast'); const m = toastQ.shift();
+  if (!m) { toastBusy = false; return; }
+  toastBusy = true; n.textContent = m; n.classList.remove('show'); void n.offsetWidth; n.classList.add('show');
+}
+
+/* ---------- 画面の出入り ---------- */
+const alch = () => ui('alch');
+function enter() {
+  hideOverlays(); ui('alStartOv').hidden = true;
+  app.hidden = true; alch().hidden = false;
+  S.screen = 'alch'; S.paused = false;
+  B = R.battle; BUSY = false; SEL = null; MARK.clear();
+  ui('alMain').dataset.view = '';
+  render(true);
+}
+function open() {
+  SFX.init();
+  const saved = store.get('alch.run', null);
+  if (saved && saved.v === 1 && saved.phase !== 'end') {
+    ui('alStartSub').textContent = `第${ACT_KAN[saved.act]}幕〈${ACT_NAME[saved.act]}〉・器 ${saved.hp}/${saved.maxHp}・札 ${saved.deck.length}枚`;
+    el.titleOv.hidden = true; ui('alStartOv').hidden = false; ui('alContinue').focus();
+  } else { newRun(); enter(); toast('三幕の混沌を鎮める旅が始まる'); }
+}
+function hide() { // タイトルへ戻るとき
+  const a = alch(); if (a) a.hidden = true;
+  ['alMenuOv', 'alDeckOv', 'alRulesOv', 'alStartOv'].forEach(id => { const n = ui(id); if (n) n.hidden = true; });
+  app.hidden = false; R = null; B = null; BUSY = false; SEL = null;
+  const best = store.get('alch.best', null), saved = store.get('alch.run', null);
+  const b = ui('bestAlchemy');
+  if (b) b.textContent = saved && saved.phase !== 'end' ? `冒険の途中（第${ACT_KAN[saved.act]}幕）` : best ? (best.wins ? `成就 ${best.wins}回` : `第${ACT_KAN[best.act] || '一'}幕・${best.step}歩まで`) : '—';
+}
+function esc() {
+  if (!ui('alStartOv').hidden) { ui('alStartOv').hidden = true; el.titleOv.hidden = false; return true; }
+  if (S.screen !== 'alch') return false;
+  if (!ui('alRulesOv').hidden) ui('alRulesOv').hidden = true;
+  else if (!ui('alDeckOv').hidden) closeDeck();
+  else if (!ui('alMenuOv').hidden) ui('alMenuOv').hidden = true;
+  else { SEL = null; if (R && R.phase === 'battle') renderBattle(); ui('alMenuOv').hidden = false; ui('alResume').focus(); }
+  return true;
+}
+function init() {
+  const ic = ui('icAlchemy');
+  if (ic) ic.innerHTML = `<span class="al-ic"><i>${orbIcon(0, 1, 18)}</i><i>${orbIcon(1, 2, 18)}</i><i>${orbIcon(2, 1, 18)}</i></span>`;
+  ui('goAlchemy').addEventListener('click', open);
+  ui('alContinue').addEventListener('click', () => { const saved = store.get('alch.run', null); if (!saved) return open(); R = saved; enter(); toast('冒険を再開する'); });
+  ui('alNewRun').addEventListener('click', () => { newRun(); enter(); toast('三幕の混沌を鎮める旅が始まる'); });
+  ui('alStartBack').addEventListener('click', () => { ui('alStartOv').hidden = true; el.titleOv.hidden = false; });
+  ui('alMain').addEventListener('click', onMain);
+  ui('alMenuBtn').addEventListener('click', () => { SFX.tap(); ui('alMenuOv').hidden = false; ui('alResume').focus(); });
+  ui('alResume').addEventListener('click', () => { ui('alMenuOv').hidden = true; });
+  ui('alRulesBtn').addEventListener('click', () => { ui('alMenuOv').hidden = true; ui('alRulesOv').hidden = false; ui('alRulesClose').focus(); });
+  ui('alRulesClose').addEventListener('click', () => { ui('alRulesOv').hidden = true; });
+  ui('alGiveUp').addEventListener('click', () => {
+    if (BUSY) return;
+    ui('alMenuOv').hidden = true;
+    if (!R || R.phase === 'end') return;
+    R.end = { won: false, by: B ? ENEMIES[B.en.key].name : '自ら' }; recordEnd(false);
+    R.battle = null; B = null; R.phase = 'end'; render(true);
+  });
+  ui('alToTitle').addEventListener('click', () => { if (BUSY) return; save(); showTitle(); });
+  ui('alDeckBtn').addEventListener('click', () => {
+    SFX.tap();
+    const list = B ? [...B.draw, ...B.hand, ...B.disc, ...B.exile, ...B.cru.filter(c => c.own)] : R.deck;
+    openDeck(B ? 'この戦闘の札（すべて）' : `山札（${R.deck.length}枚）`, list, { summary: true });
+  });
+  ui('alDeckClose').addEventListener('click', closeDeck);
+  ui('alDeckBody').addEventListener('click', e => { const t = e.target.closest('[data-pick]'); if (!t || !pickCb) return; const cb = pickCb; closeDeck(); cb(+t.dataset.pick); });
+  ui('alRelics').addEventListener('click', e => { const t = e.target.closest('[data-relic]'); if (t) toast(`〈${RELICS[t.dataset.relic].name}〉${RELICS[t.dataset.relic].desc}`); });
+  ui('alSound').addEventListener('click', () => { SFX.on = !SFX.on; store.set('sound', SFX.on); if (SFX.on) SFX.init(); updateSoundBtn(); renderTop(); });
+  ui('alToast').addEventListener('animationend', () => { ui('alToast').classList.remove('show'); nextToast(); });
+  for (const id of ['alMenuOv', 'alDeckOv', 'alRulesOv']) ui(id).addEventListener('click', e => { if (e.target.id === id) { if (id === 'alDeckOv') closeDeck(); else ui(id).hidden = true; } });
+}
+return { init, hide, esc, CFG };
+})();
+
+/* ================================================================
    ループと起動
    ================================================================ */
 let lastT = performance.now();
 function frame(t) {
   let dt = t - lastT; lastT = t; if (dt > 50) dt = 50; if (dt < 0) dt = 0;
+  if (S.screen === 'alch') { requestAnimationFrame(frame); return; } // 錬成の書：盤は描かない
   const stop = performance.now() < (S.hitStop || 0); // ヒットストップ：時間が止まる
   const clock = (S.screen === 'play' || S.screen === 'result') && !S.paused && !stop;
   if (clock) S.now += dt;
@@ -3092,6 +4319,7 @@ function bindUI() {
   document.addEventListener('keydown', skipEnding, true);
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
+    if (ALCH.esc()) return;
     if (!el.rulesOv.hidden) closeRules();
     else if (!$('#tuneOv').hidden) closeTune();
     else if (!el.pauseOv.hidden) resume();
@@ -3110,6 +4338,7 @@ function start(data) {
   installImageCSS();
   loadImages().then(() => { sprites.clear(); if (view.w) buildPlate(); });
   bindUI();
+  ALCH.init();
   fillRules();
   updateSoundBtn();
   if (data && data.v === 1 && data.screen === 'play' && Array.isArray(data.orbs) && data.orbs.length) restore(data);
