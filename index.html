@@ -493,6 +493,29 @@ button{font:inherit;color:inherit}
 .al-recap li{padding:8px 12px;border-radius:12px;border:1px solid var(--brass-faint);background:rgba(255,255,255,.02)}
 .al-recap b{color:var(--text);font-family:var(--f-display);margin-right:8px}
 @media (prefers-reduced-motion:reduce){.tut-hl{animation:none}}
+/* 札の移動の影・チュートリアルの注目枠・いまの札 */
+.al-fly,.al-spots{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.al-spots{z-index:10}
+.al-fly{z-index:11}
+.al-ghost{position:fixed;display:grid;place-items:center;transform-origin:center;will-change:transform}
+.al-ghost .oi{width:100%!important;height:100%!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),0 0 18px var(--oi-glow,rgba(255,227,160,.5))}
+.al-back{display:block;width:100%;height:100%;border-radius:5px;border:1px solid var(--brass);background:linear-gradient(160deg,rgba(201,173,114,.45),var(--panel-b))}
+.al-sock.land .oi{opacity:0}
+.al-spot{position:fixed;border:2px solid var(--lumen);box-shadow:0 0 0 4px rgba(255,227,160,.14),0 0 22px rgba(255,227,160,.45);animation:alSpot .9s ease-in-out infinite alternate}
+@keyframes alSpot{from{opacity:.5}to{opacity:1}}
+.al-mydeck{width:min(640px,100%);margin-top:10px;padding-top:12px;border-top:1px solid var(--brass-faint);text-align:left}
+.al-mydeck h3{margin:0 0 4px;font-family:var(--f-display);font-weight:800;font-size:16px}
+.al-mydeck h3 b{color:var(--lumen)}
+.al-grid.mini{grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px}
+.al-grid.mini .al-card{padding:6px 2px 5px}
+.al-grid.mini .al-cn{font-size:10.5px}
+.al-grid.mini .al-cs{display:none}
+.al-grid.mini .al-card .n{top:auto;left:auto;bottom:3px;right:6px;font-size:11px}
+.al-card.static{cursor:default;pointer-events:none}
+.al-card.fresh{box-shadow:0 0 0 2px var(--lumen),0 0 14px rgba(255,227,160,.45)}
+.al-card .new{position:absolute;top:3px;right:4px;font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--ink);background:var(--lumen);border-radius:999px;padding:0 5px;line-height:1.5}
+@media (prefers-reduced-motion:reduce){.al-spot{animation:none}}
+
 
 </style>
 
@@ -667,6 +690,8 @@ button{font:inherit;color:inherit}
     <div class="al-relics" id="alRelics"></div>
   </header>
   <main class="al-main" id="alMain"></main>
+  <div class="al-spots" id="alSpots" aria-hidden="true"></div>
+  <div class="al-fly" id="alFly" aria-hidden="true"></div>
   <div class="al-toast" id="alToast" role="status" aria-live="polite"></div>
 
   <section class="overlay" id="alMenuOv" hidden>
@@ -777,7 +802,7 @@ button{font:inherit;color:inherit}
   </div>
 </section>
 
-<div class="ver" aria-hidden="true">v1.22.0</div>
+<div class="ver" aria-hidden="true">v1.23.0</div>
 
 <script id="genso-images">window.GENSO_IMAGES = {
   "fire-1": "data:image/jpeg;base64,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",
@@ -3651,7 +3676,7 @@ function truthPow() { // 坩堝にあるあなたの真理の力
 }
 function drawN(n) {
   for (let i = 0; i < n && B.hand.length < CFG.HAND_MAX; i++) {
-    if (!B.draw.length) { if (!B.disc.length) break; B.draw = shuffle(B.disc); B.disc = []; }
+    if (!B.draw.length) { if (!B.disc.length) break; B.draw = shuffle(B.disc); B.disc = []; B.shuf = true; }
     B.hand.push(B.draw.pop());
   }
 }
@@ -3661,10 +3686,110 @@ function startTurn() {
   B.plays = CFG.PLAYS + (tp[3] ? 1 : 0) + (B.bell ? 1 : 0);
   if (B.bell) toast('静寂の鈴 ― 手数+1');
   B.bell = false;
+  const had = new Set(B.hand.map(c => c.id)); B.shuf = false;
   drawN(CFG.HAND + (tp[2] ? 1 : 0) + (has('deep') ? 1 : 0) - (has('heavy') ? 1 : 0));
   if (B.turn === 1 && has('seed')) { const c = mk('light', -1, 0, true); c.tmp = true; B.hand.push(c); }
+  const shuf = B.shuf; delete B.shuf;
   SEL = null; render(); save();
+  if (shuf) { animReshuffle(); toast('山札が尽きた ― 捨て札を混ぜて、新しい山札にした'); }
+  animDraw(B.hand.filter(c => !had.has(c.id)).map(c => c.id), shuf ? 380 : 0);
 }
+
+/* ---------- 札の移動を見せる（影のアニメーション）----------
+   札の状態はすぐに動かし、画面の上を「影」が飛んで、どこからどこへ行ったかを示す。
+   視差効果を減らす設定では移動を見せない（影は飛ばず、すぐに次へ進む） */
+const MOVE = !RM;
+const FLY_MS = 300;
+const LAST = new Map();                 // 札id → 最後にいた場所（手札から重ねた札の、重ねた先）
+const rectOf = n => (n ? n.getBoundingClientRect() : null);
+const sockEl = id => document.querySelector(`#alRow [data-id="${id}"]`);
+const pileEl = k => document.querySelector(`.al-pile[data-pile="${k}"]`);
+const orbRect = n => (n ? (n.querySelector('.oi') || n).getBoundingClientRect() : null);
+const ghostOrb = c => orbHTML(c);
+function fly(from, to, html, o = {}) {
+  if (!MOVE || !from || !to || !from.width || !to.width) return Promise.resolve();
+  const layer = ui('alFly'); if (!layer) return Promise.resolve();
+  const g = document.createElement('div');
+  g.className = `al-ghost ${o.cls || ''}`; g.innerHTML = html;
+  const w = from.width, h = from.height;
+  Object.assign(g.style, { left: `${from.left}px`, top: `${from.top}px`, width: `${w}px`, height: `${h}px` });
+  layer.appendChild(g);
+  const s = o.end != null ? o.end : Math.min(to.width / w, to.height / h);
+  const dx = to.left + to.width / 2 - (from.left + w / 2), dy = to.top + to.height / 2 - (from.top + h / 2);
+  const lift = o.lift != null ? o.lift : Math.min(40, Math.hypot(dx, dy) * .18);
+  const a = g.animate([
+    { transform: 'translate(0,0) scale(1)', opacity: 1 },
+    { transform: `translate(${dx / 2}px,${dy / 2 - lift}px) scale(${(1 + s) / 2})`, opacity: 1, offset: .5 },
+    { transform: `translate(${dx}px,${dy}px) scale(${s})`, opacity: o.fade ? .15 : 1 },
+  ], { duration: o.ms || FLY_MS, delay: o.delay || 0, easing: 'cubic-bezier(.35,.6,.3,1)', fill: 'both' });
+  return a.finished.catch(() => {}).then(() => g.remove());
+}
+// 坩堝に入った札を、影が着くまで隠しておき、着いたら見せる
+function landed(id) { MARK.delete(id); const n = sockEl(id); if (n) n.classList.remove('land'); }
+// 坩堝や手札から、山札の束（除外・捨て札）へ飛ばす
+function toPile(c, pile) {
+  if (!MOVE || !c.own) return;
+  const from = orbRect(sockEl(c.id)) || LAST.get(c.id);
+  fly(from, rectOf(pileEl(pile)), ghostOrb(c), { end: .3, fade: true, ms: 420 });
+}
+// 引いた札：山札の束から手札の位置へ（FLIP）
+function animDraw(ids, delay0 = 0) {
+  if (!MOVE || !ids.length) return;
+  const from = rectOf(pileEl('draw')); if (!from) return;
+  ids.forEach((id, k) => {
+    const n = document.querySelector(`#alHand [data-id="${id}"]`); if (!n) return;
+    const r = n.getBoundingClientRect();
+    const dx = from.left + from.width / 2 - (r.left + r.width / 2), dy = from.top + from.height / 2 - (r.top + r.height / 2);
+    n.animate([{ transform: `translate(${dx}px,${dy}px) scale(.25)`, opacity: 0 }, { transform: 'none', opacity: 1 }],
+      { duration: 380, delay: delay0 + k * 80, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'backwards' });
+  });
+}
+// 捨て札を混ぜて山札へ（裏向きの札が数枚移る）
+function animReshuffle() {
+  const a = rectOf(pileEl('disc')), b = rectOf(pileEl('draw'));
+  if (!a || !b) return;
+  const box = { left: a.left + a.width / 2 - 11, top: a.top - 18, width: 22, height: 30 };
+  for (let i = 0; i < 4; i++) fly(box, { left: b.left + b.width / 2 - 11, top: b.top - 18, width: 22, height: 30 }, '<span class="al-back"></span>', { delay: i * 60, ms: 360, lift: 30 });
+}
+
+/* ---------- チュートリアルの注目枠（画面の上に重ねる。要素の外枠は使わない）---------- */
+function placeSpots() {
+  const layer = ui('alSpots'); if (!layer) return;
+  layer.innerHTML = '';
+  const st = TUT ? tutStep() : null;
+  if (!st || !st.hl || !R || R.phase !== 'battle' || ui('alch').hidden) return;
+  const vw = document.documentElement.clientWidth, pad = 6;
+  for (const sel of st.hl) document.querySelectorAll(sel).forEach(n => {
+    let r = n.getBoundingClientRect();
+    if (n.id === 'alHand' && n.children.length) { // 手札は札の並びそのものを囲む
+      const cs = [...n.children].map(x => x.getBoundingClientRect());
+      r = { left: Math.min(...cs.map(c => c.left)), top: Math.min(...cs.map(c => c.top)), right: Math.max(...cs.map(c => c.right)), bottom: Math.max(...cs.map(c => c.bottom)) };
+    }
+    if (!(r.right - r.left) || !(r.bottom - r.top)) return;
+    const round = n.classList.contains('al-sock');
+    const br = round ? '50%' : `${Math.min(28, Math.max(10, (parseFloat(getComputedStyle(n).borderTopLeftRadius) || 0) + pad))}px`;
+    const L = Math.max(3, r.left - pad), T = Math.max(3, r.top - pad), Rr = Math.min(vw - 3, r.right + pad);
+    const d = document.createElement('div'); d.className = 'al-spot';
+    Object.assign(d.style, { left: `${L}px`, top: `${T}px`, width: `${Rr - L}px`, height: `${r.bottom + pad - T}px`, borderRadius: br });
+    layer.appendChild(d);
+  });
+}
+let spotTimer = 0;
+function spotsSoon() { // 描き終わってから測る。引く札の動きが終わった後にも測り直す
+  requestAnimationFrame(placeSpots);
+  clearTimeout(spotTimer); spotTimer = setTimeout(placeSpots, 900);
+}
+
+/* ---------- いまの札（山札が増える画面で、すべてを見せる）---------- */
+function deckPanel() {
+  const g = groupCards(R.deck), h = harmonyOf(R.deck), news = new Set(R.newIds || []);
+  const isNew = c => R.deck.some(d => sameKind(d, c) && news.has(d.id));
+  const sum = `${[0, 1, 2, 3].map(e => `${EL[e].name} <b>${h.amt[e]}</b>${h.truth[e] ? '（真理）' : ''}`).join('・')} ― 差 <b>${h.gap}</b>：${h.ok ? '<b>〈調和〉</b>' : '〈調和〉なし'}`;
+  return `<section class="al-mydeck" aria-label="いまの札"><h3>いまの札 <b>${R.deck.length}</b>枚</h3><p class="al-deck-sum">${sum}</p>
+    <div class="al-grid mini">${g.map(({ c, n }) => cardHTML(c, 'tabindex="-1" aria-hidden="true"', 'static' + (isNew(c) ? ' fresh' : '')).replace('</button>', `${n > 1 ? `<span class="n">×${n}</span>` : ''}${isNew(c) ? '<span class="new">NEW</span>' : ''}</button>`)).join('')}</div></section>`;
+}
+// 山札が変わる操作を包み、新しく加わった札に印をつける
+function trackNew(fn) { const before = new Set(R.deck.map(c => c.id)); const r = fn(); R.newIds = R.deck.filter(c => !before.has(c.id)).map(c => c.id); return r; }
 
 /* ---------- 反応 ---------- */
 function stackKind(H, Tc) { // 手札 H を坩堝の Tc に重ねたら
@@ -3703,8 +3828,8 @@ function deal(n, big) {
     setTimeout(() => toast(D.rage), 400);
   }
 }
-function toExile(c) { MARK.delete(c.id); if (c.own) B.exile.push(c); }
-function toDiscard(c) { MARK.delete(c.id); if (!c.own) return; if (CFG.exhaustSpecial && (c.k === 'light' || c.k === 'dark')) B.exile.push(c); else B.disc.push(c); }
+function toExile(c) { toPile(c, 'exile'); MARK.delete(c.id); if (c.own) B.exile.push(c); }
+function toDiscard(c) { MARK.delete(c.id); if (!c.own) return; const ex = CFG.exhaustSpecial && (c.k === 'light' || c.k === 'dark'); toPile(c, ex ? 'exile' : 'disc'); if (ex) B.exile.push(c); else B.disc.push(c); }
 async function show(ms) { renderBattle(); if (ms) await sleep(ms); }
 function chainNote() {
   const n = ui('alChain'); if (!n) return;
@@ -3837,11 +3962,20 @@ async function play(hi, tgt) {
   if (tgt.s != null) { kind = stackKind(H, B.cru[tgt.s]); if (!kind) return; }
   else if (B.cru.length >= CFG.SLOTS || tgt.p == null) return;
   SFX.init();
+  const from = orbRect(document.querySelector(`#alHand [data-id="${H.id}"]`));
   BUSY = true; SEL = null; B.plays--; B.hand.splice(hi, 1);
   CH = { k: 0, dmg: 0 };
   try {
-    if (tgt.p != null) { B.cru.splice(Math.min(tgt.p, B.cru.length), 0, H); MARK.set(H.id, 'born'); SFX.place(); await show(CFG.STEP * .4); }
-    else await doStack(H, tgt.s, kind);
+    if (tgt.p != null) {
+      B.cru.splice(Math.min(tgt.p, B.cru.length), 0, H);
+      if (MOVE) { MARK.set(H.id, 'land'); await show(0); await fly(from, orbRect(sockEl(H.id)), ghostOrb(H)); landed(H.id); }
+      else { MARK.set(H.id, 'born'); }
+      SFX.place(); await show(CFG.STEP * .4);
+    } else {
+      const T = B.cru[tgt.s];
+      if (MOVE) { await show(0); const to = orbRect(sockEl(T.id)); await fly(from, to, ghostOrb(H)); LAST.set(H.id, to); }
+      await doStack(H, tgt.s, kind);
+    }
   } catch (err) { console.error(err); }
   if (CH.k >= 2) toast(`${CH.k}連鎖 ― 調律力 ${CH.dmg}`);
   R.stats.maxChain = Math.max(R.stats.maxChain, CH.k); R.stats.maxHit = Math.max(R.stats.maxHit, CH.dmg);
@@ -3854,7 +3988,9 @@ async function play(hi, tgt) {
 async function endTurn() {
   if (BUSY || !B) return;
   BUSY = true; SEL = null; SFX.init();
+  const leaving = B.hand.map(c => [c, orbRect(document.querySelector(`#alHand [data-id="${c.id}"]`))]);
   B.disc.push(...B.hand); B.hand = [];
+  if (MOVE && leaving.length) { await show(0); const to = rectOf(pileEl('disc')); await Promise.all(leaving.map(([c, r], k) => fly(r, to, ghostOrb(c), { end: .3, fade: true, delay: k * 50, ms: 360 }))); }
   if (truthPow()[A]) { const h = heal(3); if (h) floatText(`+${h}`, 'heal', true); }
   if (has('bell') && B.cru.length === 0) B.bell = true;
   await show(200);
@@ -3865,8 +4001,13 @@ async function endTurn() {
   startTurn();
 }
 async function dropIn(c) {
-  if (B.cru.length < CFG.SLOTS) { B.cru.push(c); MARK.set(c.id, 'born'); SFX.spawn(); }
-  else {
+  const src = rectOf(document.querySelector('.al-emblem'));
+  if (B.cru.length < CFG.SLOTS) {
+    B.cru.push(c); SFX.spawn();
+    if (MOVE) { MARK.set(c.id, 'land'); await show(0); await fly(src, orbRect(sockEl(c.id)), ghostOrb(c), { ms: 260 }); landed(c.id); MARK.set(c.id, 'pop'); }
+    else MARK.set(c.id, 'born');
+  } else {
+    if (MOVE) await fly(src, rectOf(ui('alHpBar')), ghostOrb(c), { end: .5, fade: true, ms: 340 });
     const dmg = Math.max(1, (c.k === 'el' ? CFG.OVER[c.t] : 2) - (has('sand') ? 1 : 0));
     R.hp = Math.max(0, R.hp - dmg); SFX.knock(1);
     floatText(`−${dmg}`, 'hurt', true);
@@ -3881,7 +4022,7 @@ async function enemyTurn() {
     if (p.p) for (let i = 0; i < p.p; i++) await dropIn(mk('pure', -1, 1, false));
     if (p.l) await dropIn(mk('light', -1, 0, false));
     if (p.k) await dropIn(mk('dark', -1, 0, false));
-    if (p.c) { for (let i = 0; i < p.c; i++) B.disc.push(mk('pure', -1, 1, true)); toast(`無垢が${p.c}枚、捨て札に混ざった`); SFX.dark(); await show(CFG.STEP); }
+    if (p.c) { const src = rectOf(document.querySelector('.al-emblem')), to = rectOf(pileEl('disc')); for (let i = 0; i < p.c; i++) { const cu = mk('pure', -1, 1, true); B.disc.push(cu); fly(src, to, ghostOrb(cu), { end: .4, delay: i * 90, ms: 420 }); } toast(`無垢が${p.c}枚、捨て札に混ざった`); SFX.dark(); await show(CFG.STEP); }
     if (p.inv) { for (const c of B.cru) if (c.k === 'el') { c.e = OPP(c.e); MARK.set(c.id, 'flip'); } toast('坩堝の元素が、すべて反転した'); SFX.light(); await show(CFG.STEP * 1.2); }
     if (p.g) { let n = 0; for (const c of B.cru) if (!c.own && c.k === 'el' && c.t < 3) { c.t++; n++; MARK.set(c.id, 'pop'); } toast(n ? '混沌の札が育った' : '混沌がうごめく'); SFX.lvUp(); await show(CFG.STEP * 1.2); }
     if (R.hp <= 0) return;
@@ -3919,6 +4060,7 @@ function victory() {
   const pool = shuffle(relicPool());
   R.reward = { name: D.name, kind, silent, echo, cards: offerCards(3, silent), took: false, relic: kind === 'elite' && pool.length ? pool[0] : null, relicChoice: kind === 'boss' ? pool.slice(0, 3) : null, relicTaken: false };
   if (R.reward.relic) gainRelic(R.reward.relic);
+  R.newIds = [];
   R.phase = 'reward'; save(); render(true);
 }
 function leaveReward() {
@@ -3932,7 +4074,7 @@ function leaveReward() {
   }
   toMap();
 }
-function toMap() { R.phase = 'map'; R.rest = R.shop = R.event = null; save(); render(true); }
+function toMap() { R.newIds = []; R.phase = 'map'; R.rest = R.shop = R.event = null; save(); render(true); }
 function progressScore() { return (R.act - 1) * (CFG.ROWS + 1) + (R.pos ? (R.pos === 'boss' ? CFG.ROWS + 1 : R.map[R.pos].r + 1) : 0); }
 function recordEnd(won) {
   const best = store.get('alch.best', { prog: 0, act: 1, step: 0, wins: 0 });
@@ -4001,7 +4143,7 @@ function render(scrollTop) {
   if (!R) return;
   renderTop();
   const main = ui('alMain');
-  if (R.phase !== 'battle') main.dataset.view = '';
+  if (R.phase !== 'battle') { main.dataset.view = ''; const sp = ui('alSpots'); if (sp) sp.innerHTML = ''; }
   if (R.phase === 'battle') renderBattle();
   else if (R.phase === 'map') renderMap();
   else if (R.phase === 'reward') renderReward();
@@ -4073,7 +4215,7 @@ function renderBattle() {
       if (k && TUT && !tutOk('stack', H, k, i)) k = null;
       const m = MARK.get(c.id) || '';
       const tp = c.own && c.k === 'el' && c.t === 4 ? `<span class="tp">${TRUTH_POW[c.e].name}</span>` : '';
-      row += `<button type="button" class="al-sock ${c.own ? 'own' : 'foe'} ${c.k === 'el' || c.k === 'pure' ? 't' + c.t : 'sp'} ${k ? 'can' : 'info'} ${k === 'anni' || k === 'tune' ? 'anni' : ''} ${m}" data-s="${i}" aria-label="${c.own ? 'あなたの' : '混沌の'}${cname(c)}">${orbHTML(c)}${tp}</button>`;
+      row += `<button type="button" class="al-sock ${c.own ? 'own' : 'foe'} ${c.k === 'el' || c.k === 'pure' ? 't' + c.t : 'sp'} ${k ? 'can' : 'info'} ${k === 'anni' || k === 'tune' ? 'anni' : ''} ${m}" data-s="${i}" data-id="${c.id}" aria-label="${c.own ? 'あなたの' : '混沌の'}${cname(c)}">${orbHTML(c)}${tp}</button>`;
     } else {
       const put = canPut && i === B.cru.length;
       row += `<button type="button" class="al-sock ${put ? 'put' : ''}" ${put ? `data-p="${i}" aria-label="右端に置く"` : 'tabindex="-1" aria-hidden="true"'}></button>`;
@@ -4086,7 +4228,7 @@ function renderBattle() {
   ui('alMarks').innerHTML = marks;
   ui('alCruN').textContent = `${B.cru.length}/${CFG.SLOTS}`;
   // 手札
-  ui('alHand').innerHTML = B.hand.map((c, i) => cardHTML(c, `data-h="${i}"`, (SEL === i ? 'sel' : '') + (!canAct ? ' dim' : tutCls(c)))).join('');
+  ui('alHand').innerHTML = B.hand.map((c, i) => cardHTML(c, `data-h="${i}" data-id="${c.id}"`, (SEL === i ? 'sel' : '') + (!canAct ? ' dim' : tutCls(c)))).join('');
   // 下段
   const tp = truthPow();
   const pw = tp.map((on, e) => on ? `<span class="al-chip" title="${TRUTH_POW[e].desc}">${EL[e].name}〈${TRUTH_POW[e].name}〉</span>` : '').join('');
@@ -4141,7 +4283,7 @@ function renderReward() {
     ${W.silent ? '<span class="al-badge">完全なる静寂</span><p>最後の一撃で坩堝が空になった。報酬が増える。</p>' : ''}
     <p class="al-gain">残響 +${W.echo}</p>${rel}${relC}
     <p>${W.took ? '札を山札に加えた。' : '札を1枚選んで、山札に加える'}</p><div class="al-offer">${cards}</div>
-    <div class="al-choices"><button type="button" class="btn ${W.took || W.relicChoice ? 'primary' : ''}" id="alLeave">${W.took ? '先へ' : '札を加えずに先へ'}</button></div></div>`;
+    <div class="al-choices"><button type="button" class="btn ${W.took || W.relicChoice ? 'primary' : ''}" id="alLeave">${W.took ? '先へ' : '札を加えずに先へ'}</button></div>${deckPanel()}</div>`;
 }
 function relicBtn(id, attrs, dis, price) {
   const r = RELICS[id];
@@ -4157,7 +4299,7 @@ function renderRest() {
       <button type="button" class="btn" id="alRestHeal">器を${amt}回復する（いま ${R.hp}/${R.maxHp}）</button>
       <button type="button" class="btn" id="alRestMerge" ${canMerge ? '' : 'disabled'}>同じ札を2枚、合成する</button>
       <button type="button" class="btn" id="alRestRemove" ${R.deck.length > 1 ? '' : 'disabled'}>札を1枚取り除く</button>
-      <button type="button" class="btn" id="alLeave">何もせずに先へ</button></div>`}</div>`;
+      <button type="button" class="btn" id="alLeave">何もせずに先へ</button></div>`}${deckPanel()}</div>`;
 }
 function renderShop() {
   const S2 = R.shop;
@@ -4167,14 +4309,14 @@ function renderShop() {
     <div class="al-offer">${cards}</div>
     ${rels ? `<div class="al-rel-offer">${rels}</div>` : ''}
     <div class="al-choices"><button type="button" class="btn" id="alShopRemove" ${S2.removed || R.echo < R.removeCost || R.deck.length <= 1 ? 'disabled' : ''}>札を1枚取り除く（${S2.removed ? '済み' : R.removeCost}）</button>
-    <button type="button" class="btn primary" id="alLeave">市を出る</button></div></div>`;
+    <button type="button" class="btn primary" id="alLeave">市を出る</button></div>${deckPanel()}</div>`;
 }
 function renderEvent() {
   const Ev = EVENTS[R.event.key];
   const opts = Ev.opts();
   ui('alMain').innerHTML = `<div class="al-page"><p class="eyebrow">Encounter</p><h2>${Ev.name}</h2><p>${Ev.text}</p>
     ${R.event.res ? `<p class="al-gain">${R.event.res}</p><div class="al-choices"><button type="button" class="btn primary" id="alLeave">先へ</button></div>`
-    : `<div class="al-choices">${opts.map((o, i) => `<button type="button" class="btn" data-ev="${i}" ${o.ok === false ? 'disabled' : ''}>${o.label}</button>`).join('')}</div>`}</div>`;
+    : `<div class="al-choices">${opts.map((o, i) => `<button type="button" class="btn" data-ev="${i}" ${o.ok === false ? 'disabled' : ''}>${o.label}</button>`).join('')}</div>`}${deckPanel()}</div>`;
 }
 function renderEnd() {
   const E2 = R.end, s = R.stats;
@@ -4236,7 +4378,7 @@ function onMain(e) {
   if (d.node) { enterNode(d.node); return; }
   if (R.phase === 'reward') {
     const W = R.reward;
-    if (d.take != null && !W.took) { const o = W.cards[+d.take]; const c = mk(o.k, o.e, o.t); R.deck.push(c); W.took = true; SFX.unlock(); toast(`${cname(c)}を山札に加えた`); save(); render(); return; }
+    if (d.take != null && !W.took) { const o = W.cards[+d.take]; const c = mk(o.k, o.e, o.t); R.deck.push(c); R.newIds = [c.id]; W.took = true; SFX.unlock(); toast(`${cname(c)}を山札に加えた`); save(); render(); return; }
     if (d.rc && !W.relicTaken) { gainRelic(d.rc); W.relicTaken = true; W.relicChoice = [d.rc]; SFX.unlock(); save(); render(); return; }
     if (t.id === 'alLeave') { if (W.relicChoice && W.relicChoice.length > 1 && !W.relicTaken) { toast('音叉を一つ選ぼう'); return; } leaveReward(); }
     return;
@@ -4248,7 +4390,7 @@ function onMain(e) {
       const ok = c => (c.k === 'el' || c.k === 'pure') && c.t < 4 && R.deck.filter(x => sameKind(c, x)).length >= 2;
       openDeck('合成する札を選ぶ', R.deck, { filter: ok, pick: id => {
         const c = R.deck.find(x => x.id === id); const two = R.deck.filter(x => sameKind(c, x)).slice(0, 2);
-        R.deck = R.deck.filter(x => !two.includes(x)); const N = mk(c.k, c.e, c.t + 1); R.deck.push(N);
+        R.deck = R.deck.filter(x => !two.includes(x)); const N = mk(c.k, c.e, c.t + 1); R.deck.push(N); R.newIds = [N.id];
         R.rest.done = `${cname(c)}2枚が、${cname(N)}になった。`; SFX.merge(N.t, 1); truthBornDeck(N); save(); render();
       } });
       return;
@@ -4258,7 +4400,7 @@ function onMain(e) {
   }
   if (R.phase === 'shop') {
     const S2 = R.shop;
-    if (d.buy != null) { const o = S2.cards[+d.buy]; if (o.sold) return; if (R.echo < o.price) { toast('残響が足りない'); return; } R.echo -= o.price; o.sold = true; const c = mk(o.c.k, o.c.e, o.c.t); R.deck.push(c); SFX.unlock(); toast(`${cname(c)}を手に入れた`); save(); render(); return; }
+    if (d.buy != null) { const o = S2.cards[+d.buy]; if (o.sold) return; if (R.echo < o.price) { toast('残響が足りない'); return; } R.echo -= o.price; o.sold = true; const c = mk(o.c.k, o.c.e, o.c.t); R.deck.push(c); R.newIds = [...(R.newIds || []), c.id]; SFX.unlock(); toast(`${cname(c)}を手に入れた`); save(); render(); return; }
     if (d.buyr != null) { const o = S2.relics[+d.buyr]; if (o.sold || R.echo < o.price) return; R.echo -= o.price; o.sold = true; gainRelic(o.id); SFX.unlock(); save(); render(); return; }
     if (t.id === 'alShopRemove') { openDeck('取り除く札を選ぶ', R.deck, { pick: id => { const c = R.deck.find(x => x.id === id); R.deck = R.deck.filter(x => x !== c); R.echo -= R.removeCost; R.removeCost += 25; S2.removed = true; toast(`${cname(c)}を取り除いた`); SFX.dark(); save(); render(); } }); return; }
     if (t.id === 'alLeave') toMap();
@@ -4268,8 +4410,8 @@ function onMain(e) {
     if (t.id === 'alLeave') return toMap();
     if (d.ev != null) {
       const o = EVENTS[R.event.key].opts()[+d.ev];
-      if (o.pick) { openDeck(o.title, R.deck, { filter: o.pick, pick: id => { const c = R.deck.find(x => x.id === id); R.event.res = o.act(c); SFX.unlock(); save(); render(); } }); return; }
-      R.event.res = o.run ? o.run() : '何もせずに立ち去った。'; SFX.tap(); save(); render();
+      if (o.pick) { openDeck(o.title, R.deck, { filter: o.pick, pick: id => { const c = R.deck.find(x => x.id === id); R.event.res = o.act(c); R.newIds = o.act && c.k === 'el' ? [c.id] : []; SFX.unlock(); save(); render(); } }); return; }
+      R.event.res = o.run ? trackNew(o.run) : '何もせずに立ち去った。'; SFX.tap(); save(); render();
     }
     return;
   }
@@ -4341,10 +4483,10 @@ function tutPaint() {
   document.querySelectorAll('.tut-hl').forEach(n => n.classList.remove('tut-hl'));
   const c = ui('alCoach'); if (!c) return;
   const st = tutStep();
-  if (!st || R.phase !== 'battle') { c.hidden = true; return; }
+  if (!st || R.phase !== 'battle') { c.hidden = true; placeSpots(); return; }
   c.hidden = false;
   c.innerHTML = `<div class="row"><span class="ey">Tutorial ${TUT.i + 1} / ${TUT_STEPS.length}</span>${st.act ? '<span class="do">▶ やってみよう</span>' : ''}</div><p>${st.t}</p>${st.act ? '' : '<div class="row end"><button type="button" class="btn primary" id="alCoachNext">次へ</button></div>'}`;
-  for (const s of st.hl || []) document.querySelectorAll(s).forEach(n => n.classList.add('tut-hl'));
+  spotsSoon();
 }
 function startTutorial() {
   if (BUSY) return;
@@ -4415,7 +4557,7 @@ function openMenu() {
 function hide() { // タイトルへ戻るとき
   const a = alch(); if (a) a.hidden = true;
   ['alMenuOv', 'alDeckOv', 'alRulesOv', 'alStartOv'].forEach(id => { const n = ui(id); if (n) n.hidden = true; });
-  app.hidden = false; R = null; B = null; BUSY = false; SEL = null; TUT = null; if (a) a.classList.remove('tut');
+  app.hidden = false; R = null; B = null; BUSY = false; SEL = null; TUT = null; ui('alSpots').innerHTML = ''; ui('alFly').innerHTML = ''; if (a) a.classList.remove('tut');
   const best = store.get('alch.best', null), saved = store.get('alch.run', null);
   const b = ui('bestAlchemy');
   if (b) b.textContent = saved && saved.phase !== 'end' ? `冒険の途中（第${ACT_KAN[saved.act]}幕）` : best ? (best.wins ? `成就 ${best.wins}回` : `第${ACT_KAN[best.act] || '一'}幕・${best.step}歩まで`) : '—';
@@ -4437,6 +4579,8 @@ function init() {
   ui('alNewRun').addEventListener('click', () => { newRun(); enter(); toast('三幕の混沌を鎮める旅が始まる'); });
   ui('alStartBack').addEventListener('click', () => { ui('alStartOv').hidden = true; el.titleOv.hidden = false; });
   ui('alMain').addEventListener('click', onMain);
+  ui('alMain').addEventListener('scroll', () => { if (TUT) placeSpots(); }, { passive: true });
+  window.addEventListener('resize', () => { if (TUT && S.screen === 'alch') placeSpots(); });
   ui('alMenuBtn').addEventListener('click', () => { SFX.tap(); openMenu(); });
   ui('alTutorial').addEventListener('click', startTutorial);
   ui('alRulesTut').addEventListener('click', startTutorial);
