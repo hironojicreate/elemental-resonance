@@ -4598,7 +4598,7 @@ function openDeck(title, list, opts = {}) {
     const ok = !opts.filter || opts.filter(c);
     return cardHTML(c, ok && opts.pick ? `data-pick="${c.id}"` : '', ok ? '' : 'dim').replace('</button>', `${n > 1 ? `<span class="n">×${n}</span>` : ''}</button>`);
   }).join('')}</div>` : '<p class="al-deck-sum">札はない。</p>');
-  ov.hidden = false; ui('alDeckClose').focus();
+  ov.hidden = false; ov.querySelector('.panel').scrollTop = 0; ui('alDeckClose').focus({ preventScroll: true });
 }
 function closeDeck() { ui('alDeckOv').hidden = true; pickCb = null; }
 // 旅の錬成：戦闘の外で、残響を払って同じ札2枚を一段上の1枚に（ずっと残る）。分解は無料で一段下の2枚に
@@ -4623,7 +4623,7 @@ function openForge() {
       <button type="button" class="al-fg" id="alUseDark" ${nd ? '' : 'disabled'}>${miniCard({ k: 'dark', e: -1, t: 0 })}<span class="x">〈反転〉札を反対の元素に</span><span class="al-price">${nd}枚</span></button>`; })()}</div>
     <h3 class="al-sec">いまの札（${R.deck.length}枚）</h3>
     <div class="al-grid mini">${g.map(({ c, n }) => cardHTML(c, 'tabindex="-1" aria-hidden="true"', 'static').replace('</button>', `${n > 1 ? `<span class="n">×${n}</span>` : ''}</button>`)).join('')}</div>`;
-  ui('alDeckOv').hidden = false; ui('alDeckClose').focus();
+  ui('alDeckOv').hidden = false; ui('alDeckOv').querySelector('.panel').scrollTop = 0; ui('alDeckClose').focus({ preventScroll: true });
 }
 function forgeMerge(id) {
   const c = R.deck.find(x => x.id === id); if (!c || c.t >= 4) return;
