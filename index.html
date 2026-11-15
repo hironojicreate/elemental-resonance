@@ -913,6 +913,109 @@ button{font:inherit;color:inherit}
   .er>.al-coach{min-height:0}
   .er-hand{min-height:100px;padding-top:8px}
 }
+/* ================= 四方の盤 =================
+   上＝得点と山札の並び（すべて見える）／中＝4×4の盤と四方の刻印（上=火 下=水 左=風 右=土）／下＝手札3枚と操作 */
+.sh{position:fixed;inset:0;z-index:15;display:flex;flex-direction:column;gap:6px;overflow:hidden;
+  background-color:var(--ink);background-image:radial-gradient(120% 70% at 50% 0%,#14182f 0%,var(--ink) 62%);
+  padding-top:calc(env(safe-area-inset-top,0px) + 8px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 14px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.sh>.ks-top,.sh>.sh-deck,.sh>.sh-field,.sh>.ks-info,.sh>.sh-hand,.sh>.er-bot,.sh>.al-coach{width:100%;max-width:720px;margin-inline:auto}
+.sh>.ks-top,.sh>.sh-deck,.sh>.ks-info,.sh>.er-bot,.sh>.sh-hand{flex:none}
+.sh>.al-coach{min-height:7.4em;flex:none}
+.sh-deck{display:flex;flex-wrap:wrap;align-items:center;gap:3px 2px;min-height:22px;font-size:12px;color:var(--muted)}
+.sh-deck .lbl{margin-right:6px;white-space:nowrap}
+.sh-deck .lbl b{color:var(--text);font-variant-numeric:tabular-nums}
+.sh-deck .dk{display:inline-grid;place-items:center;width:19px;height:19px;border-radius:50%}
+.sh-deck .dk .oi{width:17px !important;height:17px !important}
+.sh-deck .dk.nx{box-shadow:0 0 0 1px var(--lumen)}
+.sh-deck .dk.far{opacity:.55}
+.sh-deck .goal{color:var(--text)}
+.sh-deck .goal em{font-style:normal;color:var(--lumen);font-weight:700}
+.sh-deck .goal .ng{color:#ffb3c1;font-weight:700}
+.sh-field{flex:1 1 auto;min-height:0;position:relative;display:grid;place-items:center}
+.sh-field .al-call{z-index:7}
+.sh-board{position:relative;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.sh-frame{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.sh-frame .fr{fill:rgba(0,0,0,.18);stroke:rgba(201,173,114,.34);stroke-width:1}
+.sh-frame .edge{stroke-width:2.5;stroke-linecap:round;opacity:.55}
+.sh-frame .cr{fill:#0c0f22;stroke:rgba(201,173,114,.6);stroke-width:1}
+.sh-frame .cr2{fill:none;stroke:rgba(201,173,114,.2);stroke-width:1}
+.sh-frame .gl{fill:none;stroke-linejoin:round;stroke-linecap:round}
+.sh-frame .ar{fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;opacity:.5}
+.sh-cell{position:absolute;left:0;top:0;padding:0;margin:0;border-radius:12px;border:1px solid rgba(201,173,114,.13);background:rgba(255,255,255,.018);
+  color:inherit;font:inherit;cursor:default;transition:background .15s,border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
+.sh-cell.can{cursor:pointer;border:1px dashed rgba(255,227,160,.55);background:rgba(255,227,160,.04)}
+.sh-cell.can:hover{background:rgba(255,227,160,.1)}
+.sh-cell.tgt{cursor:pointer;border-color:transparent;background:transparent}
+.sh-cell.pend{border:2px solid var(--lumen);background:rgba(255,227,160,.13);box-shadow:0 0 18px rgba(255,227,160,.25)}
+.sh-cell.tut{border:2px solid var(--lumen);animation:shTut .9s ease-in-out infinite alternate}
+@keyframes shTut{from{box-shadow:0 0 0 0 rgba(255,227,160,0)}to{box-shadow:0 0 0 3px rgba(255,227,160,.45),0 0 18px rgba(255,227,160,.5)}}
+.sh-pieces,.sh-board .sh-fx{position:absolute;inset:0;pointer-events:none}
+.sh-board .sh-fx{z-index:6}
+.sh-pc{position:absolute;left:0;top:0;z-index:2;border-radius:50%;will-change:transform;
+  transition:transform .2s cubic-bezier(.3,.75,.25,1),width .22s,height .22s,box-shadow .15s,opacity .2s}
+.sh-pc .oi{display:block;width:100% !important;height:100% !important}
+/* 刻印の向き：札の縁の小さな山形 */
+.sh-pc::after{content:"";position:absolute;left:50%;top:50%;width:0;height:0;border:4px solid transparent;opacity:.75;pointer-events:none;transition:opacity .2s}
+.sh-pc[data-e="0"]::after{border-bottom:5px solid #ffe0c8;border-top:0;transform:translate(-50%,calc(-50% - var(--h) - 3px))}
+.sh-pc[data-e="1"]::after{border-top:5px solid #d6efff;border-bottom:0;transform:translate(-50%,calc(-50% + var(--h) + 3px))}
+.sh-pc[data-e="2"]::after{border-right:5px solid #dcfff0;border-left:0;transform:translate(calc(-50% - var(--h) - 3px),-50%)}
+.sh-pc[data-e="3"]::after{border-left:5px solid #fff0c8;border-right:0;transform:translate(calc(-50% + var(--h) + 3px),-50%)}
+.sh-pc.slide{transition:transform var(--tk,.09s) linear,width .22s,height .22s}
+.sh-pc.tg{outline:2px dashed var(--lumen);outline-offset:3px}
+.sh-pc.hl{z-index:3;outline:3px solid var(--lumen);outline-offset:2px;filter:drop-shadow(0 0 10px rgba(255,227,160,.8))}
+.sh-pc.anni{z-index:3;outline:3px solid #e4dcff;outline-offset:2px;filter:drop-shadow(0 0 12px rgba(185,163,255,.95))}
+.sh-pc.pm{outline:2.5px solid var(--lumen);outline-offset:3px;animation:shPulse .8s ease-in-out infinite alternate}
+.sh-pc.pa{outline:2.5px solid #dcd0ff;outline-offset:3px;animation:shPulse .8s ease-in-out infinite alternate}
+.sh-pc.ghost{z-index:4;opacity:.55;filter:saturate(.8)}
+.sh-pc.ghost::after{opacity:1}
+.sh-pc.leaving{z-index:4;transition:none;outline:0;filter:none}
+.sh-pc.leaving::after{display:none}
+@keyframes shPulse{from{outline-color:rgba(255,255,255,.35)}to{filter:brightness(1.25) drop-shadow(0 0 10px rgba(220,208,255,.8))}}
+.sh-trail{position:absolute;left:0;top:0;height:3px;margin-top:-1.5px;border-radius:2px;transform-origin:0 50%;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,227,160,.8))}
+.sh-pts{position:absolute;left:0;top:0;transform:translate(-50%,-50%);font-family:var(--f-display);font-weight:800;font-size:15px;color:var(--lumen);white-space:nowrap;
+  text-shadow:0 0 10px rgba(0,0,0,.9),0 0 14px rgba(255,227,160,.5);pointer-events:none;animation:shPts 1s ease-out forwards}
+.sh-pts small{font-family:var(--f-latin);font-size:12px;color:#dcd0ff;margin-left:3px}
+@keyframes shPts{0%{opacity:0;translate:0 6px;scale:.7}18%{opacity:1;translate:0 0;scale:1.1}100%{opacity:0;translate:0 -26px;scale:1}}
+.sh-hand{min-height:112px;margin-top:0;padding-top:12px}
+.sh-hand .al-card.can{box-shadow:0 0 0 2px var(--lumen),0 0 16px rgba(255,227,160,.45)}
+.sh-hand .al-card.no{opacity:.55}
+.sh-hand .al-card.tut{animation:erTutC .9s ease-in-out infinite alternate}
+.sh-hand .al-card.er-in{animation:erIn .38s cubic-bezier(.2,.8,.3,1) both}
+.sh-hand .empty{align-self:center;font-size:12px;color:var(--faint)}
+.sh-hand .al-cs{color:var(--muted)}
+.sh .er-bot .btn.tut{box-shadow:0 0 0 3px rgba(255,227,160,.5);animation:erTutC .9s ease-in-out infinite alternate}
+.sh-pz{width:min(560px,100%)}
+.sh-pz h3{margin:12px 0 6px;font-family:var(--f-display);font-weight:800;font-size:16px}
+.sh-pz h3 small{font-family:var(--f-body);font-weight:500;font-size:12px;color:var(--muted);margin-left:8px}
+.sh-pz-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px}
+.sh-pz-grid .btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-height:54px;padding:6px 4px;border-radius:14px;line-height:1.25}
+.sh-pz-grid .btn b{margin:0;font-size:17px;color:var(--text)}
+.sh-pz-grid .btn small{font-size:10.5px;color:var(--muted)}
+.sh-pz-grid .btn.done{border-color:var(--lumen);background:rgba(255,227,160,.1)}
+.sh-pz-grid .btn.done small{color:var(--lumen)}
+.sh-pz-grid .btn.next{box-shadow:0 0 0 2px rgba(255,227,160,.45)}
+.sh-pz .sum{font-size:12.5px;color:var(--muted);margin:0 0 4px}
+.sh-rules .ks-mini{display:inline-flex;align-items:center;gap:3px;vertical-align:middle}
+.sh-rules .ks-mini .oi{width:20px !important;height:20px !important}
+.sh-rules .sh-fig{display:block;margin:6px auto 10px;max-width:100%}
+.sh-res .ks-left{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin:4px 0 6px}
+@media (prefers-reduced-motion:reduce){.sh-pc{transition-duration:.08s}.sh-pc.pm,.sh-pc.pa,.sh-cell.tut,.sh-hand .al-card.tut{animation:none}}
+@media (max-width:480px){.sh>.ks-top .ks-name{display:none}}
+@media (max-width:560px){
+  .sh .er-bot .btn{padding:6px 12px;font-size:12.5px}
+  .sh>.ks-top{flex-wrap:nowrap;gap:4px 10px}
+  .sh>.ks-top .ks-stat b{font-size:16px}
+  .sh-hand{min-height:104px}
+}
+@media (max-height:760px){
+  .sh.tut>.ks-info{display:none}
+}
+@media (max-height:700px){
+  .sh>.al-coach{min-height:0}
+  .sh-hand{min-height:96px;padding-top:8px}
+}
 </style>
 
 <div id="app" class="on-title">
@@ -996,6 +1099,12 @@ button{font:inherit;color:inherit}
         <span class="mode-desc">迫りくる侵食の隊列を、手札の札で打ち消す。一列ずつ押し返し、結界を守りきる。</span>
         <span class="mode-best">記録 <b id="bestErosion">—</b></span>
       </button>
+      <button class="mode" id="goShiho" type="button">
+        <span class="mode-ic drops" id="icShiho"></span>
+        <span class="mode-name">四方の盤<small>Four Crests</small></span>
+        <span class="mode-desc">4×4の盤に札を置く。消えた跡へ、四方の刻印に引かれた札が滑り込み、連鎖する。詰め将棋のように読みきる。</span>
+        <span class="mode-best">記録 <b id="bestShiho">—</b></span>
+      </button>
       <div class="links"><button class="link" id="goRules" type="button">あそびかた</button><button class="link" id="goTune" type="button">バランス調整</button></div>
     </div>
   </div>
@@ -1057,6 +1166,10 @@ button{font:inherit;color:inherit}
       <div>
         <h3>侵食</h3>
         <p>混沌の山から毎手番湧く<em>侵食</em>を、<em>4マスの前線</em>で手札の札をぶつけて打ち消す迎撃戦。同じ元素・同じ段階は合成、反対の元素・同じ段階は対消滅、というきまりが侵食にも働き、侵食どうしは合流して重くなる一方、新しく隣り合えば誘爆して消える。手番の終わりに前線に残った量だけ結界が崩れ、残りが1体以下なら押し返し、2体以上なら居座られる。混沌の山32枚を尽くせば守りきり。チュートリアルつき。</p>
+      </div>
+      <div>
+        <h3>四方の盤</h3>
+        <p>4×4の盤に、手札3枚から1枚ずつ札を置く。盤の縁の刻印（上=火・下=水・左=風・右=土）へ、札はそれぞれ引かれている。<em>置いた札は留まり</em>、上下左右と合成・対消滅する。札が消えて正面のマスが空くと、その札は刻印へ向かって<em>ぶつかるまで滑り</em>、止まった先でまた反応して連鎖する。〈一局〉は山札28枚の並びがすべて見え、連鎖の段ごとに倍率が倍、16マスが埋まれば終わり。〈詰め〉は答えが一通りの24問。チュートリアルつき。</p>
       </div>
       <div>
         <h3>錬成の書</h3>
@@ -1489,7 +1602,121 @@ button{font:inherit;color:inherit}
   </div>
 </section>
 
-<div class="ver" aria-hidden="true">v1.58.0</div>
+<section class="sh" id="sh" hidden aria-label="四方の盤">
+  <header class="ks-top">
+    <span class="ks-name">四方の盤</span>
+    <span id="shStats" style="display:contents"></span>
+    <div class="ks-tbtns">
+      <button class="btn icon" id="shRulesBtn" type="button" aria-label="あそびかた" title="あそびかた">?</button>
+      <button class="btn icon" id="shSound" type="button" aria-label="音のオン・オフ">♪</button>
+      <button class="btn icon" id="shMenuBtn" type="button" aria-label="メニュー">≡</button>
+    </div>
+  </header>
+  <div class="sh-deck" id="shDeck"></div>
+  <main class="sh-field" id="shField">
+    <div class="sh-board" id="shBoard">
+      <svg class="sh-frame" id="shFrame" aria-hidden="true"></svg>
+      <div class="sh-cells" id="shCells" role="group" aria-label="盤（4×4）"></div>
+      <div class="sh-pieces" id="shPieces" aria-hidden="true"></div>
+      <div class="sh-fx" id="shFx" aria-hidden="true"></div>
+    </div>
+    <div id="shCall" aria-hidden="true"></div>
+  </main>
+  <div id="shCoach" hidden></div>
+  <p class="ks-info" id="shInfo" role="status" aria-live="polite"></p>
+  <div class="al-hand sh-hand" id="shHand" role="group" aria-label="手札"></div>
+  <footer class="er-bot" id="shActs"></footer>
+  <div class="er-fly" id="shFly" aria-hidden="true"></div>
+
+  <section class="overlay" id="shMenuOv" hidden>
+    <div class="panel pause" role="dialog" aria-modal="true" aria-labelledby="shMenuH">
+      <p class="eyebrow">Four Crests</p>
+      <h2 id="shMenuH">四方の盤</h2>
+      <div class="stack">
+        <button class="btn primary" id="shResume" type="button">続ける</button>
+        <button class="btn" id="shMenuRules" type="button">あそびかた</button>
+        <button class="btn" id="shAnswer" type="button">答えを見る</button>
+        <button class="btn" id="shRetrySame" type="button">同じ並びで最初から</button>
+        <button class="btn" id="shRetryNew" type="button">新しい並びで始める</button>
+        <button class="btn" id="shToList" type="button">問題を選ぶ</button>
+        <button class="btn" id="shToTitle" type="button">タイトルへ（一局の続きは保存される）</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="overlay" id="shResOv" hidden>
+    <div class="panel result sh-res" role="dialog" aria-modal="true" aria-labelledby="shResH">
+      <p class="eyebrow">Four Crests</p>
+      <h2 id="shResH">終局</h2>
+      <p class="res-sub" id="shResSub"></p>
+      <div class="ks-left" id="shResLeft"></div>
+      <div class="res-score"><b id="shResPts">0</b><span class="badge" id="shResRec" hidden>新記録</span></div>
+      <dl class="res-stats" id="shResStats"></dl>
+      <div class="panel-btns">
+        <button class="btn primary" id="shResA" type="button">新しい並びで</button>
+        <button class="btn" id="shResB" type="button">同じ並びでもう一度</button>
+        <button class="btn" id="shResTitle" type="button">タイトルへ</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="overlay" id="shRulesOv" hidden>
+    <div class="panel rules al-rules sh-rules" role="dialog" aria-modal="true" aria-labelledby="shRulesH">
+      <p class="eyebrow">How to play</p>
+      <h2 id="shRulesH">四方の盤 あそびかた</h2>
+      <p class="rules-lede">4×4の盤に、手札の札を一枚ずつ置く。四方の縁には刻印があり、札はそれぞれの元素の刻印へ引かれている。消えた札の跡へ、周りの札が滑り込み、連鎖する。</p>
+      <div class="al-tutcall"><span>実際に動かして覚えるなら</span><button class="btn primary" id="shRulesTut" type="button">チュートリアルを始める</button></div>
+      <h3>盤と刻印</h3>
+      <p>上の縁に<em>火</em>、下に<em>水</em>、左に<em>風</em>、右に<em>土</em>の刻印。<em>札はみな、自分の元素の刻印の向きに引かれている</em>（火は上へ、水は下へ、風は左へ、土は右へ）。盤の札の縁の小さな山形が、その向き（<em>正面</em>）。向かい合う刻印どうしが対：火と水、風と土。</p>
+      <p>段階は雫・輝石・光核・真理。<span id="shRulesTiers"></span></p>
+      <h3>置く</h3>
+      <p>手札（3枚）から1枚選び、空いたマスをタップすると<em>下見</em>（最初に起きる反応が光る）、もう一度タップで置く（マウスなら、指すと下見、クリックで置く）。<em>置いた札は、そのマスに留まる</em>。置いただけでは滑らない。</p>
+      <p><em>光〈昇華〉</em>は盤の札に使い、一段上げる（光核まで）。<em>闇〈反転〉</em>は盤の札を反対の元素に変える。向きも反対になり、<em>新しい刻印へ滑り出す</em>。</p>
+      <h3>反応</h3>
+      <p>置いた札は、上下左右の札と反応する。<em>同じ元素・同じ段階なら合成</em>：置いた札が相手のマスへ重なり、一段上がる（置いたマスは空く）。<em>反対の元素・同じ段階なら対消滅</em>：両方消える。真理どうしは合成しない。</p>
+      <p>相手が二つ以上いるときは、<em>正面から時計回り</em>に探して、最初に見つかった一つと反応する。</p>
+      <h3>滑り込みと連鎖</h3>
+      <p>札が消えて（または滑り去って）、ある札の<em>正面のマスが空くと</em>、その札は刻印へ向かって滑り出し、<em>何かにぶつかるか縁に着くまで止まらない</em>。去ったマスには、また後ろの札が続く。止まった札は上下左右と反応する。これが<em>連鎖</em>。合成でできた札も、すぐに次の相手を探す。</p>
+      <p>滑りは1マスずつ一斉に進む。<em>同じマスへ同時に入ろうとしたら、火・水・風・土の順に先</em>。相手を探す順は、合成でできた札が先、次に止まった順（同時に止まったら盤の左上から）。</p>
+      <h3>一局</h3>
+      <ol class="al-steps">
+        <li><b>山札</b>28枚（雫が四元素6枚ずつ、光2枚、闇2枚）。<em>引く順まで、すべて見えている</em>。盤には初めに<em>混沌の種</em>（四元素の雫が一つずつ）。</li>
+        <li><b>一手</b>手札から1枚使うと、山札から引いて3枚に戻る。使える相手のいない光・闇は「流す」で捨てられる。</li>
+        <li><b>得点</b>対消滅は 雫10・輝石30・光核90・真理270、合成は 輝石5・光核15・真理45。<em>連鎖の段ごとに倍率が倍</em>（1つ目×1、2つ目×2、3つ目×4、4つ目×8…）。山札と手札を使いきったとき、盤に札が一枚もなければ<em>〈静寂〉+1000</em>（終わり方まで読みきろう）。</li>
+        <li><b>終わり</b>山札と手札を使いきったら終局。<em>盤の16マスが埋まったら、そこで終わり</em>（混沌に呑まれる）。盤を溜めるほど大きな連鎖を狙えるが、埋まる危うさも増す。</li>
+      </ol>
+      <h3>詰め</h3>
+      <p>決まった盤と手札で、<em>示された手数以内に盤を空にする</em>（〈静寂〉）。手札をすべて使う必要はない。どの問題も、答えは一通り。一手詰め・二手詰め・三手詰め、あわせて24問。「一手戻す」「やり直す」で何度でも考え直せる。行き詰まったら、メニューの「答えを見る」で手順を光で示す。</p>
+      <div class="panel-btns"><button class="btn primary" id="shRulesClose" type="button">閉じる</button></div>
+    </div>
+  </section>
+</section>
+
+<section class="overlay" id="shStartOv" hidden>
+  <div class="panel pause" role="dialog" aria-modal="true" aria-labelledby="shStartH">
+    <p class="eyebrow">Four Crests</p>
+    <h2 id="shStartH">四方の盤</h2>
+    <p class="res-sub" id="shStartSub"></p>
+    <div class="stack">
+      <button class="btn primary" id="shContinue" type="button">続きから</button>
+      <button class="btn" id="shNew" type="button">一局を始める</button>
+      <button class="btn" id="shPuz" type="button">詰め（問題集）</button>
+      <button class="btn" id="shTutorial" type="button">チュートリアル</button>
+      <button class="btn" id="shStartBack" type="button">戻る</button>
+    </div>
+  </div>
+</section>
+
+<section class="overlay" id="shPzOv" hidden>
+  <div class="panel sh-pz" role="dialog" aria-modal="true" aria-labelledby="shPzH">
+    <p class="eyebrow">Four Crests</p>
+    <h2 id="shPzH">詰め</h2>
+    <div id="shPzList"></div>
+    <div class="panel-btns" style="margin-top:14px"><button class="btn" id="shPzBack" type="button">戻る</button></div>
+  </div>
+</section>
+
+<div class="ver" aria-hidden="true">v1.59.0</div>
 
 <script id="genso-images">window.GENSO_IMAGES = {
   "fire-1": "data:image/jpeg;base64,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",
@@ -1651,7 +1878,7 @@ const partN = n => Math.ceil(n * (RM ? .4 : 1) * (PERF.low ? .45 : 1));
    音（WebAudioで合成。調律＝連鎖ごとに音階が上がる）
    ================================================================ */
 // 音の3系統（クラシック・サバイバル）：エレメントボイス（石の反応音）・場の共鳴（持続する和声）・効果音。
-// それぞれオン・オフと音量を選べ、ブラウザに保存される。ほかのモード（錬成の書・重ね札・侵食）では使わない（すべて等倍）
+// それぞれオン・オフと音量を選べ、ブラウザに保存される。ほかのモード（錬成の書・重ね札・侵食・四方の盤）では使わない（すべて等倍）
 const AUDIO_KEYS = ['voice', 'harm', 'fx'];
 // 内部のスイッチ（設定画面には出さない）。anniBreath：対消滅の〈シュワァ…〉を鳴らすか
 const SND_KNOB = { anniBreath: false };
@@ -4309,7 +4536,7 @@ let rulesBack = null;
 function hideOverlays() { el.titleOv.hidden = el.rulesOv.hidden = el.pauseOv.hidden = el.resultOv.hidden = true; $('#tuneOv').hidden = true; $('#soundOv').hidden = true; }
 function showScreen() { hideOverlays(); app.classList.remove('on-title'); }
 function showTitle() {
-  ALCH.hide(); KS.hide(); ER.hide();
+  ALCH.hide(); KS.hide(); ER.hide(); SH.hide();
   S.token++; tweens.length = 0; S.screen = 'title'; S.paused = false; S.drag = null; S.orbs = [];
   FX.parts.length = FX.rings.length = FX.wells.length = FX.texts.length = FX.beams.length = 0;
   hideOverlays(); hideTip(); el.crit.hidden = true;
@@ -7352,6 +7579,831 @@ function init() {
 return { init, hide, esc };
 })();
 
+/* ---------- 四方の盤のきまり（描画と切り離した純粋な計算。詰めの問題の検証にも同じものを使う）----------
+   盤 b：16マス（左上から横へ）。null か {id, e, t}。e：0火（上の刻印へ） 1水（下へ） 2風（左へ） 3土（右へ）
+   ・置いた札は、そのマスに留まる。
+   ・反応：同じ元素・同じ段階は合成（動いた札が相手のマスへ重なり、一段上がる）。反対の元素・同じ段階は対消滅（両方消える）。
+     相手は、自分の刻印の向き（正面）から時計回りに探し、最初に見つかった一つ。
+   ・滑り込み：札が消えたり去ったりして、ある札の正面のマスが空くと、その札は刻印へ向かって滑り出し、ぶつかるまで止まらない。
+     滑りは1マスずつ一斉に進む。同じマスへ同時に入ろうとしたら、火・水・風・土の順に先。
+   ・止まった札・反転した札・合成でできた札は、また相手を探す（連鎖）。合成でできた札が先、次に止まった順（同時なら左上から）
+   ---------------------------------------------------------------- */
+const SHR = (() => {
+const DIR = [[-1, 0], [1, 0], [0, -1], [0, 1]], OPP = [1, 0, 3, 2];
+const CW = [0, 3, 1, 2], CWI = [0, 2, 3, 1]; // 時計回り（上・右・下・左）と、元素ごとの正面がその何番目か
+const PA = [0, 10, 30, 90, 270], PM = [0, 0, 5, 15, 45], QUIET = 1000; // 対消滅・合成の点（段階ごと）、終局の静寂の点（一局で、山札と手札を使いきって盤が空なら一度だけ）
+const mult = k => 2 ** (k - 1); // 連鎖の倍率：1・2・4・8…
+const at = (r, c) => r < 0 || c < 0 || r > 3 || c > 3 ? -1 : r * 4 + c;
+const front = (i, e) => at((i >> 2) + DIR[e][0], (i & 3) + DIR[e][1]);
+function nbrs(i, e) {
+  const out = [];
+  for (let k = 0; k < 4; k++) { const d = CW[(CWI[e] + k) % 4], j = at((i >> 2) + DIR[d][0], (i & 3) + DIR[d][1]); if (j >= 0) out.push(j); }
+  return out;
+}
+function react(a, b) {
+  if (!a || !b || a.t !== b.t) return null;
+  if (a.e === b.e) return a.t < 4 ? 'm' : null;
+  return OPP[a.e] === b.e ? 'a' : null;
+}
+const snap = b => b.map(p => p && { id: p.id, e: p.e, t: p.t });
+const count = b => b.reduce((n, p) => n + (p ? 1 : 0), 0);
+function wake(b, awake, v) { for (let i = 0; i < 16; i++) { const p = b[i]; if (p && front(i, p.e) === v) awake.add(p.id); } }
+// 起きている札を、止まるまで1マスずつ一斉に滑らせる。止まった札の id を止まった順に返す
+function settle(b, awake, log, moving) {
+  const rest = [];
+  for (;;) {
+    const want = new Map();
+    for (let i = 0; i < 16; i++) {
+      const p = b[i]; if (!p || !awake.has(p.id)) continue;
+      const j = front(i, p.e);
+      if (j < 0 || b[j]) { awake.delete(p.id); if (moving.has(p.id)) { moving.delete(p.id); rest.push(p.id); } continue; }
+      if (!want.has(j)) want.set(j, []);
+      want.get(j).push(i);
+    }
+    if (!want.size) break;
+    const mv = [];
+    for (const [j, list] of want) { list.sort((x, y) => b[x].e - b[y].e); mv.push({ id: b[list[0]].id, from: list[0], to: j }); }
+    for (const m of mv) { b[m.to] = b[m.from]; b[m.from] = null; moving.add(m.id); }
+    for (const m of mv) wake(b, awake, m.from);
+    if (log) log.push({ k: 'tick', mv, b: snap(b) });
+  }
+  return rest;
+}
+function resolve(G, queue, awake, log) {
+  const b = G.b, moving = new Set(); let chain = 0, pts = 0;
+  const find = id => { for (let i = 0; i < 16; i++) if (b[i] && b[i].id === id) return i; return -1; };
+  const push = ids => { for (const x of ids) if (!queue.includes(x)) queue.push(x); };
+  push(settle(b, awake, log, moving));
+  while (queue.length) {
+    const id = queue.shift(), i = find(id); if (i < 0) continue;
+    const P = b[i]; let hit = -1, kind = null;
+    for (const j of nbrs(i, P.e)) { const r = react(P, b[j]); if (r) { hit = j; kind = r; break; } }
+    if (hit < 0) continue;
+    const Q = b[hit]; chain++;
+    if (log) log.push({ k: 'meet', a: P.id, b: Q.id, kind, chain, b0: snap(b) });
+    let head = [];
+    if (kind === 'a') {
+      const p = PA[P.t] * mult(chain); pts += p;
+      b[i] = b[hit] = null; G.st.anni++;
+      if (log) log.push({ k: 'anni', a: P.id, b: Q.id, cells: [i, hit], e: [P.e, Q.e], t: P.t, chain, pts: p, b: snap(b) });
+      wake(b, awake, i); wake(b, awake, hit);
+    } else {
+      const n = { id: ++G.nid, e: P.e, t: P.t + 1 }, p = PM[n.t] * mult(chain); pts += p;
+      b[i] = null; b[hit] = n; G.st.merge++; if (n.t === 4) G.st.truth++;
+      if (log) log.push({ k: 'merge', a: P.id, b: Q.id, n: n.id, cell: hit, from: i, e: n.e, t: n.t, chain, pts: p, b: snap(b) });
+      wake(b, awake, i); head = [n.id];
+    }
+    const stopped = settle(b, awake, log, moving);
+    const rest = queue.filter(x => !stopped.includes(x));
+    queue.length = 0; queue.push(...head, ...stopped.filter(x => !head.includes(x)), ...rest);
+  }
+  return { chain, pts };
+}
+// 札 c を使えるか。c：{k:'el', e, t} は空きマスへ、{k:'light'} は光核より下の札へ、{k:'dark'} はどの札へも
+function can(b, c, cell) {
+  const p = b[cell];
+  if (!c) return false;
+  if (c.k === 'el') return !p;
+  if (!p) return false;
+  return c.k === 'dark' || p.t < 3;
+}
+const usable = (b, c) => { for (let i = 0; i < 16; i++) if (can(b, c, i)) return true; return false; };
+// 一手を打つ。G：{b, nid, score, st}。log があれば演出用の出来事を積む
+function play(G, c, cell, log) {
+  if (!can(G.b, c, cell)) return null;
+  const awake = new Set(); let p;
+  if (c.k === 'el') {
+    p = { id: ++G.nid, e: c.e, t: c.t || 1 }; G.b[cell] = p;
+    if (log) log.push({ k: 'place', id: p.id, cell, b: snap(G.b) });
+  } else {
+    p = G.b[cell];
+    if (c.k === 'light') p.t++; else { p.e = OPP[p.e]; awake.add(p.id); }
+    if (log) log.push({ k: c.k === 'light' ? 'raise' : 'flip', id: p.id, cell, b: snap(G.b) });
+  }
+  const before = count(G.b);
+  const r = resolve(G, [p.id], awake, log);
+  r.quiet = r.chain > 0 && count(G.b) === 0 && before > 0; // 盤をすべて消した（途中の静寂は演出だけ。点は終局で一度）
+  if (r.quiet) G.st.quiet = (G.st.quiet || 0) + 1;
+  G.score += r.pts;
+  G.st.maxChain = Math.max(G.st.maxChain || 0, r.chain);
+  return r;
+}
+const clone = G => ({ b: G.b.map(p => p && { ...p }), nid: G.nid, score: G.score, st: { ...G.st } });
+// 下見：その手で最初に起きる反応（反応する二枚の id と種類）と、使った札（置いた札・反転した札）が最初に止まるマス
+function peek(G, c, cell) {
+  const g = clone(G), log = [];
+  if (!play(g, c, cell, log)) return null;
+  const meet = log.find(x => x.k === 'meet'), self = log[0].id;
+  let stop = cell;
+  for (const x of log) { if (x === meet) break; if (x.k === 'tick') for (const m of x.mv) if (m.id === self) stop = m.to; }
+  if (!meet) return { stop, kind: null, self: false, id: self };
+  return { stop, kind: meet.kind, a: meet.a, b: meet.b, self: meet.a === self || meet.b === self, id: self };
+}
+return { DIR, OPP, PA, PM, QUIET, mult, front, nbrs, react, can, usable, play, clone, peek, count, snap };
+})();
+
+/* ================================================================
+   四方の盤
+   4×4の盤に、手札（3枚）から1枚ずつ置く。四方の縁の刻印（上=火 下=水 左=風 右=土）へ、札はそれぞれ引かれている。
+   置いた札は留まり、上下左右と反応する。消えた跡（空いたマス）へ、後ろの札が刻印の向きへ滑り込み、連鎖する。きまりは SHR。
+   一局：山札28枚の並びはすべて見える。連鎖の段ごとに倍率が倍。盤が埋まれば終わり。
+   詰め：決まった盤と手札で、示された手数以内に盤を空に。
+   状態 G はそのまま JSON で保存できる形に保つ（札は id を持ち、描画はその id で同じ要素を動かす）
+   ================================================================ */
+const SH = (() => {
+const q = id => document.getElementById(id);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const T = RM ? { place: 90, flip: 120, meet: 80, merge: 130, anni: 150, tick: 40 } : { place: 220, flip: 300, meet: 170, merge: 300, anni: 340, tick: 85 };
+const SPC = { light: '#ffd36b', dark: '#b9a3ff' };
+const PSZ = [0, .6, .7, .8, .9];               // 札の大きさ（マスに対する比）
+const DIRN = ['上', '下', '左', '右'];
+const DECK = { drops: 6, light: 2, dark: 2, seeds: 4, hand: 3 };
+const pname = p => `${EL[p.e].name}の${TI[p.t].name}`;
+const cname = c => c.k === 'light' ? '光' : c.k === 'dark' ? '闇' : pname(c);
+const cellName = i => `${['一', '二', '三', '四'][i >> 2]}段${(i & 3) + 1}列`;
+let G = null, BUSY = false, SEL = null, PEND = null, PREV = null, TUT = null, VIEW = null, HL = {}, MOVE = {}, OUT = {}, GROW = null, NEWP = null, SLIDE = false;
+let MSG = null, FRESH = new Set(), GEO = null, FRAMEKEY = '', DISP = 0;
+const PIECES = new Map();
+
+/* ---------- 詰めの問題（盤：16マス×2文字。'..' は空き、F/W/A/E＝火水風土＋段階。手札：F1・L（光）・D（闇）。m：手数。答えは一通り）---------- */
+const PZ = [
+  {"b":"E1F1A1....W2....................","h":"L E1 L","m":1,"sol":"L@1"},
+  {"b":"W2......E1..A1..F1........F2....","h":"L A2 W1","m":1,"sol":"W1@9"},
+  {"b":"......W1......E1A1E2..F1........","h":"L F2 D","m":1,"sol":"D@7"},
+  {"b":"........E1W2..A1........E2F1A2..","h":"F1 F2 E2","m":1,"sol":"F1@9"},
+  {"b":"....E2W1....A1....E2F1........A2","h":"F1 A2 L","m":1,"sol":"L@6"},
+  {"b":"E1W1......F2..E1......A2F1..F2..","h":"D A1 F1","m":1,"sol":"D@5"},
+  {"b":"....F1....A1W2..........E1F1E1A2","h":"E1 W2 W1","m":1,"sol":"E1@9"},
+  {"b":"....W2A2E2..E2A1..E1F2........A1","h":"A1 E1 E1","m":1,"sol":"A1@11"},
+  {"b":"W1E2......A1W1..E1F1E1A2....F1..","h":"W1 L A2","m":1,"sol":"L@5"},
+  {"b":"W2..A2E1E1..W1..F2E1A2F2......W1","h":"W1 E1 W1","m":1,"sol":"E1@5"},
+  {"b":"..W1........F1W2......A1..F1....","h":"F2 L E1","m":2,"sol":"E1@5 L@6"},
+  {"b":"W1..W2....A1..E1....F2..F1......","h":"A1 E1 A2","m":2,"sol":"E1@4 A1@6"},
+  {"b":"E1W1..A1..A2..A2........W1..F1..","h":"F1 D F1","m":2,"sol":"F1@8 D@5"},
+  {"b":"W1....F1E1......F1E1F1....F1..A2","h":"D W1 D","m":2,"sol":"W1@5 D@3"},
+  {"b":"..W1..W2E2A1..A1E1..A1......F1F2","h":"E1 L E1","m":2,"sol":"L@10 E1@9"},
+  {"b":"W1W2......E1..A1E1..F2..F1E1F1A1","h":"W1 F1 A1","m":2,"sol":"W1@2 A1@4"},
+  {"b":"E2W1W2A2....E2....W1A1..F1F2F1A1","h":"E1 L L","m":2,"sol":"L@1 L@14"},
+  {"b":"W1E2W1..E1..E1..F1..A2..E2F2W1E2","h":"A2 W2 D","m":2,"sol":"D@15 A2@5"},
+  {"b":"..E1........A1W1..E2....E2....F1","h":"A1 A1 A2","m":3,"sol":"A1@11 A2@10 A1@5"},
+  {"b":"..W1......A2F2..W1E1......F1F2..","h":"E1 D F1","m":3,"sol":"F1@12 E1@8 D@6"},
+  {"b":"..A1....E1..F1W2..W2..A1..E1F2..","h":"W2 F2 F1","m":3,"sol":"F2@5 F1@5 W2@15"},
+  {"b":"F2E1..W2....E2A1F1..A1..E1..F2..","h":"A2 D F1","m":3,"sol":"D@0 A2@5 F1@9"},
+  {"b":"E2A1A2..E1..W1....W1..A1F2A2F1..","h":"E1 E2 W1","m":3,"sol":"W1@5 E1@10 E2@14"},
+  {"b":"A2A1W1A1........W2F1F2W1..E1F1A1","h":"D W1 L","m":3,"sol":"D@0 W1@7 L@9"}
+];
+const tok = s => s === 'L' ? { k: 'light' } : s === 'D' ? { k: 'dark' } : { k: 'el', e: 'FWAE'.indexOf(s[0]), t: +s[1] };
+const ctok = c => c.k === 'light' ? 'L' : c.k === 'dark' ? 'D' : 'FWAE'[c.e] + c.t;
+function parseBoard(str) { const b = []; for (let i = 0; i < 16; i++) { const s = str.slice(i * 2, i * 2 + 2); b.push(s === '..' ? null : { id: ++G.nid, e: 'FWAE'.indexOf(s[0]), t: +s[1] }); } return b; }
+const PZ_LV = [{ m: 1, name: '一手詰め' }, { m: 2, name: '二手詰め' }, { m: 3, name: '三手詰め' }];
+
+/* ---------- 乱数（種と状態を G に持つので、同じ並びを再現でき、保存もできる）---------- */
+function rnd() { let t = G.rs = (G.rs + 0x6D2B79F5) | 0; t = Math.imul(t ^ t >>> 15, 1 | t); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+/* ---------- 新しい盤 ---------- */
+function blank(mode, seed) {
+  return { v: 1, mode, seed, rs: seed | 0, nid: 0, b: Array(16).fill(null), score: 0, st: { anni: 0, merge: 0, truth: 0, maxChain: 0, quiet: 0 },
+           deck: [], hand: [], turn: 0, phase: 'play', end: null, hist: [], pid: -1, lim: 0, guide: -1 };
+}
+const ADJ = i => { const r = i >> 2, c = i & 3, o = []; if (r) o.push(i - 4); if (r < 3) o.push(i + 4); if (c) o.push(i - 1); if (c < 3) o.push(i + 1); return o; };
+function newRun(seed) {
+  if (seed == null) seed = Math.floor(Math.random() * 4294967296);
+  G = blank('run', seed);
+  const d = [];
+  for (let e = 0; e < 4; e++) for (let i = 0; i < DECK.drops; i++) d.push({ k: 'el', e, t: 1 });
+  for (let i = 0; i < DECK.light; i++) d.push({ k: 'light' });
+  for (let i = 0; i < DECK.dark; i++) d.push({ k: 'dark' });
+  shuffle(d); for (const c of d) c.id = ++G.nid;
+  // 混沌の種：四元素の雫を一つずつ。初めから反応する組はつくらない
+  for (const e of shuffle([0, 1, 2, 3])) for (;;) {
+    const i = Math.floor(rnd() * 16); if (G.b[i]) continue;
+    const p = { id: ++G.nid, e, t: 1 }; if (ADJ(i).some(j => SHR.react(p, G.b[j]))) continue;
+    G.b[i] = p; break;
+  }
+  G.deck = d; draw(); DISP = 0; TUT = null;
+}
+function newPuz(pid) {
+  const P = PZ[pid]; G = blank('puz', 0); G.pid = pid; G.lim = P.m;
+  G.b = parseBoard(P.b); G.hand = P.h.split(' ').map(s => Object.assign(tok(s), { id: ++G.nid }));
+  for (const c of G.hand) FRESH.add(c.id);
+  DISP = 0; TUT = null;
+}
+function draw() {
+  while (G.hand.length < DECK.hand && G.deck.length) { const c = G.deck.shift(); G.hand.push(c); FRESH.add(c.id); }
+}
+const card = id => G.hand.find(c => c.id === id);
+const selCard = () => SEL != null ? card(SEL) : null;
+const board = () => VIEW || G.b;
+const full = () => SHR.count(G.b) >= 16;
+const outOfMoves = () => G.mode === 'puz' && G.turn >= G.lim && SHR.count(G.b) > 0;
+const canPlay = () => G && G.phase === 'play' && !BUSY && !outOfMoves();
+
+/* ---------- 手を打つ ---------- */
+function choose(c, cell) { // 1回目は下見、同じマスをもう一度で置く
+  if (!canPlay() || !c || !SHR.can(G.b, c, cell)) return;
+  if (PEND === cell) return commit(c, cell);
+  PEND = cell; PREV = SHR.peek(G, c, cell); SFX.tap(); render();
+}
+function commit(c, cell) {
+  if (!canPlay() || !SHR.can(G.b, c, cell)) return;
+  if (!tutOk({ c, cell })) { PEND = null; PREV = null; render(); return; }
+  const gg = guideGoal(); if (gg && (ctok(c) !== gg.c || cell !== gg.cell)) { G.guide = -1; MSG = null; setTimeout(() => toast('答えの手順から外れた（メニューの「答えを見る」で、また初めから示す）'), 50); }
+  if (G.mode === 'puz') G.hist.push(JSON.stringify({ b: G.b, hand: G.hand, nid: G.nid, score: G.score, st: G.st, turn: G.turn }));
+  const fromEl = q('shHand').querySelector(`[data-id="${c.id}"]`), fr = fromEl && fromEl.getBoundingClientRect();
+  G.hand.splice(G.hand.indexOf(c), 1);
+  SEL = null; PEND = null; PREV = null; BUSY = true;
+  VIEW = SHR.snap(G.b); render();
+  const log = [], r = SHR.play(G, c, cell, log);
+  G.turn++;
+  (async () => {
+    try { await flyTo(c, fr, cellRect(cell)); await playLog(log, r); }
+    finally { BUSY = false; VIEW = null; HL = {}; MOVE = {}; SLIDE = false; DISP = G.score; }
+    after(r);
+  })();
+}
+function after(r) {
+  if (G.mode === 'run') {
+    if (full()) return finish('full');
+    draw();
+    if (!G.hand.length) return finish('done');
+  } else if (G.mode === 'puz') {
+    if (!SHR.count(G.b)) return solved();
+    if (outOfMoves()) { SFX.dark(); toast('手数が尽きた。「一手戻す」か「やり直す」で考え直そう。'); }
+  }
+  save(); render();
+  if (TUT) tutAfter(r);
+}
+function discard(c) { // 使える相手のいない光・闇を流す
+  if (!canPlay() || SHR.usable(G.b, c) || !tutOk({ c, cell: -1 })) return;
+  if (G.mode === 'puz') G.hist.push(JSON.stringify({ b: G.b, hand: G.hand, nid: G.nid, score: G.score, st: G.st, turn: G.turn }));
+  G.hand.splice(G.hand.indexOf(c), 1); SEL = null; PEND = null; PREV = null; G.turn++; SFX.dark();
+  toast(`${cname(c)}を流した`);
+  after({ chain: 0, pts: 0 });
+}
+function undo() {
+  if (BUSY || !G || G.mode !== 'puz' || !G.hist.length || G.phase !== 'play') return;
+  Object.assign(G, JSON.parse(G.hist.pop())); SEL = null; PEND = null; PREV = null; DISP = G.score; SFX.tap(); clearPieces(); toast('一手戻した'); render();
+}
+function retry() {
+  if (BUSY || !G || G.mode !== 'puz') return;
+  const g = G.guide; newPuz(G.pid); if (g >= 0) G.guide = 0; SEL = null; PEND = null; PREV = null; clearPieces(); q('shHand').dataset.h = ''; render();
+}
+
+/* ---------- 結末 ---------- */
+function finish(kind) {
+  G.phase = 'end'; SEL = null; PEND = null;
+  G.quietEnd = kind === 'done' && !SHR.count(G.b); // 終局の静寂：山札と手札を使いきって盤が空
+  if (G.quietEnd) { G.score += SHR.QUIET; DISP = G.score; call('静寂', `+${fmt(SHR.QUIET)}`, 'lv3'); }
+  G.end = { kind, score: G.score, left: SHR.count(G.b), chain: G.st.maxChain };
+  const best = store.get('sh.best', null), better = !best || G.score > best.score;
+  if (better) store.set('sh.best', { score: G.score, chain: G.st.maxChain });
+  store.set('sh.run', null);
+  render();
+  if (kind === 'done') SFX.win(); else SFX.over();
+  setTimeout(() => showResult(better), kind === 'done' ? 700 : 900);
+}
+function showResult(rec) {
+  const e = G.end; if (!e) return;
+  const left = SHR.count(G.b);
+  q('shResH').textContent = e.kind === 'full' ? '混沌に呑まれた' : left ? '終局' : '終局〈静寂〉';
+  q('shResSub').textContent = e.kind === 'full' ? `第${G.turn}手、盤の16マスが埋まった。山札にはあと${G.deck.length}枚残っていた。`
+    : left ? `山札を使いきった。盤には${left}枚の札が残った。` : `山札を使いきり、盤をすべて静めた。〈静寂〉+${fmt(SHR.QUIET)}。`;
+  q('shResLeft').innerHTML = G.b.filter(Boolean).slice(0, 16).map(p => orbIcon(p.e, p.t, 20 + p.t * 2)).join('');
+  q('shResPts').textContent = fmt(e.score);
+  q('shResRec').hidden = !rec;
+  const s = G.st;
+  q('shResStats').innerHTML = [['対消滅', s.anni], ['合成', s.merge], ['最大連鎖', s.maxChain], ['真理', s.truth], ['盤を空に', s.quiet || 0], ['手', G.turn]]
+    .map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+  resBtns('run');
+  q('shResOv').hidden = false; q('shResA').focus();
+}
+function solved() {
+  G.phase = 'end';
+  const pz = store.get('sh.pz', {}), first = !pz[G.pid]; pz[G.pid] = Math.min(pz[G.pid] || 99, G.turn); store.set('sh.pz', pz);
+  render(); SFX.win();
+  if (TUT) return;
+  setTimeout(() => {
+    const P = PZ[G.pid], lv = PZ_LV.find(l => l.m === P.m);
+    q('shResH').textContent = '詰めた';
+    q('shResSub').textContent = `問題${G.pid + 1}（${lv ? lv.name : ''}）を、${G.turn}手で静寂にした。${G.guide >= 0 ? '（答えを見て）' : ''}`;
+    q('shResLeft').innerHTML = '';
+    q('shResPts').innerHTML = `${G.st.maxChain}<small style="font-size:.4em;opacity:.7"> 連鎖</small>`;
+    q('shResRec').hidden = !first; q('shResRec').textContent = '初めて解いた';
+    const done = Object.keys(pz).length;
+    q('shResStats').innerHTML = [['対消滅', G.st.anni], ['合成', G.st.merge], ['解いた問題', `${done}/${PZ.length}`]].map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+    resBtns('puz');
+    q('shResOv').hidden = false; q('shResA').focus();
+  }, 800);
+}
+function resBtns(mode) {
+  const nx = nextPuz(G.pid);
+  q('shResA').textContent = mode === 'run' ? '新しい並びで' : nx >= 0 ? '次の問題へ' : '問題を選ぶ';
+  q('shResB').textContent = mode === 'run' ? '同じ並びでもう一度' : '問題を選ぶ';
+  q('shResB').hidden = mode === 'puz' && nx < 0;
+  q('shResA').dataset.act = mode === 'run' ? 'new' : nx >= 0 ? 'next' : 'list';
+  q('shResB').dataset.act = mode === 'run' ? 'same' : 'list';
+  q('shResRec').textContent = mode === 'run' ? '新記録' : '初めて解いた';
+}
+function nextPuz(pid) {
+  const pz = store.get('sh.pz', {});
+  for (let k = 1; k <= PZ.length; k++) { const j = (pid + k) % PZ.length; if (!pz[j]) return j; }
+  return pid + 1 < PZ.length ? pid + 1 : -1;
+}
+function bestText() {
+  const b = store.get('sh.best', null), pz = Object.keys(store.get('sh.pz', {})).length;
+  const parts = []; if (b) parts.push(`${fmt(b.score)}点`); if (pz) parts.push(`詰め ${pz}/${PZ.length}`);
+  return parts.length ? parts.join('・') : '—';
+}
+
+/* ---------- 位置 ---------- */
+function geo() {
+  const f = q('shField'), W = f.clientWidth, H = f.clientHeight; if (!W || !H) return null;
+  const M = Math.round(Math.max(18, Math.min(28, Math.min(W, H) * .065)));
+  const S = Math.max(160, Math.floor(Math.min(W, H, 560) - 2 * M));
+  return GEO = { M, S, tot: S + 2 * M, cell: S / 4, gap: Math.max(3, Math.round(S / 4 * .06)) };
+}
+const cxy = (g, r, c) => [g.M + (c + .5) * g.cell, g.M + (r + .5) * g.cell];
+function cellRect(i) { const n = q('shCells').children[i]; return n ? n.getBoundingClientRect() : null; }
+function pieceSize(t) { const g = GEO || geo(); return g ? Math.round(g.cell * PSZ[t]) : 40; }
+function posOf(i, id) { const m = MOVE[id]; return m ? m : { r: i >> 2, c: i & 3 }; }
+
+/* ---------- 演出 ---------- */
+function fxEl(cls, x, y, size) {
+  const n = document.createElement('span'); n.className = cls;
+  n.style.width = n.style.height = size + 'px'; n.style.left = (x - size / 2) + 'px'; n.style.top = (y - size / 2) + 'px';
+  q('shFx').appendChild(n); return n;
+}
+function anim(n, frames, o) { const a = n.animate(frames, o); a.onfinish = () => n.remove(); return a; }
+function cellXY(i) { const g = GEO || geo(); return g ? cxy(g, i >> 2, i & 3) : [0, 0]; }
+function midXY(i, j) { const a = cellXY(i), b = cellXY(j); return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]; }
+function burstMerge(x, y, t) {
+  const s = pieceSize(t);
+  anim(fxEl('ks-burst glow', x, y, s * 1.5), [{ opacity: 0, scale: .3 }, { opacity: 1, scale: 1, offset: .35 }, { opacity: 0, scale: 1.25 }], { duration: RM ? 200 : 520, easing: 'ease-out' });
+  anim(fxEl('ks-burst m', x, y, s), [{ opacity: .95, scale: .5 }, { opacity: 0, scale: 2.2 }], { duration: RM ? 200 : 560, easing: 'cubic-bezier(.2,.7,.3,1)' });
+}
+function burstAnni(x, y, ea, eb, t) {
+  const s = pieceSize(t);
+  anim(fxEl('ks-burst flash', x, y, s * 1.6), [{ opacity: 1, scale: .4 }, { opacity: .9, scale: 1, offset: .25 }, { opacity: 0, scale: 1.4 }], { duration: RM ? 200 : 420, easing: 'ease-out' });
+  anim(fxEl('ks-burst a', x, y, s), [{ opacity: 1, scale: .6 }, { opacity: 0, scale: 3 }], { duration: RM ? 220 : 620, easing: 'cubic-bezier(.15,.7,.3,1)' });
+  if (RM) return;
+  const cols = [EL[ea].color, EL[eb].color, '#ffffff'], n = 8 + t * 3;
+  for (let i = 0; i < n; i++) {
+    const a = Math.PI * 2 * i / n + Math.random() * .4, d = s * (.8 + Math.random() * .8);
+    const sp = fxEl('ks-spark', x, y, 6); sp.style.background = cols[i % 3]; sp.style.boxShadow = `0 0 8px ${cols[i % 3]}`;
+    anim(sp, [{ translate: '0 0', opacity: 1, scale: 1 }, { translate: `${Math.cos(a) * d}px ${Math.sin(a) * d}px`, opacity: 0, scale: .3 }], { duration: 420 + Math.random() * 260, easing: 'cubic-bezier(.1,.7,.3,1)' });
+  }
+}
+function floatPts(x, y, pts, chain) {
+  if (!pts) return;
+  const n = document.createElement('span'); n.className = 'sh-pts';
+  n.innerHTML = `+${fmt(pts)}${chain >= 2 ? `<small>×${SHR.mult(chain)}</small>` : ''}`;
+  n.style.left = x + 'px'; n.style.top = (y - 10) + 'px';
+  n.addEventListener('animationend', () => n.remove()); q('shFx').appendChild(n);
+}
+function flyTo(c, from, to) {
+  if (!from || !to || RM) return wait(RM ? 40 : 0);
+  const col = c.k === 'el' ? EL[c.e].color : SPC[c.k], s = Math.min(from.width, 44);
+  const g = document.createElement('span'); g.className = 'er-ghost';
+  g.innerHTML = c.k === 'el' ? orbIcon(c.e, c.t, s) : orbIcon(c.k, 0, s);
+  g.style.width = g.style.height = s + 'px'; g.style.filter = `drop-shadow(0 0 10px ${col})`;
+  q('shFly').appendChild(g);
+  const x0 = from.left + from.width / 2 - s / 2, y0 = from.top + from.height * .4 - s / 2;
+  const x1 = to.left + to.width / 2 - s / 2, y1 = to.top + to.height / 2 - s / 2;
+  const a = g.animate([{ transform: `translate(${x0}px,${y0}px) scale(1)`, opacity: 1 }, { transform: `translate(${(x0 + x1) / 2}px,${Math.min(y0, y1) - 24}px) scale(.9)`, offset: .5 }, { transform: `translate(${x1}px,${y1}px) scale(.7)`, opacity: .85 }],
+    { duration: 260, easing: 'cubic-bezier(.4,.1,.3,1)' });
+  return new Promise(r => { a.onfinish = () => { g.remove(); r(); }; });
+}
+function call(text, sub, cls = '') {
+  const box = q('shCall'); box.innerHTML = '';
+  const n = document.createElement('div'); n.className = 'al-call ' + cls;
+  n.innerHTML = `<b>${text}</b>${sub ? `<i>${sub}</i>` : ''}`;
+  n.addEventListener('animationend', () => n.remove()); box.appendChild(n);
+}
+function toast(m) { MSG = m; render(); setTimeout(() => { if (MSG === m) { MSG = null; if (G) render(); } }, 2600); }
+// 盤の出来事を順に見せる（G はもう打ったあとの形。VIEW に途中の形を置いて描く）
+async function playLog(log, r) {
+  for (let k = 0; k < log.length; k++) {
+    const x = log[k];
+    if (x.k === 'place') { VIEW = x.b; NEWP = x.id; render(); SFX.tap(); await wait(T.place); }
+    else if (x.k === 'raise' || x.k === 'flip') {
+      VIEW = x.b; GROW = x.id; render();
+      if (x.k === 'raise') { SFX.light(); call('昇華', pname(x.b[x.cell]), 'calm'); } else { SFX.dark(); call('反転', `${pname(x.b[x.cell])}・${DIRN[x.b[x.cell].e]}へ`, 'calm'); }
+      await wait(T.flip);
+    } else if (x.k === 'tick') {
+      SFX.spawn(); SLIDE = true;
+      while (k < log.length && log[k].k === 'tick') { VIEW = log[k].b; render(); await wait(T.tick); k++; }
+      k--; SLIDE = false; await wait(RM ? 20 : 60);
+    } else if (x.k === 'meet') {
+      const c = x.kind === 'm' ? 'hl' : 'anni'; HL = { [x.a]: c, [x.b]: c }; render(); await wait(T.meet);
+    } else if (x.k === 'merge') {
+      const [r0, c0] = [x.cell >> 2, x.cell & 3];
+      MOVE = { [x.a]: { r: r0, c: c0 } }; render(); await wait(T.merge * .45);
+      HL = {}; MOVE = {}; OUT[x.a] = OUT[x.b] = 'fuse'; GROW = x.n; VIEW = x.b; DISP += x.pts;
+      const [px, py] = cellXY(x.cell); burstMerge(px, py, x.t); floatPts(px, py, x.pts, x.chain);
+      SFX.merge(x.t, x.chain);
+      if (x.t === 4) call('真理', `${EL[x.e].name}の真理`, 'lv3'); else if (x.chain >= 2) call(`${x.chain}連鎖`, `×${SHR.mult(x.chain)}`, x.chain >= 4 ? 'lv3' : 'lv2');
+      render(); await wait(T.merge);
+    } else if (x.k === 'anni') {
+      const [i, j] = x.cells, a = { r: ((i >> 2) + (j >> 2)) / 2, c: ((i & 3) + (j & 3)) / 2 };
+      MOVE = { [x.a]: a, [x.b]: a }; render(); await wait(T.anni * .4);
+      HL = {}; MOVE = {}; OUT[x.a] = OUT[x.b] = 'burst'; VIEW = x.b; DISP += x.pts;
+      const [px, py] = midXY(i, j); burstAnni(px, py, x.e[0], x.e[1], x.t); floatPts(px, py, x.pts, x.chain);
+      if (x.t >= 3) SFX.nova(x.t); else SFX.anni(x.t, x.chain);
+      if (x.chain >= 2) call(`${x.chain}連鎖`, `×${SHR.mult(x.chain)}`, x.chain >= 4 ? 'lv3' : 'lv2'); else if (x.t >= 3) call('対消滅', pname(x.b0 ? x.b0 : { e: x.e[0], t: x.t }), '');
+      render(); await wait(T.anni);
+    }
+  }
+  if (r && r.quiet) { DISP = G.score; call('静寂', 'Silence', 'calm'); SFX.relief(); render(); await wait(RM ? 200 : 700); }
+}
+
+/* ---------- 描画 ---------- */
+function tutGoal() { const st = tutStep(); return st && typeof st.go === 'object' ? st.go : null; }
+function guideGoal() { // 答えを見ている詰め：次の一手
+  if (!G || G.mode !== 'puz' || G.guide < 0) return null;
+  const s = PZ[G.pid].sol.split(' ')[G.turn]; if (!s) return null;
+  const [c, i] = s.split('@'); return { c, cell: +i };
+}
+function frame(g) {
+  const key = `${g.tot}`; if (FRAMEKEY === key) return; FRAMEKEY = key;
+  const { M, S } = g, x0 = M - 3, y0 = M - 3, w = S + 6, f = n => n.toFixed(1);
+  let s = `<rect class="fr" x="${x0}" y="${y0}" width="${w}" height="${w}" rx="14"/>`;
+  const edges = [[0, x0 + 18, y0, x0 + w - 18, y0], [1, x0 + 18, y0 + w, x0 + w - 18, y0 + w], [2, x0, y0 + 18, x0, y0 + w - 18], [3, x0 + w, y0 + 18, x0 + w, y0 + w - 18]];
+  for (const [e, a, b, c, d] of edges) s += `<line class="edge" x1="${f(a)}" y1="${f(b)}" x2="${f(c)}" y2="${f(d)}" stroke="${EL[e].color}"/>`;
+  const R = Math.max(10, M * .62), gs = R * .42;
+  const marks = [[0, M + S / 2, y0], [1, M + S / 2, y0 + w], [2, x0, M + S / 2], [3, x0 + w, M + S / 2]];
+  for (const [e, x, y] of marks) {
+    const dm = r => `M${f(x)},${f(y - r)} L${f(x + r)},${f(y)} L${f(x)},${f(y + r)} L${f(x - r)},${f(y)}Z`;
+    s += `<path class="cr" d="${dm(R)}"/><path class="cr2" d="${dm(R - 3.5)}"/>`;
+    s += `<path class="gl" transform="translate(${f(x)},${f(y)})" d="${glyphD(e, gs)}" stroke="${rgba(EL[e].color, .9)}" stroke-width="${f(Math.max(1.2, gs * .2))}"/>`;
+    // 刻印へ向かう小さな矢印（両脇に）
+    const [dx, dy] = [[0, -1], [0, 1], [-1, 0], [1, 0]][e], off = R + 14, a = 4.5;
+    for (const sd of [-1, 1]) {
+      const px = x + (dy ? sd * off : 0) + (dx ? -dx * 6 : 0), py = y + (dx ? sd * off : 0) + (dy ? -dy * 6 : 0);
+      const tip = [px + dx * a, py + dy * a], l = [px - dx * a + dy * a, py - dy * a + dx * a], rr = [px - dx * a - dy * a, py - dy * a - dx * a];
+      s += `<path class="ar" stroke="${EL[e].color}" d="M${f(l[0])},${f(l[1])} L${f(tip[0])},${f(tip[1])} L${f(rr[0])},${f(rr[1])}"/>`;
+    }
+  }
+  const sv = q('shFrame'); sv.setAttribute('viewBox', `0 0 ${g.tot} ${g.tot}`); sv.innerHTML = s;
+}
+function renderBoard() {
+  const g = geo(); if (!g) return;
+  const bd = q('shBoard'); bd.style.width = bd.style.height = g.tot + 'px';
+  frame(g);
+  const b = board(), sc = canPlay() ? selCard() : null, tg = tutGoal() || guideGoal(), cells = q('shCells');
+  if (cells.children.length !== 16) cells.innerHTML = Array.from({ length: 16 }, (_, i) => `<button type="button" class="sh-cell" data-i="${i}"></button>`).join('');
+  for (let i = 0; i < 16; i++) {
+    const n = cells.children[i], [cx, cy] = cxy(g, i >> 2, i & 3), s = g.cell - g.gap;
+    n.style.width = n.style.height = s + 'px'; n.style.transform = `translate(${(cx - s / 2).toFixed(1)}px,${(cy - s / 2).toFixed(1)}px)`;
+    const can = sc && SHR.can(G.b, sc, i), p = b[i];
+    n.className = 'sh-cell' + (can ? (sc.k === 'el' ? ' can' : ' tgt') : '') + (PEND === i ? ' pend' : '') + (tg && tg.cell === i && !BUSY && (!sc || ctok(sc) === tg.c) ? ' tut' : '');
+    n.setAttribute('aria-label', `${cellName(i)}：${p ? pname(p) : '空き'}${can ? '・ここに使える' : ''}`);
+    n.setAttribute('aria-disabled', String(!can));
+  }
+  // 札
+  const seen = new Set(), layer = q('shPieces'), items = [];
+  b.forEach((p, i) => { if (p) items.push({ p, i }); });
+  // 下見の影：置く札（空きマス）／反転して滑った先
+  let ghost = null;
+  if (PEND != null && PREV && sc && !BUSY) {
+    if (sc.k === 'el') ghost = { p: { id: 'g', e: sc.e, t: sc.t }, i: PEND };
+    else if (sc.k === 'dark' && G.b[PEND]) ghost = { p: { id: 'g', e: SHR.OPP[G.b[PEND].e], t: G.b[PEND].t }, i: PREV.stop };
+    else if (sc.k === 'light' && G.b[PEND]) ghost = null;
+    if (ghost) items.push(ghost);
+  }
+  const prevIds = PREV && PREV.kind && !BUSY ? { [PREV.a]: PREV.kind, [PREV.b]: PREV.kind } : {};
+  const pk = PREV ? (PREV.kind === 'm' ? 'pm' : 'pa') : '';
+  for (const it of items) {
+    const { p, i } = it, id = p.id; seen.add(id);
+    let el = PIECES.get(id), fresh = false;
+    const sz = pieceSize(p.t), pos = posOf(i, id), [cx, cy] = cxy(g, pos.r, pos.c), x = cx - sz / 2, y = cy - sz / 2;
+    if (!el) {
+      el = document.createElement('span'); el.className = 'sh-pc'; layer.appendChild(el); PIECES.set(id, el); fresh = true;
+      el.style.transition = 'none'; el.style.width = el.style.height = sz + 'px'; el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+      void el.offsetWidth; el.style.transition = '';
+    }
+    if (el.dataset.t !== String(p.t) || el.dataset.e !== String(p.e) || el.dataset.sz !== String(sz)) {
+      const changed = !fresh && (el.dataset.t !== String(p.t) || el.dataset.e !== String(p.e));
+      el.dataset.t = p.t; el.dataset.e = p.e; el.dataset.sz = sz; el.style.setProperty('--h', (sz / 2) + 'px');
+      el.innerHTML = orbIcon(p.e, p.t, sz);
+      if (changed && GROW !== id) el.firstElementChild.animate([{ scale: 1.3, filter: 'brightness(2)' }, { scale: 1, filter: 'brightness(1)' }], { duration: RM ? 120 : 380, easing: 'ease-out' });
+    }
+    if (fresh && id !== 'g' && GROW !== id) el.firstElementChild.animate(NEWP === id ? [{ scale: .4, opacity: 0 }, { scale: 1.12, opacity: 1, offset: .7 }, { scale: 1 }] : [{ opacity: 0 }, { opacity: 1 }], { duration: RM ? 100 : 300, easing: 'ease-out' });
+    if (GROW === id) {
+      GROW = null;
+      el.firstElementChild.animate([{ scale: .25, opacity: .2, filter: 'brightness(2.4)' }, { scale: 1.22, opacity: 1, filter: 'brightness(1.6)', offset: .6 }, { scale: 1, filter: 'brightness(1)' }], { duration: RM ? 140 : 460, easing: 'cubic-bezier(.2,.8,.3,1)' });
+    }
+    el.style.width = el.style.height = sz + 'px';
+    el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+    const tgt = sc && sc.k !== 'el' && id !== 'g' && SHR.can(G.b, sc, i) && !BUSY;
+    el.className = 'sh-pc' + (SLIDE ? ' slide' : '') + (id === 'g' ? ' ghost' : '') + (HL[id] ? ' ' + HL[id] : '') + (prevIds[id] || (id === 'g' && PREV && PREV.self && PREV.kind) ? ' ' + pk : '') + (tgt && PEND !== i ? ' tg' : '');
+    el.style.setProperty('--tk', T.tick + 'ms');
+  }
+  if (NEWP && seen.has(NEWP)) NEWP = null;
+  for (const [id, el] of PIECES) if (!seen.has(id)) {
+    PIECES.delete(id); const how = OUT[id]; delete OUT[id];
+    if (id === 'g') { el.remove(); continue; }
+    el.classList.add('leaving');
+    const fr = how === 'fuse' ? [{ scale: 1, opacity: 1 }, { scale: .45, opacity: 0, filter: 'brightness(2.6)' }]
+      : how === 'burst' ? [{ scale: 1, opacity: 1, filter: 'brightness(1)' }, { scale: 1.3, opacity: 1, filter: 'brightness(3) saturate(.3)', offset: .3 }, { scale: 1.9, opacity: 0, filter: 'brightness(3) saturate(0)' }]
+      : [{ opacity: 1 }, { opacity: 0 }];
+    const a = (el.firstElementChild || el).animate(fr, { duration: RM ? 120 : how === 'burst' ? 380 : 240, easing: 'ease-out', fill: 'forwards' });
+    a.onfinish = () => el.remove();
+  }
+}
+function clearPieces() { for (const el of PIECES.values()) el.remove(); PIECES.clear(); }
+function cardHTML(c, cls) {
+  const col = c.k === 'el' ? EL[c.e].color : SPC[c.k];
+  const sub = c.k === 'el' ? `${DIRN[c.e]}の刻印へ` : c.k === 'light' ? '〈昇華〉＋1段' : '〈反転〉対へ';
+  const pips = c.k === 'el' ? `<span class="pips">${'<i></i>'.repeat(c.t)}</span>` : '<span class="pips"></span>';
+  const icon = c.k === 'el' ? orbIcon(c.e, c.t, 44) : orbIcon(c.k, 0, 44);
+  return `<button type="button" class="al-card t${c.t || 0} ${cls}" data-id="${c.id}" style="--c:${col};--cg:${rgba(col, .22)};--cb:${rgba(col, .5)}" aria-label="${cname(c)}（${sub}）">${icon}<span class="al-cn">${cname(c)}</span><span class="al-cs">${sub}</span>${pips}</button>`;
+}
+function renderHand() {
+  const play = canPlay(), sc = play ? selCard() : null, tg = tutGoal() || guideGoal();
+  const html = G.hand.length ? G.hand.map(c => {
+    const cls = [];
+    if (sc && sc.id === c.id) cls.push('sel');
+    if (play && !SHR.usable(G.b, c)) cls.push('no');
+    if (tg && !BUSY && (!sc || ctok(sc) !== tg.c) && ctok(c) === tg.c) cls.push('tut');
+    if (FRESH.has(c.id)) cls.push('er-in');
+    return cardHTML(c, cls.join(' '));
+  }).join('') : `<span class="empty">${G.phase === 'play' && !BUSY ? '手札はない' : ''}</span>`;
+  const box = q('shHand');
+  if (box.dataset.h !== html) { box.innerHTML = html; box.dataset.h = html; }
+  if (FRESH.size) { let k = 0; for (const n of box.querySelectorAll('.er-in')) n.style.animationDelay = (k++ * 60) + 'ms'; FRESH.clear(); }
+}
+function renderTop() {
+  let s = '';
+  if (G.mode === 'run') s = `<span class="ks-stat pts">得点<b>${fmt(DISP)}</b></span><span class="ks-stat">手<b>${G.turn}</b></span><span class="ks-stat">連鎖<b>${G.st.maxChain}</b></span>`;
+  else if (G.mode === 'puz') s = `<span class="ks-stat">問題<b>${G.pid + 1}</b></span><span class="ks-stat">手<b>${G.turn}</b><small style="color:var(--muted)"> / ${G.lim}</small></span>`;
+  else s = `<span class="ks-stat">チュートリアル</span>`;
+  q('shStats').innerHTML = s;
+  // 山札の並び（一局）／問題の目標（詰め）
+  const dk = q('shDeck');
+  if (G.mode === 'run') {
+    dk.innerHTML = `<span class="lbl">山札 <b>${G.deck.length}</b>${G.deck.length ? '（この順に引く）' : ''}</span>`
+      + G.deck.map((c, j) => `<span class="dk${j === 0 ? ' nx' : ''}" title="${j + 1}枚目：${cname(c)}">${c.k === 'el' ? orbIcon(c.e, c.t, 17) : orbIcon(c.k, 0, 17)}</span>`).join('');
+    dk.setAttribute('aria-label', `山札 ${G.deck.length}枚：` + G.deck.map(cname).join('、'));
+  } else if (G.mode === 'puz') {
+    const P = PZ[G.pid], lv = PZ_LV.find(l => l.m === P.m), rest = G.lim - G.turn;
+    dk.innerHTML = `<span class="goal">${lv ? lv.name : ''}：<em>${G.lim}手</em>以内に盤を空に（〈静寂〉）。${G.phase === 'end' ? '<em>詰めた</em>' : rest > 0 ? `あと<em>${rest}</em>手` : '<span class="ng">手数が尽きた</span>'}${G.guide >= 0 ? '・答えを見ている' : ''}</span>`;
+    dk.removeAttribute('aria-label');
+  } else { dk.innerHTML = '<span class="goal">四方の刻印へ、札は滑る。</span>'; dk.removeAttribute('aria-label'); }
+}
+function render() {
+  if (!G) return;
+  q('sh').classList.toggle('tut', !!TUT); q('sh').dataset.busy = BUSY ? '1' : '';
+  renderTop(); renderBoard(); renderHand();
+  // 操作
+  const sc = canPlay() ? selCard() : null; let acts = '';
+  if (G.phase === 'play') {
+    if (sc && PEND != null) acts += `<button type="button" class="btn primary" id="shPut">${sc.k === 'el' ? 'ここに置く' : 'この札に使う'}</button>`;
+    if (sc && !SHR.usable(G.b, sc)) acts += `<button type="button" class="btn" id="shDiscard">流す</button>`;
+    if (sc) acts += `<button type="button" class="btn" id="shCancel">やめる</button>`;
+    if (G.mode === 'puz' && !TUT) {
+      acts += `<button type="button" class="btn${outOfMoves() ? ' primary' : ''}" id="shUndo" ${G.hist.length && !BUSY ? '' : 'disabled'}>一手戻す</button>`;
+      acts += `<button type="button" class="btn" id="shRetry" ${G.turn && !BUSY ? '' : 'disabled'}>やり直す</button>`;
+    }
+  } else if (G.phase === 'end' && !TUT) acts = `<button type="button" class="btn primary" id="shShowRes">結果を見る</button>` + (G.mode === 'puz' && nextPuz(G.pid) >= 0 ? `<button type="button" class="btn" id="shNext">次の問題へ</button>` : '');
+  q('shActs').innerHTML = acts;
+  // 案内
+  const info = q('shInfo'); info.classList.remove('warn');
+  let t = '';
+  const gg = guideGoal();
+  if (MSG) t = MSG;
+  else if (G.phase === 'end') t = G.mode === 'puz' ? '詰めた。盤は静まった。' : G.end && G.end.kind === 'full' ? '盤が埋まった。' : '山札を使いきった。';
+  else if (BUSY) t = '…';
+  else if (outOfMoves()) { t = '手数が尽きた。「一手戻す」か「やり直す」で考え直そう。'; info.classList.add('warn'); }
+  else if (sc && PEND != null && PREV) {
+    const nm = id => { const p = G.b.find(x => x && x.id === id); return p ? pname(p) : ''; };
+    const verb = PREV.kind === 'm' ? '合成する' : '対消滅する';
+    const others = PREV.kind ? [PREV.a, PREV.b].filter(id => id !== PREV.id).map(nm).filter(Boolean) : [];
+    const who = PREV.self ? `${others[0]}と` : `${others.join('と')}が`, res = PREV.kind ? `${who}${verb}。` : '';
+    if (sc.k === 'el') t = PREV.kind ? `ここに置くと、${res}` : 'ここに置いても、まだ反応しない。';
+    else if (sc.k === 'light') t = `${pname(G.b[PEND])}を一段上げる。` + (PREV.kind ? res : 'まだ反応しない。');
+    else t = `${pname(G.b[PEND])}を反転し、${DIRN[SHR.OPP[G.b[PEND].e]]}の刻印へ滑らせる。` + (PREV.kind ? (PREV.self ? '滑った先で' : 'すると') + res : '');
+    t += ' もう一度タップで決める。その先の連鎖は、読んで確かめよう。';
+  } else if (sc) {
+    if (sc.k === 'el') t = `${cname(sc)}：空いたマスを選ぶ。置いた札は留まり、上下左右の札と反応する。`;
+    else if (sc.k === 'light') t = '光〈昇華〉：盤の札を一段上げる（光核まで）。上げた札は、上下左右と反応する。';
+    else t = '闇〈反転〉：盤の札を反対の元素に変える。反転した札は、新しい刻印の向きへ滑り出す。';
+    if (!SHR.usable(G.b, sc)) t = `${cname(sc)}を使える札が盤にない。「流す」で捨てられる。`;
+  } else if (gg) t = `答え：${G.turn + 1}手目は、${cname(tok(gg.c))}を${cellName(gg.cell)}へ。`;
+  else if (G.mode === 'puz') t = '手札を選んで、空いたマス（光・闇なら盤の札）を選ぶ。';
+  else if (G.mode === 'run') t = SHR.count(G.b) >= 13 ? `盤に${SHR.count(G.b)}枚。16マスが埋まると終わる。` : '手札を選んで、空いたマスを選ぶ。消えた跡へ、札が刻印の向きに滑り込む。';
+  if (G.mode === 'run' && !BUSY && G.phase === 'play' && SHR.count(G.b) >= 14 && !MSG) info.classList.add('warn');
+  info.textContent = t;
+  if (TUT) renderCoach(); else q('shCoach').hidden = true;
+}
+
+/* ---------- 入力 ---------- */
+function onHand(e) {
+  const b = e.target.closest('[data-id]'); if (!b || !canPlay()) return;
+  const c = card(+b.dataset.id); if (!c) return;
+  if (SEL === c.id) { SEL = null; PEND = null; PREV = null; SFX.tap(); render(); return; }
+  if (!tutSelOk(c)) return;
+  SEL = c.id; PEND = null; PREV = null; SFX.tap(); render();
+}
+function onCell(e) {
+  const b = e.target.closest('.sh-cell'); if (!b || !canPlay()) return;
+  const i = +b.dataset.i, sc = selCard();
+  if (!sc) { toast(G.b[i] ? `${pname(G.b[i])}：${DIRN[G.b[i].e]}の刻印へ引かれている。先に手札を選ぼう。` : '先に手札を選んでから、マスを選ぶ。'); return; }
+  if (!SHR.can(G.b, sc, i)) { SFX.tap(); toast(sc.k === 'el' ? '札は空いたマスに置く。' : sc.k === 'light' && G.b[i] ? '光核と真理は、光では上がらない。' : `${cname(sc)}は盤の札に使う。`); return; }
+  choose(sc, i);
+}
+function onHover(e) { // マウスでは、指したマスを下見する
+  if (e.pointerType !== 'mouse' || !canPlay()) return;
+  const b = e.target.closest('.sh-cell'), sc = selCard(); if (!b || !sc) return;
+  const i = +b.dataset.i; if (PEND === i || !SHR.can(G.b, sc, i)) return;
+  PEND = i; PREV = SHR.peek(G, sc, i); render();
+}
+function onActs(e) {
+  const b = e.target.closest('button'); if (!b || b.disabled) return;
+  if (b.id === 'shPut') { const c = selCard(); if (c && PEND != null) commit(c, PEND); }
+  else if (b.id === 'shDiscard') { const c = selCard(); if (c) discard(c); }
+  else if (b.id === 'shCancel') { SEL = null; PEND = null; PREV = null; render(); }
+  else if (b.id === 'shUndo') undo();
+  else if (b.id === 'shRetry') retry();
+  else if (b.id === 'shShowRes') { if (G.mode === 'puz') solvedPanel(); else showResult(false); }
+  else if (b.id === 'shNext') { const j = nextPuz(G.pid); if (j >= 0) beginPuz(j); }
+}
+function solvedPanel() { q('shResOv').hidden = false; q('shResA').focus(); }
+
+/* ---------- チュートリアル ----------
+   場面ごとに盤と手札を用意して、対消滅・合成・滑り込みの連鎖・闇の反転・光の昇華を一つずつ動かす */
+const TSTEPS = [
+  { say: '<em>四方の盤</em>へようこそ。盤の縁には四つの<em>刻印</em>：上に火、下に水、左に風、右に土。<em>札はみな、自分の元素の刻印へ引かれている</em>。札の縁の小さな山形が、その向き（正面）。', go: 'next',
+    set: { b: '..........F1..........W1........', h: 'W1 A1 E1' } },
+  { say: '手札から札を選んで、空いたマスに置く。<em>置いた札は、そのマスに留まり、上下左右の札と反応する</em>。反対の元素・同じ段階なら<em>対消滅</em>。手札の<em>水の雫</em>を選んで、<em>火の雫の右</em>のマスを2回タップしよう（1回目は下見）。', go: { c: 'W1', cell: 6 }, do: '水の雫 → 火の右' },
+  { say: '火と水が打ち消し合った。<em>同じ元素・同じ段階なら合成</em>：置いた札が相手のマスへ重なって一段上がる。<em>風の雫</em>を、<em>風の雫の上</em>に置こう。', go: { c: 'A1', cell: 5 }, do: '風の雫 → 風の上',
+    set: { b: '..................A1........F1..', h: 'A1 E1 W1' } },
+  { say: 'ここからが四方の盤。札が消えて、ある札の<em>正面のマスが空くと</em>、その札は<em>刻印へ向かって滑り出し、ぶつかるまで止まらない</em>。止まった先でまた反応すれば<em>連鎖</em>。<em>風の雫</em>を、<em>土の雫の右</em>に置いてみよう。土の下で待っている<em>火の雫</em>に注目。', go: { c: 'A1', cell: 10 }, do: '風の雫 → 土の右',
+    set: { b: '..W1..............E1......F1....', h: 'A1 W1 E1' } },
+  { say: '風と土が消えて、火の雫の正面（上）が空いた。火は上の刻印へ滑り、<em>水の雫</em>にぶつかって対消滅。<em>2連鎖</em>。一局では、連鎖の段ごとに得点の倍率が倍になる（×1・×2・×4…）。', go: 'next' },
+  { say: '<em>闇〈反転〉</em>は、盤の札を反対の元素に変える。向きも反対になり、<em>新しい刻印へ滑り出す</em>。闇を選んで、上の<em>火の雫</em>に使おう。水の雫になって、下へ落ちていく。', go: { c: 'D', cell: 2 }, do: '闇 → 火の雫',
+    set: { b: '....F1......................W1F2', h: 'D L A1' } },
+  { say: '下の水の雫と<em>合成</em>して水の輝石になり、その右の<em>火の輝石</em>と対消滅した。相手が二つ以上いるときは、<em>正面から時計回り</em>に探して最初の一つと反応する。', go: 'next' },
+  { say: '<em>光〈昇華〉</em>は、盤の札を一段上げる（光核まで）。光を選んで、右端の<em>土の雫</em>に使おう。土の輝石になり、隣の<em>風の輝石</em>と出会う。', go: { c: 'L', cell: 7 }, do: '光 → 土の雫',
+    set: { b: '............A2E1........F1......', h: 'L W1 D' } },
+  { say: '滑りは1マスずつ一斉に進む。<em>同じマスへ同時に入ろうとしたら、火・水・風・土の順に先</em>。<em>一局</em>：山札28枚の並びは<em>すべて見えている</em>。盤を溜めて大きな連鎖を狙うほど得点は伸びるが、<em>16マスが埋まると終わり</em>。<em>詰め</em>：決まった盤と手札で、示された手数以内に盤を空にする。答えは一通り。', go: 'final' },
+];
+function tutStep() { return TUT && TSTEPS[TUT.i]; }
+function tutSet(st) {
+  if (!st.set) return;
+  G.b = parseBoard(st.set.b); G.hand = st.set.h.split(' ').map(s => Object.assign(tok(s), { id: ++G.nid }));
+  for (const c of G.hand) FRESH.add(c.id);
+  SEL = null; PEND = null; PREV = null; clearPieces(); q('shHand').dataset.h = '';
+}
+function startTutorial() {
+  SFX.init();
+  G = blank('tut', 0); TUT = { i: 0 }; tutSet(TSTEPS[0]); show(); render();
+}
+function nudge() { const c = q('shCoach'); c.classList.remove('nudge'); void c.offsetWidth; c.classList.add('nudge'); SFX.tap(); }
+function tutSelOk(c) {
+  if (!TUT) return true;
+  const g = tutGoal(); if (!g) { nudge(); return false; }
+  if (ctok(c) === g.c) return true;
+  nudge(); return false;
+}
+function tutOk(a) {
+  if (!TUT) return true;
+  const g = tutGoal();
+  if (g && ctok(a.c) === g.c && a.cell === g.cell) return true;
+  nudge(); return false;
+}
+function tutAfter() { if (!TUT) return; tutAdvance(); }
+function tutAdvance() {
+  if (!TUT) return;
+  TUT.i++; const st = tutStep(); if (st) tutSet(st);
+  G.phase = 'play'; G.turn = 0; render();
+}
+function renderCoach() {
+  const box = q('shCoach'), st = tutStep();
+  if (!st) { box.hidden = true; return; }
+  box.hidden = false;
+  const btns = st.go === 'next' ? `<div class="row end"><button type="button" class="btn primary" id="shTutNext" ${BUSY ? 'disabled' : ''}>次へ</button></div>`
+    : st.go === 'final' ? '<div class="row end"><button type="button" class="btn" id="shTutAgain">もう一度</button><button type="button" class="btn" id="shTutPuz">詰めへ</button><button type="button" class="btn primary" id="shTutPlay">一局を始める</button></div>' : '';
+  box.className = 'al-coach';
+  box.innerHTML = `<div class="row"><span class="ey">Tutorial ${TUT.i + 1} / ${TSTEPS.length}</span>${st.do ? `<span class="do">${st.do}</span>` : ''}</div><p>${st.say}</p>${btns}`;
+}
+function onCoach(e) {
+  const b = e.target.closest('button'); if (!b || b.disabled) return;
+  if (b.id === 'shTutNext') { if (BUSY) return; SFX.tap(); tutAdvance(); }
+  else if (b.id === 'shTutAgain') startTutorial();
+  else if (b.id === 'shTutPuz') { store.set('sh.tutDone', true); openPuzList(); }
+  else if (b.id === 'shTutPlay') { store.set('sh.tutDone', true); begin(); }
+}
+
+/* ---------- 保存 ---------- */
+function save() { if (G && G.mode === 'run' && G.phase === 'play' && !BUSY) store.set('sh.run', G); }
+function loadRun() { const r = store.get('sh.run', null); return r && r.v === 1 && r.mode === 'run' && r.phase === 'play' && Array.isArray(r.b) && r.b.length === 16 && Array.isArray(r.hand) ? r : null; }
+
+/* ---------- 画面の出入り ---------- */
+function show() {
+  hideOverlays(); ['shStartOv', 'shPzOv'].forEach(id => q(id).hidden = true); ['shMenuOv', 'shResOv', 'shRulesOv'].forEach(id => q(id).hidden = true);
+  app.hidden = true; q('sh').hidden = false; S.screen = 'shiho'; S.paused = false; BUSY = false; SEL = null; PEND = null; PREV = null; HL = {}; MOVE = {}; OUT = {}; MSG = null; VIEW = null;
+  q('shCall').innerHTML = ''; q('shFx').innerHTML = ''; q('shFly').innerHTML = ''; clearPieces(); q('shHand').dataset.h = ''; FRAMEKEY = '';
+  menuBtns(); render();
+}
+function menuBtns() {
+  const puz = G && G.mode === 'puz', tut = !!TUT;
+  q('shRetrySame').textContent = puz ? 'やり直す' : tut ? 'チュートリアルを最初から' : '同じ並びで最初から';
+  q('shRetryNew').hidden = puz || tut;
+  q('shAnswer').hidden = !puz;
+  q('shToList').hidden = !puz && !tut;
+}
+function begin(seed) { newRun(seed); show(); toast('山札の並びは、すべて見えている。'); save(); }
+function beginPuz(pid) { SFX.init(); newPuz(pid); show(); }
+function open() {
+  SFX.init();
+  const run = loadRun(), first = !store.get('sh.tutDone', false), pz = Object.keys(store.get('sh.pz', {})).length;
+  q('shContinue').hidden = !run;
+  q('shStartSub').textContent = run ? `遊びかけの一局：第${run.turn}手・得点 ${fmt(run.score)}・山札 ${run.deck.length}枚`
+    : first ? 'はじめてなら、まずチュートリアルで、滑り込みと連鎖を動かして覚えよう。' : `四方の刻印へ札が滑り込む。詰めは ${pz}/${PZ.length} 問を解いた。`;
+  q('shTutorial').className = 'btn' + (first && !run ? ' primary' : '');
+  q('shNew').className = 'btn' + (!first && !run ? ' primary' : '');
+  el.titleOv.hidden = true; q('shStartOv').hidden = false;
+  (run ? q('shContinue') : first ? q('shTutorial') : q('shNew')).focus();
+}
+function openPuzList() {
+  const pz = store.get('sh.pz', {}), nx = nextPuz(-1);
+  let html = `<p class="sum">解いた問題 <b>${Object.keys(pz).length}</b> / ${PZ.length}。示された手数以内に、盤を空にする。答えはどれも一通り。</p>`;
+  for (const lv of PZ_LV) {
+    const ids = PZ.map((p, i) => p.m === lv.m ? i : -1).filter(i => i >= 0); if (!ids.length) continue;
+    html += `<h3>${lv.name}<small>${ids.filter(i => pz[i]).length} / ${ids.length}</small></h3><div class="sh-pz-grid">`
+      + ids.map(i => `<button type="button" class="btn${pz[i] ? ' done' : ''}${i === nx && !pz[i] ? ' next' : ''}" data-pz="${i}" aria-label="問題${i + 1}${pz[i] ? '（解いた）' : ''}"><b>${i + 1}</b><small>${pz[i] ? '詰めた' : `札${PZ[i].b.match(/[FWAE]\d/g).length}枚`}</small></button>`).join('')
+      + '</div>';
+  }
+  q('shPzList').innerHTML = html;
+  el.titleOv.hidden = true; q('shStartOv').hidden = true; q('shPzOv').hidden = false;
+  const f = q('shPzList').querySelector('.next') || q('shPzList').querySelector('[data-pz]'); if (f) f.focus();
+}
+function openRules() { q('shRulesOv').hidden = false; q('shRulesOv').querySelector('.panel').scrollTop = 0; q('shRulesClose').focus({ preventScroll: true }); }
+function hideGame() {
+  q('sh').hidden = true; ['shMenuOv', 'shResOv', 'shRulesOv'].forEach(id => q(id).hidden = true);
+  if (G && G.mode === 'run') save();
+  G = null; TUT = null; BUSY = false; SEL = null; PEND = null; PREV = null; app.hidden = false;
+}
+function hide() {
+  const k = q('sh'); if (!k) return;
+  hideGame(); ['shStartOv', 'shPzOv'].forEach(id => { const n = q(id); if (n) n.hidden = true; });
+  const b = q('bestShiho'); if (b) b.textContent = loadRun() ? '遊びかけ' : bestText();
+}
+function esc() {
+  if (!q('shPzOv').hidden) { q('shPzOv').hidden = true; if (S.screen === 'shiho') return true; el.titleOv.hidden = false; return true; }
+  if (!q('shStartOv').hidden) { q('shStartOv').hidden = true; el.titleOv.hidden = false; return true; }
+  if (S.screen !== 'shiho') return false;
+  if (!q('shRulesOv').hidden) q('shRulesOv').hidden = true;
+  else if (!q('shMenuOv').hidden) q('shMenuOv').hidden = true;
+  else if (!q('shResOv').hidden) q('shResOv').hidden = true;
+  else if (SEL != null) { SEL = null; PEND = null; PREV = null; render(); }
+  else q('shMenuOv').hidden = false;
+  return true;
+}
+function updateSound() { const b = q('shSound'); b.classList.toggle('off', !SFX.on); b.setAttribute('aria-pressed', String(SFX.on)); }
+function init() {
+  const ic = q('icShiho');
+  if (ic) ic.innerHTML = orbIcon(0, 1, 20) + orbIcon(2, 1, 18) + orbIcon(1, 1, 18);
+  q('shRulesTiers').innerHTML = [1, 2, 3, 4].map(t => `<span class="ks-mini">${orbIcon(1, t, 20)}${TI[t].name}</span>`).join('　');
+  q('goShiho').addEventListener('click', open);
+  q('shContinue').addEventListener('click', () => { const r = loadRun(); if (!r) return open(); G = r; TUT = null; DISP = G.score; show(); toast('続きから'); });
+  q('shNew').addEventListener('click', () => begin());
+  q('shPuz').addEventListener('click', openPuzList);
+  q('shTutorial').addEventListener('click', startTutorial);
+  q('shStartBack').addEventListener('click', () => { q('shStartOv').hidden = true; el.titleOv.hidden = false; });
+  q('shPzList').addEventListener('click', e => { const b = e.target.closest('[data-pz]'); if (b) beginPuz(+b.dataset.pz); });
+  q('shPzBack').addEventListener('click', () => { q('shPzOv').hidden = true; if (S.screen === 'shiho') return; open(); });
+  q('shHand').addEventListener('click', onHand);
+  q('shCells').addEventListener('click', onCell);
+  q('shCells').addEventListener('pointerover', onHover);
+  q('shActs').addEventListener('click', onActs);
+  q('shCoach').addEventListener('click', onCoach);
+  q('shMenuBtn').addEventListener('click', () => { SFX.tap(); menuBtns(); q('shMenuOv').hidden = false; q('shResume').focus(); });
+  q('shResume').addEventListener('click', () => { q('shMenuOv').hidden = true; });
+  q('shMenuRules').addEventListener('click', () => { q('shMenuOv').hidden = true; openRules(); });
+  q('shRulesBtn').addEventListener('click', () => { SFX.tap(); openRules(); });
+  q('shRulesClose').addEventListener('click', () => { q('shRulesOv').hidden = true; });
+  q('shRulesTut').addEventListener('click', () => { if (BUSY) return; if (G && G.mode === 'run') save(); startTutorial(); });
+  q('shRetrySame').addEventListener('click', () => { if (BUSY) return; q('shMenuOv').hidden = true; if (TUT) return startTutorial(); if (G && G.mode === 'puz') { const g = G.guide; retry(); if (g >= 0) G.guide = -1; render(); return; } begin(G ? G.seed : undefined); });
+  q('shRetryNew').addEventListener('click', () => { if (BUSY) return; begin(); });
+  q('shAnswer').addEventListener('click', () => { if (BUSY || !G || G.mode !== 'puz') return; q('shMenuOv').hidden = true; newPuz(G.pid); G.guide = 0; clearPieces(); q('shHand').dataset.h = ''; render(); toast('答えの手順を、光る札とマスで示す。'); });
+  q('shToList').addEventListener('click', () => { if (BUSY) return; q('shMenuOv').hidden = true; openPuzList(); });
+  q('shToTitle').addEventListener('click', () => { if (BUSY) return; showTitle(); });
+  q('shResA').addEventListener('click', () => { const a = q('shResA').dataset.act; q('shResOv').hidden = true; if (a === 'new') begin(); else if (a === 'next') { const j = nextPuz(G.pid); if (j >= 0) beginPuz(j); } else openPuzList(); });
+  q('shResB').addEventListener('click', () => { const a = q('shResB').dataset.act; q('shResOv').hidden = true; if (a === 'same') begin(G ? G.seed : undefined); else openPuzList(); });
+  q('shResTitle').addEventListener('click', showTitle);
+  q('shSound').addEventListener('click', () => { SFX.on = !SFX.on; store.set('sound', SFX.on); if (SFX.on) SFX.init(); updateSound(); updateSoundBtn(); });
+  for (const id of ['shMenuOv', 'shRulesOv']) q(id).addEventListener('click', e => { if (e.target.id === id) q(id).hidden = true; });
+  const relayout = () => { if (S.screen === 'shiho' && G && !BUSY) render(); };
+  if (window.ResizeObserver) new ResizeObserver(relayout).observe(q('shField'));
+  else window.addEventListener('resize', relayout);
+  updateSound();
+  hide();
+}
+return { init, hide, esc };
+})();
+
 /* ================================================================
    ループと起動
    ================================================================ */
@@ -7360,7 +8412,7 @@ function frame(t) {
   let dt = t - lastT; lastT = t;
   if (S.screen === 'play' && !document.hidden) perfTick(dt);
   if (dt > 50) dt = 50; if (dt < 0) dt = 0;
-  if (S.screen === 'alch' || S.screen === 'kasane' || S.screen === 'erosion') { requestAnimationFrame(frame); return; } // 錬成の書・重ね札・侵食：盤は描かない
+  if (S.screen === 'alch' || S.screen === 'kasane' || S.screen === 'erosion' || S.screen === 'shiho') { requestAnimationFrame(frame); return; } // 錬成の書・重ね札・侵食・四方の盤：盤は描かない
   const stop = performance.now() < (S.hitStop || 0); // ヒットストップ：時間が止まる
   const clock = (S.screen === 'play' || S.screen === 'result') && !S.paused && !stop;
   if (clock) S.now += dt;
@@ -7424,6 +8476,7 @@ function bindUI() {
     if (ALCH.esc()) return;
     if (KS.esc()) return;
     if (ER.esc()) return;
+    if (SH.esc()) return;
     if (!el.rulesOv.hidden) closeRules();
     else if (!$('#tuneOv').hidden) closeTune();
     else if (!$('#soundOv').hidden) closeSound();
@@ -7446,6 +8499,7 @@ function start(data) {
   ALCH.init();
   KS.init();
   ER.init();
+  SH.init();
   fillRules();
   updateSoundBtn();
   if (data && data.v === 1 && data.screen === 'play' && Array.isArray(data.orbs) && data.orbs.length) restore(data);
