@@ -738,6 +738,96 @@ button{font:inherit;color:inherit}
   .ks-card.cur{width:62px;height:84px}.ks-card.cur .oi{width:44px !important;height:44px !important}
   .ks-acts .btn{padding:6px 12px;font-size:12.5px}
 }
+/* ================= 侵食（迎撃）=================
+   上＝混沌の山と次に湧く侵食／中＝前線（4マス）と結界／下＝手札と操作 */
+.er{position:fixed;inset:0;z-index:15;display:flex;flex-direction:column;gap:8px;overflow:hidden;
+  background-color:var(--ink);background-image:radial-gradient(120% 70% at 50% 0%,#1b1130 0%,var(--ink) 62%);
+  padding-top:calc(env(safe-area-inset-top,0px) + 8px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 14px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.er>.ks-top,.er>.er-field,.er>.ks-info,.er>.er-hand,.er>.er-bot,.er>.al-coach{width:100%;max-width:720px;margin-inline:auto}
+.er>.al-coach{min-height:8.6em;flex:none}
+.er>.ks-top,.er>.ks-info,.er>.er-bot{flex:none}
+.er-field{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;justify-content:space-evenly;gap:10px;position:relative}
+.er-field .al-call{z-index:7;top:46%}
+.er-chaos{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted);min-width:0}
+.er-pile{position:relative;display:grid;place-items:center;width:44px;height:58px;flex:none;border-radius:9px;border:1px solid rgba(255,82,114,.5);
+  background:repeating-linear-gradient(135deg,rgba(255,82,114,.12) 0 6px,rgba(0,0,0,.22) 6px 12px),var(--panel-b);box-shadow:0 0 14px rgba(255,82,114,.15)}
+.er-pile b{font-family:var(--f-display);font-weight:800;font-size:17px;color:var(--text);font-variant-numeric:tabular-nums}
+.er-pile small{position:absolute;bottom:-15px;left:50%;transform:translateX(-50%);font-size:9.5px;white-space:nowrap;color:var(--muted)}
+.er-next{display:flex;flex-direction:column;align-items:center;gap:1px;flex:none;width:56px;font-size:10.5px;line-height:1.3;text-align:center}
+.er-next .oi{width:34px !important;height:34px !important}
+.er-next.deep span{color:#ffb3c1}
+.er-remain{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;min-width:0}
+.er-remain span{display:inline-flex;align-items:center;gap:3px;font-variant-numeric:tabular-nums}
+.er-remain span.zero{opacity:.35}
+.er-remain b{color:var(--text);font-weight:700}
+.er-remain .oi{width:16px !important;height:16px !important}
+.er-remain .layer{flex:1 1 100%;color:var(--muted)}
+.er-remain .layer em{font-style:normal;color:#ffb3c1}
+.er-front{position:relative;flex:none;height:clamp(104px,21vh,150px);border-radius:16px;border:1px solid rgba(255,82,114,.3);
+  background:linear-gradient(180deg,rgba(255,82,114,.08),rgba(0,0,0,.28))}
+.er-front.tut-hl{outline-offset:4px}
+.er-slots{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);pointer-events:none}
+.er-slots i{border-left:1px dashed rgba(201,173,114,.16)}
+.er-slots i:first-child{border-left:0}
+.er-pieces,.er-front .er-fx{position:absolute;inset:0}
+.er-front .er-fx{pointer-events:none;z-index:6}
+.er-pc{position:absolute;left:0;top:0;z-index:1;padding:0;margin:0;border:0;border-radius:50%;background:none;color:inherit;font:inherit;cursor:default;
+  transition:transform .26s cubic-bezier(.25,.8,.3,1),width .26s,height .26s,box-shadow .15s;-webkit-appearance:none;appearance:none;will-change:transform}
+.er-pc .oi{display:block;width:100% !important;height:100% !important}
+.er-pc .er-cr{position:absolute;left:50%;top:100%;transform:translate(-50%,2px);font-size:10.5px;line-height:1.3;color:#ffb3c1;white-space:nowrap;pointer-events:none}
+.er-pc.can{cursor:pointer;outline:2px dashed var(--lumen);outline-offset:4px}
+.er-pc.can.foe{outline:2.5px solid #dcd0ff;outline-offset:4px;box-shadow:0 0 24px rgba(185,163,255,.85)}
+.er-pc.hl{z-index:3;outline:3px solid var(--lumen);outline-offset:3px;box-shadow:0 0 18px rgba(255,227,160,.7)}
+.er-pc.anni{z-index:3;outline:3px solid #e4dcff;outline-offset:3px;box-shadow:0 0 20px rgba(185,163,255,.9)}
+.er-pc.crum{z-index:3;outline:3px solid var(--danger);outline-offset:3px;box-shadow:0 0 20px rgba(255,82,114,.8)}
+.er-pc.tut{animation:erTut .9s ease-in-out infinite alternate}
+@keyframes erTut{from{outline-color:rgba(255,227,160,.25)}to{outline-color:var(--lumen)}}
+.er-pc.leaving{z-index:4;transition:none;box-shadow:none;outline:0}
+.er-pc.leaving .er-cr{display:none}
+.er-status{display:flex;justify-content:space-between;align-items:baseline;gap:4px 12px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);padding:6px 2px 0}
+.er-status b{color:var(--text);font-variant-numeric:tabular-nums}
+.er-status .ok{color:var(--lumen);font-weight:700}
+.er-status .ng{color:#ffb3c1;font-weight:700}
+.er-ward{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
+.er-ward .lbl{white-space:nowrap}
+.er-bar{position:relative;flex:1;height:12px;border-radius:999px;background:rgba(0,0,0,.4);border:1px solid var(--brass-dim);overflow:hidden}
+.er-bar i{position:absolute;top:0;bottom:0;left:0;background:linear-gradient(90deg,#8fd6ff,var(--lumen));box-shadow:0 0 12px rgba(143,214,255,.5);transition:width .45s cubic-bezier(.3,.8,.3,1),left .45s}
+.er-bar i.loss{background:repeating-linear-gradient(135deg,rgba(255,82,114,.9) 0 4px,rgba(255,82,114,.35) 4px 8px);box-shadow:none}
+.er-ward b{font-family:var(--f-display);font-weight:800;font-size:18px;color:var(--text);font-variant-numeric:tabular-nums;min-width:3.4em;text-align:right}
+.er-ward b small{font-size:11px;color:var(--muted);font-weight:500}
+.er-ward.hit .er-bar{animation:alShake .35s ease;border-color:var(--danger)}
+.er-hand{min-height:118px;margin-top:0;padding-top:12px;flex:none}
+.er-hand .al-card.can{box-shadow:0 0 0 2px var(--lumen),0 0 16px rgba(255,227,160,.45)}
+.er-hand .al-card.tut{animation:erTutC .9s ease-in-out infinite alternate}
+@keyframes erTutC{from{box-shadow:0 0 0 2px rgba(255,227,160,.2)}to{box-shadow:0 0 0 3px var(--lumen),0 0 20px rgba(255,227,160,.7)}}
+.er-hand .al-card.er-in{animation:erIn .38s cubic-bezier(.2,.8,.3,1) both}
+@keyframes erIn{from{opacity:0;translate:0 26px}to{opacity:1;translate:0 0}}
+.er-hand .al-card.er-grow .oi{animation:erGrow .45s cubic-bezier(.2,.8,.3,1)}
+@keyframes erGrow{0%{scale:.3;filter:brightness(2.4)}60%{scale:1.2;filter:brightness(1.6)}100%{scale:1;filter:none}}
+.er-hand .empty{align-self:center;font-size:12px;color:var(--faint)}
+.er-bot{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;min-height:48px;padding-top:6px;border-top:1px solid var(--brass-faint)}
+.er-bot .btn{min-height:40px}
+.er-bot .btn.warn{border-color:var(--danger);color:#ffd6de;background:rgba(255,82,114,.1)}
+.er-bot .btn.tut{box-shadow:0 0 0 3px rgba(255,227,160,.5);animation:erTutC .9s ease-in-out infinite alternate}
+.er-fly{position:fixed;inset:0;pointer-events:none;z-index:40}
+.er-ghost{position:absolute;left:0;top:0;display:grid;place-items:center;border-radius:50%}
+.er-ghost .oi{width:100% !important;height:100% !important}
+.er-shard{position:absolute;left:0;top:0;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;background:var(--danger);box-shadow:0 0 12px var(--danger)}
+.er-rules .ks-mini{display:inline-flex;align-items:center;gap:3px;vertical-align:middle}
+.er-rules .ks-mini .oi{width:20px !important;height:20px !important}
+.er-res .ks-left{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin:4px 0 6px}
+@media (prefers-reduced-motion:reduce){.er-pc{transition-duration:.12s}.er-pc.tut,.er-hand .al-card.tut,.er-bot .btn.tut{animation:none}}
+@media (max-width:560px){
+  .er-bot .btn{padding:6px 12px;font-size:12.5px}
+  .er-hand{min-height:106px}
+}
+@media (max-height:700px){
+  .er-front{height:clamp(92px,18vh,130px)}
+  .er>.al-coach{min-height:0}
+  .er-hand{min-height:100px;padding-top:8px}
+}
 </style>
 
 <div id="app" class="on-title">
@@ -806,6 +896,12 @@ button{font:inherit;color:inherit}
         <span class="mode-desc">五つの座に札を重ねる一人遊び。真理へ束ねるか、静寂へ消すか。</span>
         <span class="mode-best">記録 <b id="bestKasane">—</b></span>
       </button>
+      <button class="mode" id="goErosion" type="button">
+        <span class="mode-ic drops" id="icErosion"></span>
+        <span class="mode-name">侵食<small>Erosion</small></span>
+        <span class="mode-desc">湧き出る侵食を、手札の札で打ち消す。前線を押し返し、結界を守りきる。</span>
+        <span class="mode-best">記録 <b id="bestErosion">—</b></span>
+      </button>
       <div class="links"><button class="link" id="goRules" type="button">あそびかた</button><button class="link" id="goTune" type="button">バランス調整</button></div>
     </div>
   </div>
@@ -858,6 +954,10 @@ button{font:inherit;color:inherit}
       <div>
         <h3>重ね札</h3>
         <p>山札34枚を1枚ずつめくり、<em>中心から放射状にのびる五つの座</em>へ流す一人遊び。流せるのは巡りの印の座とその両隣だけ。流した札は中心から1マス目に入り、すでにある束は外へずれる。中心に接する束が新しくなると、すぐ外側→反時計回りの隣→時計回りの隣の順に相手を探して合成・対消滅し、連鎖する。座に束が5つ残ると混沌。得点は真理に近い合成ほど大きく、四つの真理だけを残せば〈四元の真理〉で2倍。チュートリアルつき。</p>
+      </div>
+      <div>
+        <h3>侵食</h3>
+        <p>混沌の山から毎手番湧く<em>侵食</em>を、<em>4マスの前線</em>で手札の札をぶつけて打ち消す迎撃戦。同じ元素・同じ段階は合成、反対の元素・同じ段階は対消滅、というきまりが侵食にも働き、侵食どうしは合流して重くなる一方、新しく隣り合えば誘爆して消える。手番の終わりに前線に残った量だけ結界が崩れ、残りが1体以下なら押し返し、2体以上なら居座られる。混沌の山32枚を尽くせば守りきり。チュートリアルつき。</p>
       </div>
       <div>
         <h3>錬成の書</h3>
@@ -1159,7 +1259,125 @@ button{font:inherit;color:inherit}
   </div>
 </section>
 
-<div class="ver" aria-hidden="true">v1.42.0</div>
+<section class="er" id="er" hidden aria-label="侵食">
+  <header class="ks-top">
+    <span class="ks-name">侵食</span>
+    <span class="ks-stat">手番<b id="erTurn">1</b></span>
+    <span class="ks-stat">押し返し<b id="erPush">0</b></span>
+    <div class="ks-tbtns">
+      <button class="btn icon" id="erRulesBtn" type="button" aria-label="あそびかた" title="あそびかた">?</button>
+      <button class="btn icon" id="erSound" type="button" aria-label="音のオン・オフ">♪</button>
+      <button class="btn icon" id="erMenuBtn" type="button" aria-label="メニュー">≡</button>
+    </div>
+  </header>
+  <main class="er-field" id="erField">
+    <div class="er-chaos">
+      <div class="er-pile" id="erPile" aria-label="混沌の山"><b id="erChaosN">32</b><small>混沌の山</small></div>
+      <div class="er-next" id="erNext"></div>
+      <div class="er-remain" id="erRemain" aria-label="混沌の山の中身"></div>
+    </div>
+    <div>
+      <div class="er-front" id="erFront" role="group" aria-label="前線">
+        <div class="er-slots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <div class="er-pieces" id="erPieces"></div>
+        <div class="er-fx" id="erFx" aria-hidden="true"></div>
+      </div>
+      <div class="er-status" id="erStatus"></div>
+    </div>
+    <div class="er-ward" id="erWard"><span class="lbl">結界</span><div class="er-bar"><i id="erHpBar"></i><i class="loss" id="erLoss"></i></div><b id="erHpN">20</b></div>
+    <div id="erCall" aria-hidden="true"></div>
+  </main>
+  <div id="erCoach" hidden></div>
+  <p class="ks-info" id="erInfo" role="status" aria-live="polite"></p>
+  <div class="al-hand er-hand" id="erHand" role="group" aria-label="手札"></div>
+  <footer class="er-bot" id="erActs"></footer>
+  <div class="er-fly" id="erFly" aria-hidden="true"></div>
+
+  <section class="overlay" id="erMenuOv" hidden>
+    <div class="panel pause" role="dialog" aria-modal="true" aria-labelledby="erMenuH">
+      <p class="eyebrow">Erosion</p>
+      <h2 id="erMenuH">侵食</h2>
+      <div class="stack">
+        <button class="btn primary" id="erResume" type="button">続ける</button>
+        <button class="btn" id="erMenuRules" type="button">あそびかた</button>
+        <button class="btn" id="erRetrySame" type="button">同じ並びで最初から</button>
+        <button class="btn" id="erRetryNew" type="button">新しい並びで始める</button>
+        <button class="btn" id="erToTitle" type="button">タイトルへ（続きは保存される）</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="overlay" id="erResOv" hidden>
+    <div class="panel result er-res" role="dialog" aria-modal="true" aria-labelledby="erResH">
+      <p class="eyebrow">Erosion</p>
+      <h2 id="erResH">守りきった</h2>
+      <p class="res-sub" id="erResSub"></p>
+      <div class="ks-left" id="erResLeft"></div>
+      <div class="res-score"><b id="erResPts">0</b><span class="badge" id="erResRec" hidden>新記録</span></div>
+      <dl class="res-stats" id="erResStats"></dl>
+      <div class="panel-btns">
+        <button class="btn primary" id="erResNew" type="button">新しい並びで</button>
+        <button class="btn" id="erResSame" type="button">同じ並びでもう一度</button>
+        <button class="btn" id="erResTitle" type="button">タイトルへ</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="overlay" id="erRulesOv" hidden>
+    <div class="panel rules al-rules er-rules" role="dialog" aria-modal="true" aria-labelledby="erRulesH">
+      <p class="eyebrow">How to play</p>
+      <h2 id="erRulesH">侵食 あそびかた</h2>
+      <p class="rules-lede">混沌の山から毎手番、侵食が湧いて前線に並ぶ。手札の札をぶつけて打ち消し、前線を押し返しながら、結界を守りきる。</p>
+      <div class="al-tutcall"><span>実際に動かして覚えるなら</span><button class="btn primary" id="erRulesTut" type="button">チュートリアルを始める</button></div>
+      <h3>札</h3>
+      <p><em>調律の山</em>（自分の札）は24枚：火・水・風・土の<em>雫</em>が5枚ずつと、<em>光</em>と<em>闇</em>が2枚ずつ。使った札は捨て札になり、山が尽きたら混ぜ直して使い回す。</p>
+      <p><em>混沌の山</em>は32枚で、二つの層に分かれる。先に出る<em>浅層</em>は雫16枚（各4）。あとの<em>深層</em>は雫12枚と<em>輝石</em>4枚（各1）。中身はいつでも上に表示され、次に湧く1枚も見えている。</p>
+      <p>段階は雫・輝石・光核・真理で、その<em>量</em>は雫1・輝石2・光核4・真理8。反対の元素は火と水、風と土。</p>
+      <p id="erRulesTiers"></p>
+      <h3>きまりは一つ</h3>
+      <p><em>同じ元素・同じ段階は合成して一段上に。反対の元素・同じ段階は対消滅して両方消える。</em>このきまりは、手札にも侵食にも同じように働く。侵食どうしの合成を<em>合流</em>、侵食どうしの対消滅を<em>誘爆</em>と呼ぶ。</p>
+      <h3>手番</h3>
+      <ol class="al-steps">
+        <li><b>湧く</b>前線（4マス）の空いたマスに、混沌の山から左詰めで侵食が湧く。湧いた侵食が左隣と同じ元素・同じ段階なら<em>合流</em>して一段上がり、空いたマスにさらに湧く。<em>湧くときは合流だけ</em>で、反対の元素が隣に湧いても打ち消し合わない。</li>
+        <li><b>引く</b>手札が5枚になるまで引く。使わなかった札は次の手番へ持ち越す。</li>
+        <li><b>迎え撃つ</b>手札を選んで、相手をタップする。何手でも打てる。
+          <ul>
+            <li><em>対消滅</em>：元素の札を、反対の元素で同じ段階の侵食にぶつけると、両方消える。</li>
+            <li><em>合成</em>：手札の同じ札2枚を重ねると、一段上の1枚になる（輝石の侵食は、輝石の札で消す）。</li>
+            <li><em>光〈昇華〉</em>：手札か侵食を一段上げる。<em>闇〈反転〉</em>：手札か侵食を反対の元素に変える。</li>
+          </ul>
+        </li>
+        <li><b>崩れ</b>「迎え撃つ」で手番を終えると、前線に残った侵食の量（雫1・輝石2・光核4・真理8）の合計だけ、結界が崩れる。</li>
+        <li><b>押し返し</b>残った侵食が<em>1体以下</em>なら押し返し：残りは消え、次の手番は新しい4マスから。<em>2体以上</em>残ると<em>居座る</em>：そのまま次の手番に持ち越され、空いたマスにだけ湧く。新しく湧いた侵食は居座りと合流しやすい。</li>
+      </ol>
+      <h3>誘爆</h3>
+      <p>侵食が消えると、右側が左へ詰まる。<em>新しく隣り合った</em>侵食どうしが反対の元素・同じ段階なら誘爆して、手札を使わずに両方消える（同じなら合流してしまう）。光や闇で変えた侵食も、隣と新しく出会ったことになる。たとえば、水の輝石の隣の火の雫を光で昇華すれば、火の輝石と水の輝石が誘爆する。どこから消すかで、前線の並びが変わる。</p>
+      <h3>勝ち負け</h3>
+      <table class="al-tbl"><tbody>
+        <tr><th>守りきった</th><td>混沌の山が尽き、前線が空になった。残った結界が記録になる。</td></tr>
+        <tr><th>結界の崩壊</th><td>結界が0になった。混沌の山にあと何枚残っていたかが記録になる。</td></tr>
+      </tbody></table>
+      <p>使った札は、合成や昇華・反転をしていても<em>元の札に戻って</em>捨て札へ（火の輝石を作って使えば、火の雫2枚が戻る）。札を選ぶと「手放す」で捨て札にもできる（手札は次の手番に5枚まで引き直す）。「手番の初めに戻す」で、その手番の打ち直しができる。</p>
+      <div class="panel-btns"><button class="btn primary" id="erRulesClose" type="button">閉じる</button></div>
+    </div>
+  </section>
+</section>
+
+<section class="overlay" id="erStartOv" hidden>
+  <div class="panel pause" role="dialog" aria-modal="true" aria-labelledby="erStartH">
+    <p class="eyebrow">Erosion</p>
+    <h2 id="erStartH">侵食</h2>
+    <p class="res-sub" id="erStartSub"></p>
+    <div class="stack">
+      <button class="btn primary" id="erContinue" type="button">続きから</button>
+      <button class="btn" id="erNew" type="button">新しく始める</button>
+      <button class="btn" id="erTutorial" type="button">チュートリアル</button>
+      <button class="btn" id="erStartBack" type="button">戻る</button>
+    </div>
+  </div>
+</section>
+
+<div class="ver" aria-hidden="true">v1.43.0</div>
 
 <script id="genso-images">window.GENSO_IMAGES = {
   "fire-1": "data:image/jpeg;base64,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",
@@ -3675,7 +3893,7 @@ let rulesBack = null;
 function hideOverlays() { el.titleOv.hidden = el.rulesOv.hidden = el.pauseOv.hidden = el.resultOv.hidden = true; $('#tuneOv').hidden = true; }
 function showScreen() { hideOverlays(); app.classList.remove('on-title'); }
 function showTitle() {
-  ALCH.hide(); KS.hide();
+  ALCH.hide(); KS.hide(); ER.hide();
   S.token++; tweens.length = 0; S.screen = 'title'; S.paused = false; S.drag = null; S.orbs = [];
   FX.parts.length = FX.rings.length = FX.wells.length = FX.texts.length = FX.beams.length = 0;
   hideOverlays(); hideTip(); el.crit.hidden = true;
@@ -5966,12 +6184,651 @@ return { init, hide, esc };
 })();
 
 /* ================================================================
+   侵食（迎撃）
+   混沌の山から湧く侵食を、前線（4マス）で手札の札をぶつけて打ち消す。
+   きまりは手札にも侵食にも同じ：同じ元素・同じ段階は合成（侵食どうしは合流）、反対の元素・同じ段階は対消滅（侵食どうしは誘爆）。
+   湧くときは合流だけ。誘爆は、侵食が消えて詰まったときや、昇華・反転で変わったときに「新しく出会った組」だけで起きる。
+   手番の終わりに、前線に残った侵食の量だけ結界が崩れる。残りが1体以下なら押し返し、2体以上なら居座る。
+   状態 G はそのまま JSON で保存できる形に保つ（侵食・手札は id を持ち、描画はその id で同じ要素を動かす）
+   ================================================================ */
+const ER = (() => {
+const SLOTS = 4, HAND = 5, HP = 20;
+const CNT = [0, 1, 2, 4, 8];              // 段階ごとの量（崩れの大きさ）
+const PSZ = [0, .6, .72, .84, .96];       // 侵食の駒の大きさ（マスに対する比）
+const q = id => document.getElementById(id);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const T = RM ? [80, 110, 150, 110] : [170, 250, 330, 300]; // 光る／寄る／弾ける／湧く（ms）
+const SPC = { light: '#ffd36b', dark: '#b9a3ff' };
+const opp = e => EL[e].opp;
+const pname = p => `${EL[p.e].name}の${TI[p.t].name}`;
+const cname = c => c.k === 'light' ? '光' : c.k === 'dark' ? '闇' : pname(c);
+let G = null, BUSY = false, SEL = null, TUT = null, HL = {}, MOVE = {}, SPAWN = null, MSG = null, OUT = {}, GROW = null;
+let FRESH = new Set(), GROWC = null;
+const PIECES = new Map();
+
+/* ---------- 乱数（種と状態を G に持つので、同じ並びを再現でき、保存もできる）---------- */
+function rnd() { let t = G.rs = (G.rs + 0x6D2B79F5) | 0; t = Math.imul(t ^ t >>> 15, 1 | t); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+/* ---------- 新しい一局 ---------- */
+function blank(seed) {
+  return { v: 1, seed, rs: seed | 0, nid: 0, hp: HP, maxHp: HP, turn: 0, front: [], chaos: [], own: [], disc: [], hand: [], acted: false,
+           phase: 'play', end: null, undo: null, st: { anni: 0, blast: 0, fuse: 0, push: 0, stay: 0, dmg: 0 } };
+}
+function newGame(seed) {
+  if (seed == null) seed = Math.floor(Math.random() * 4294967296);
+  G = blank(seed);
+  const sh = [], dp = [];
+  for (let e = 0; e < 4; e++) {
+    for (let i = 0; i < 4; i++) sh.push({ e, t: 1 });
+    for (let i = 0; i < 3; i++) dp.push({ e, t: 1, d: 1 });
+    dp.push({ e, t: 2, d: 1 });
+  }
+  G.chaos = shuffle(sh).concat(shuffle(dp));
+  for (let e = 0; e < 4; e++) for (let i = 0; i < 5; i++) G.own.push({ k: 'el', e });
+  G.own.push({ k: 'light' }, { k: 'light' }, { k: 'dark' }, { k: 'dark' });
+  shuffle(G.own);
+  TUT = null;
+}
+const toHand = b => ({ k: b.k, e: b.e, t: b.k === 'el' ? 1 : 0, id: ++G.nid, src: [b] });
+
+/* ---------- きまり ---------- */
+function react(a, b) { // 侵食どうし・札どうし共通
+  if (!a || !b || a.t !== b.t) return null;
+  if (a.e === b.e) return a.t < 4 ? 'm' : null;
+  return opp(a.e) === b.e ? 'a' : null;
+}
+const fidx = id => G.front.findIndex(p => p.id === id);
+const card = id => G.hand.find(c => c.id === id);
+const dmgOf = () => G.front.reduce((n, p) => n + CNT[p.t], 0);
+// 札 c を相手に使えるか。tgt は {f: 前線の位置} か {h: 手札の id}。できることの名前を返す
+function canOn(c, tgt) {
+  if (!c) return null;
+  if (tgt.f != null) {
+    const p = G.front[tgt.f]; if (!p) return null;
+    if (c.k === 'el') return p.t === c.t && opp(c.e) === p.e ? 'anni' : null;
+    if (c.k === 'light') return p.t < 4 ? 'raise' : null;
+    return 'flip';
+  }
+  const d = card(tgt.h); if (!d || d.id === c.id || d.k !== 'el') return null;
+  if (c.k === 'el') return d.e === c.e && d.t === c.t && c.t < 4 ? 'fuse' : null;
+  if (c.k === 'light') return d.t < 4 ? 'raise' : null;
+  return 'flip';
+}
+
+/* ---------- 前線の反応（演出つき）---------- */
+async function merge(lo) { // 前線の lo と lo+1 が合流して一段上がる
+  const a = G.front[lo], b = G.front[lo + 1];
+  HL = { [a.id]: 'hl', [b.id]: 'hl' }; render(); await wait(T[0]);
+  MOVE = { [b.id]: lo }; render(); await wait(T[1]);
+  const n = { e: a.e, t: a.t + 1, id: ++G.nid };
+  G.front.splice(lo, 2, n); HL = {}; MOVE = {}; G.st.fuse++;
+  OUT[a.id] = OUT[b.id] = 'fuse'; GROW = n.id;
+  const [x, y] = slotXY(lo); burstMerge(x, y, n.t); SFX.merge(n.t, 1);
+  call('合流', `${pname(n)}`, 'back'); render(); await wait(T[2]);
+  return n;
+}
+async function blast(lo) { // 前線の lo と lo+1 が誘爆して消える
+  const a = G.front[lo], b = G.front[lo + 1];
+  HL = { [a.id]: 'anni', [b.id]: 'anni' }; render(); await wait(T[0]);
+  MOVE = { [a.id]: lo + .5, [b.id]: lo + .5 }; render(); await wait(T[1] * .8);
+  G.front.splice(lo, 2); HL = {}; MOVE = {}; G.st.blast++; G.k++;
+  OUT[a.id] = OUT[b.id] = 'burst';
+  const [x, y] = slotXY(lo + .5); burstAnni(x, y, a, b);
+  if (a.t >= 3) SFX.nova(a.t); else SFX.anni(a.t, G.k);
+  call(G.k >= 2 ? `誘爆<em>×${G.k}</em>` : '誘爆', 'Chain Blast', G.k >= 2 ? 'lv2' : '');
+  render(); await wait(T[2]);
+}
+// 新しく出会った組を順に確かめる。pairs は [左の id, 右の id] の並び
+async function settle(pairs) {
+  while (pairs.length) {
+    const [a, b] = pairs.shift(), ia = fidx(a), ib = fidx(b);
+    if (ia < 0 || ib < 0 || ib !== ia + 1) continue;
+    const r = react(G.front[ia], G.front[ib]);
+    if (r === 'm') { const n = await merge(ia); pairs.push(...around(n.id)); }
+    else if (r === 'a') { await blast(ia); if (ia > 0 && ia < G.front.length) pairs.push([G.front[ia - 1].id, G.front[ia].id]); }
+  }
+}
+function around(id) {
+  const i = fidx(id), out = []; if (i < 0) return out;
+  if (i > 0) out.push([G.front[i - 1].id, id]);
+  if (i + 1 < G.front.length) out.push([id, G.front[i + 1].id]);
+  return out;
+}
+
+/* ---------- 手番 ---------- */
+async function reveal() {
+  while (G.front.length < SLOTS && G.chaos.length) {
+    const c = G.chaos.shift(), p = { e: c.e, t: c.t, id: ++G.nid };
+    G.front.push(p); SPAWN = p.id; SFX.spawn(); render(); SPAWN = null; await wait(T[3]);
+    for (;;) { // 湧くときは合流だけ（左隣と同じなら）
+      const n = G.front.length, a = G.front[n - 2], b = G.front[n - 1];
+      if (n < 2 || a.e !== b.e || a.t !== b.t || a.t >= 4) break;
+      await merge(n - 2);
+    }
+  }
+}
+function draw() {
+  while (G.hand.length < HAND) {
+    if (!G.own.length) { if (!G.disc.length) break; G.own = shuffle(G.disc); G.disc = []; }
+    const c = toHand(G.own.shift()); G.hand.push(c); FRESH.add(c.id);
+  }
+}
+async function startTurn() {
+  if (!G.front.length && !G.chaos.length) return finish(true);
+  BUSY = true; SEL = null; G.k = 0; render();
+  try {
+    G.turn++;
+    await reveal();
+  } finally { BUSY = false; HL = {}; MOVE = {}; SPAWN = null; }
+  draw(); G.acted = false;
+  G.undo = null; G.undo = JSON.stringify(G);
+  save(); render();
+}
+function act(fn) {
+  if (BUSY || !G || G.phase !== 'play') return;
+  BUSY = true; G.k = 0; render();
+  (async () => {
+    try { await fn(); } finally { BUSY = false; HL = {}; MOVE = {}; SPAWN = null; }
+    G.acted = true; save(); render();
+    if (TUT) tutAdvance();
+  })();
+}
+function use(c, tgt) {
+  const kind = canOn(c, tgt); if (!kind) return false;
+  if (!tutOk({ act: kind, c, tgt })) return true;
+  const fromEl = q('erHand').querySelector(`[data-id="${c.id}"]`), fr = fromEl && fromEl.getBoundingClientRect();
+  act(async () => {
+    SEL = null;
+    G.hand.splice(G.hand.indexOf(c), 1);
+    if (tgt.f != null) {
+      const p = G.front[tgt.f];
+      render(); await flyTo(c, fr, pieceRect(p.id));
+      if (kind === 'anni') {
+        HL = { [p.id]: 'anni' }; render(); await wait(T[0] * .6);
+        const i = fidx(p.id), [x, y] = slotXY(i);
+        G.front.splice(i, 1); HL = {}; G.disc.push(...c.src); G.st.anni++; G.k++;
+        OUT[p.id] = 'burst'; burstAnni(x, y, c, p); SFX.anni(p.t, 1);
+        if (p.t >= 2) call('対消滅', `${pname(p)}`, '');
+        render(); await wait(T[2]);
+        if (i > 0 && i < G.front.length) await settle([[G.front[i - 1].id, G.front[i].id]]);
+      } else {
+        G.disc.push(...c.src);
+        if (kind === 'raise') { p.t++; SFX.light(); call('昇華', pname(p), 'calm'); }
+        else { p.e = opp(p.e); SFX.dark(); call('反転', pname(p), 'calm'); }
+        GROW = p.id; render(); await wait(T[2]);
+        await settle(around(p.id));
+      }
+    } else {
+      const d = card(tgt.h);
+      render(); await flyTo(c, fr, handRect(d.id));
+      if (kind === 'fuse') {
+        const n = { k: 'el', e: d.e, t: d.t + 1, id: ++G.nid, src: d.src.concat(c.src) };
+        G.hand.splice(G.hand.indexOf(d), 1, n); GROWC = n.id; SFX.merge(n.t, 1);
+      } else {
+        G.disc.push(...c.src);
+        if (kind === 'raise') { d.t++; SFX.light(); } else { d.e = opp(d.e); SFX.dark(); }
+        GROWC = d.id;
+      }
+      render(); await wait(T[1]);
+    }
+  });
+  return true;
+}
+function release(c) {
+  if (BUSY || !G || G.phase !== 'play' || !tutOk({ act: 'release', c })) return;
+  G.hand.splice(G.hand.indexOf(c), 1); G.disc.push(...c.src); SEL = null; G.acted = true; SFX.dark();
+  toast(`${cname(c)}を手放した（次の手番に引き直す）`); save(); render();
+}
+function undoTurn() {
+  if (BUSY || !G || !G.undo || !G.acted || TUT) return;
+  const u = G.undo; G = JSON.parse(u); G.undo = u; SEL = null; SFX.tap(); clearPieces(); toast('手番の初めに戻した'); save(); render();
+}
+function endTurn() {
+  if (BUSY || !G || G.phase !== 'play' || !tutOk({ act: 'end' })) return;
+  BUSY = true; SEL = null; render();
+  (async () => {
+    let over = false;
+    try {
+      const dmg = dmgOf();
+      if (dmg) { // 崩れ：残った侵食が結界へ打ち寄せる
+        HL = {}; for (const p of G.front) HL[p.id] = 'crum'; render(); await wait(T[0]);
+        await shards();
+        G.hp = Math.max(0, G.hp - dmg); G.st.dmg += dmg; HL = {};
+        const w = q('erWard'); w.classList.remove('hit'); void w.offsetWidth; w.classList.add('hit');
+        SFX.anni(1, 1); floatWard(`−${dmg}`); render(); await wait(T[2]);
+      }
+      if (G.hp <= 0) over = true;
+      else if (G.front.length <= 1) {
+        for (const p of G.front) OUT[p.id] = 'push';
+        G.front = []; G.st.push++; SFX.relief(); call('押し返し', 'Repelled', 'calm'); render(); await wait(T[2] * 1.4);
+      } else { G.st.stay++; SFX.dark(); call('居座り', `${G.front.length}体が残る`, 'back'); render(); await wait(T[2] * 1.4); }
+    } finally { BUSY = false; HL = {}; }
+    if (over) return finish(false);
+    if (TUT && !G.chaos.length) { G.undo = null; render(); return tutAdvance(); }
+    if (TUT) tutAdvance();
+    startTurn();
+  })();
+}
+
+/* ---------- 結末 ---------- */
+function finish(win) {
+  G.phase = 'end'; G.undo = null;
+  const left = G.chaos.length + G.front.length;
+  G.end = { win, hp: G.hp, left, turn: G.turn };
+  const best = store.get('er.best', null);
+  const better = !G.tut && (!best || cmp(G.end, best) > 0);
+  if (better) store.set('er.best', { win, hp: G.hp, left });
+  store.set('er.run', null);
+  render();
+  if (win) SFX.win(); else SFX.over();
+  setTimeout(() => showResult(better), win ? 700 : 900);
+}
+function cmp(a, b) { // 守りきった → 残った結界が多い → （崩壊なら）残りが少ない
+  if (!!a.win !== !!b.win) return a.win ? 1 : -1;
+  if (a.win) return a.hp - b.hp;
+  return b.left - a.left;
+}
+function bestText(b) { return !b ? '—' : b.win ? `結界 ${b.hp} で守りきった` : `残り ${b.left} で崩壊`; }
+function showResult(rec) {
+  const e = G.end;
+  q('erResH').textContent = e.win ? '守りきった' : '結界の崩壊';
+  q('erResSub').textContent = e.win ? `混沌の山を尽くし、前線を押し返しきった。${G.turn}手番で、結界は ${e.hp} / ${G.maxHp} 残った。`
+    : `第${G.turn}手番、結界が崩れ落ちた。混沌の山にはあと${G.chaos.length}枚、前線には${G.front.length}体の侵食が残っていた。`;
+  q('erResLeft').innerHTML = e.win ? '' : G.front.map(p => orbIcon(p.e, p.t, 24 + p.t * 3)).join('');
+  q('erResPts').innerHTML = e.win ? `${e.hp}<small style="font-size:.4em;opacity:.7"> / ${G.maxHp}</small>` : `<small style="font-size:.4em;opacity:.7">残り </small>${e.left}`;
+  q('erResPts').title = e.win ? '残った結界' : '残っていた侵食（混沌の山の枚数と前線の数）';
+  q('erResRec').hidden = !rec;
+  const s = G.st;
+  q('erResStats').innerHTML = [['対消滅', s.anni], ['誘爆', s.blast], ['押し返し', s.push], ['居座り', s.stay], ['合流', s.fuse], ['崩れ', s.dmg]]
+    .map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+  q('erResOv').hidden = false; q('erResNew').focus();
+}
+
+/* ---------- 位置 ---------- */
+function frontBox() { const f = q('erFront'); return { w: f.clientWidth, h: f.clientHeight }; }
+function slotXY(i) { const b = frontBox(), sw = b.w / SLOTS; return [sw * (i + .5), b.h * .44]; }
+function pieceSize(t) { const b = frontBox(); return Math.round(Math.min(b.w / SLOTS * .9, b.h * .78) * PSZ[t]); }
+function pieceRect(id) { const n = PIECES.get(id); return n ? n.getBoundingClientRect() : q('erFront').getBoundingClientRect(); }
+function handRect(id) { const n = q('erHand').querySelector(`[data-id="${id}"]`); return n ? n.getBoundingClientRect() : q('erHand').getBoundingClientRect(); }
+
+/* ---------- 演出 ---------- */
+function fxEl(cls, x, y, size) {
+  const n = document.createElement('span'); n.className = cls;
+  n.style.width = n.style.height = size + 'px'; n.style.left = (x - size / 2) + 'px'; n.style.top = (y - size / 2) + 'px';
+  q('erFx').appendChild(n); return n;
+}
+function anim(n, frames, o) { const a = n.animate(frames, o); a.onfinish = () => n.remove(); return a; }
+function burstMerge(x, y, t) {
+  const s = pieceSize(t);
+  anim(fxEl('ks-burst glow', x, y, s * 1.5), [{ opacity: 0, scale: .3 }, { opacity: 1, scale: 1, offset: .35 }, { opacity: 0, scale: 1.25 }], { duration: RM ? 200 : 520, easing: 'ease-out' });
+  anim(fxEl('ks-burst m', x, y, s), [{ opacity: .95, scale: .5 }, { opacity: 0, scale: 2.2 }], { duration: RM ? 200 : 560, easing: 'cubic-bezier(.2,.7,.3,1)' });
+}
+function burstAnni(x, y, A, B) {
+  const s = pieceSize(B.t || 1);
+  anim(fxEl('ks-burst flash', x, y, s * 1.6), [{ opacity: 1, scale: .4 }, { opacity: .9, scale: 1, offset: .25 }, { opacity: 0, scale: 1.4 }], { duration: RM ? 200 : 420, easing: 'ease-out' });
+  anim(fxEl('ks-burst a', x, y, s), [{ opacity: 1, scale: .6 }, { opacity: 0, scale: 3 }], { duration: RM ? 220 : 620, easing: 'cubic-bezier(.15,.7,.3,1)' });
+  if (RM) return;
+  const cols = [A.e != null && EL[A.e] ? EL[A.e].color : '#fff', EL[B.e].color, '#ffffff'], n = 8 + (B.t || 1) * 3;
+  for (let i = 0; i < n; i++) {
+    const a = Math.PI * 2 * i / n + Math.random() * .4, d = s * (.8 + Math.random() * .8);
+    const sp = fxEl('ks-spark', x, y, 6); sp.style.background = cols[i % 3]; sp.style.boxShadow = `0 0 8px ${cols[i % 3]}`;
+    anim(sp, [{ translate: '0 0', opacity: 1, scale: 1 }, { translate: `${Math.cos(a) * d}px ${Math.sin(a) * d}px`, opacity: 0, scale: .3 }], { duration: 420 + Math.random() * 260, easing: 'cubic-bezier(.1,.7,.3,1)' });
+  }
+}
+// 手札の札が、相手のところへ飛んでいく（光る玉になって）
+function flyTo(c, from, to) {
+  if (!from || !to || RM) return wait(RM ? 60 : 0);
+  const col = c.k === 'el' ? EL[c.e].color : SPC[c.k], s = Math.min(from.width, 48);
+  const g = document.createElement('span'); g.className = 'er-ghost';
+  g.innerHTML = c.k === 'el' ? orbIcon(c.e, c.t, s) : orbIcon(c.k, 0, s);
+  g.style.width = g.style.height = s + 'px'; g.style.filter = `drop-shadow(0 0 10px ${col})`;
+  q('erFly').appendChild(g);
+  const x0 = from.left + from.width / 2 - s / 2, y0 = from.top + from.height * .4 - s / 2;
+  const x1 = to.left + to.width / 2 - s / 2, y1 = to.top + to.height / 2 - s / 2;
+  const a = g.animate([{ transform: `translate(${x0}px,${y0}px) scale(1)`, opacity: 1 }, { transform: `translate(${(x0 + x1) / 2}px,${Math.min(y0, y1) - 30}px) scale(.9)`, offset: .5 }, { transform: `translate(${x1}px,${y1}px) scale(.6)`, opacity: .9 }],
+    { duration: 300, easing: 'cubic-bezier(.4,.1,.3,1)' });
+  return new Promise(r => { a.onfinish = () => { g.remove(); r(); }; });
+}
+// 崩れ：残った侵食から結界へ、赤い欠片が落ちる
+function shards() {
+  if (RM) return wait(120);
+  const w = q('erWard').querySelector('.er-bar').getBoundingClientRect(), list = [];
+  for (const p of G.front) {
+    const r = pieceRect(p.id);
+    for (let k = 0; k < CNT[p.t]; k++) {
+      const s = document.createElement('span'); s.className = 'er-shard'; q('erFly').appendChild(s);
+      const x0 = r.left + r.width / 2, y0 = r.top + r.height / 2, x1 = w.left + w.width * (.15 + Math.random() * .7), y1 = w.top + w.height / 2;
+      const a = s.animate([{ transform: `translate(${x0}px,${y0}px)`, opacity: 1 }, { transform: `translate(${x1}px,${y1}px)`, opacity: .9 }],
+        { duration: 380 + Math.random() * 160, delay: k * 50, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'both' });
+      list.push(new Promise(res => { a.onfinish = () => { s.remove(); res(); }; }));
+    }
+  }
+  return Promise.all(list);
+}
+function floatWard(text) {
+  const w = q('erWard'), r = w.getBoundingClientRect(), f = q('erField').getBoundingClientRect();
+  const n = document.createElement('span'); n.className = 'ks-fl'; n.textContent = text; n.style.color = 'var(--danger)'; n.style.textShadow = '0 0 14px rgba(255,82,114,.7)';
+  n.style.left = (r.left - f.left + r.width / 2) + 'px'; n.style.top = (r.top - f.top) + 'px';
+  n.addEventListener('animationend', () => n.remove()); q('erField').appendChild(n);
+}
+function call(text, sub, cls = '') {
+  const box = q('erCall'); box.innerHTML = '';
+  const n = document.createElement('div'); n.className = 'al-call ' + cls;
+  n.innerHTML = `<b>${text}</b>${sub ? `<i>${sub}</i>` : ''}`;
+  n.addEventListener('animationend', () => n.remove()); box.appendChild(n);
+}
+function toast(m) { MSG = m; render(); setTimeout(() => { if (MSG === m) { MSG = null; if (G) render(); } }, 2400); }
+
+/* ---------- 描画 ---------- */
+function selCard() { return SEL != null ? card(SEL) : null; }
+function tutTarget() { // チュートリアルで、いま触ってほしいもの
+  const st = tutStep(); if (!st || BUSY || typeof st.go !== 'object') return {};
+  const g = st.go, sc = selCard();
+  if (!sc || !matchCard(sc, g.c)) { const h = G.hand.find(c => matchCard(c, g.c)); return { hand: h && h.id }; }
+  if (g.f != null) return { front: G.front[g.f] && G.front[g.f].id };
+  if (g.h) { const h = G.hand.find(c => c.id !== sc.id && matchCard(c, g.h)); return { hand: h && h.id }; }
+  return {};
+}
+function renderFront() {
+  const b = frontBox(); if (!b.w) return;
+  const sc = BUSY || G.phase !== 'play' ? null : selCard(), tt = tutTarget(), seen = new Set(), layer = q('erPieces');
+  const sw = b.w / SLOTS;
+  G.front.forEach((p, i) => {
+    seen.add(p.id);
+    let el = PIECES.get(p.id), fresh = false;
+    const sz = pieceSize(p.t), pos = MOVE[p.id] != null ? MOVE[p.id] : i;
+    const x = sw * (pos + .5) - sz / 2, y = b.h * .44 - sz / 2;
+    if (!el) {
+      el = document.createElement('button'); el.type = 'button'; el.className = 'er-pc'; el.dataset.id = p.id; layer.appendChild(el); PIECES.set(p.id, el); fresh = true;
+      el.style.transition = 'none'; el.style.width = el.style.height = sz + 'px';
+      if (SPAWN === p.id) { // 混沌の山から湧いて出る
+        const pr = q('erPile').getBoundingClientRect(), fr = q('erFront').getBoundingClientRect();
+        el.style.transform = `translate(${pr.left - fr.left + pr.width / 2 - sz / 2}px,${pr.top - fr.top + pr.height / 2 - sz / 2}px) scale(.4)`;
+      } else el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+      void el.offsetWidth; el.style.transition = '';
+    }
+    if (el.dataset.t !== String(p.t) || el.dataset.e !== String(p.e)) {
+      const changed = !fresh;
+      el.dataset.t = p.t; el.dataset.e = p.e;
+      el.innerHTML = orbIcon(p.e, p.t, sz) + `<span class="er-cr">崩れ${CNT[p.t]}</span>`;
+      if (changed && GROW !== p.id) el.firstElementChild.animate([{ scale: 1.3, filter: 'brightness(2)' }, { scale: 1, filter: 'brightness(1)' }], { duration: RM ? 120 : 380, easing: 'ease-out' });
+    }
+    if (GROW === p.id) {
+      GROW = null;
+      el.firstElementChild.animate([{ scale: .25, opacity: .2, filter: 'brightness(2.4)' }, { scale: 1.22, opacity: 1, filter: 'brightness(1.6)', offset: .6 }, { scale: 1, filter: 'brightness(1)' }], { duration: RM ? 140 : 460, easing: 'cubic-bezier(.2,.8,.3,1)' });
+    }
+    el.style.width = el.style.height = sz + 'px';
+    el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+    const can = sc && canOn(sc, { f: i });
+    el.className = 'er-pc' + (can ? ' can' + (can === 'anni' ? ' foe' : '') : '') + (HL[p.id] ? ' ' + HL[p.id] : '') + (tt.front === p.id ? ' tut' : '');
+    el.setAttribute('aria-disabled', String(!can));
+    el.setAttribute('aria-label', `前線${i + 1}：${pname(p)}（崩れ${CNT[p.t]}）${can === 'anni' ? '・ぶつけられる' : can ? '・使える' : ''}`);
+  });
+  for (const [id, el] of PIECES) if (!seen.has(id)) {
+    PIECES.delete(id); const how = OUT[id]; delete OUT[id];
+    el.classList.add('leaving'); el.disabled = true;
+    const fr = how === 'fuse' ? [{ scale: 1, opacity: 1 }, { scale: .45, opacity: 0, filter: 'brightness(2.6)' }]
+      : how === 'burst' ? [{ scale: 1, opacity: 1, filter: 'brightness(1)' }, { scale: 1.3, opacity: 1, filter: 'brightness(3) saturate(.3)', offset: .3 }, { scale: 1.9, opacity: 0, filter: 'brightness(3) saturate(0)' }]
+      : how === 'push' ? [{ translate: '0 0', opacity: 1 }, { translate: '0 -40px', opacity: 0, filter: 'brightness(.4)' }]
+      : [{ opacity: 1 }, { opacity: 0 }];
+    const a = (el.firstElementChild || el).animate(fr, { duration: RM ? 120 : how === 'push' ? 520 : how === 'burst' ? 380 : 240, easing: 'ease-out', fill: 'forwards' });
+    a.onfinish = () => el.remove();
+  }
+}
+function clearPieces() { for (const el of PIECES.values()) el.remove(); PIECES.clear(); }
+function cardHTML(c, cls) {
+  const col = c.k === 'el' ? EL[c.e].color : SPC[c.k];
+  const sub = c.k === 'el' ? `対：${EL[opp(c.e)].name}の${TI[c.t].name}` : c.k === 'light' ? '〈昇華〉＋1段' : '〈反転〉対の元素';
+  const pips = c.k === 'el' ? `<span class="pips">${'<i></i>'.repeat(c.t)}</span>` : '<span class="pips"></span>';
+  const icon = c.k === 'el' ? orbIcon(c.e, c.t, 44) : orbIcon(c.k, 0, 44);
+  return `<button type="button" class="al-card t${c.t} ${cls}" data-id="${c.id}" style="--c:${col};--cg:${rgba(col, .22)};--cb:${rgba(col, .5)}" aria-label="${cname(c)}（${sub}）">${icon}<span class="al-cn">${cname(c)}</span><span class="al-cs">${sub}</span>${pips}</button>`;
+}
+function renderHand() {
+  const sc = BUSY || G.phase !== 'play' ? null : selCard(), tt = tutTarget();
+  q('erHand').innerHTML = G.hand.length ? G.hand.map(c => {
+    const cls = [];
+    if (sc && sc.id === c.id) cls.push('sel');
+    else if (sc) cls.push(canOn(sc, { h: c.id }) ? 'can' : 'dim');
+    if (tt.hand === c.id) cls.push('tut');
+    if (FRESH.has(c.id)) cls.push('er-in');
+    if (GROWC === c.id) cls.push('er-grow');
+    return cardHTML(c, cls.join(' '));
+  }).join('') : `<span class="empty">${G.phase === 'play' ? '手札はない' : ''}</span>`;
+  if (FRESH.size) { // 引いた札が、少しずつ遅れて入ってくる
+    let k = 0; for (const n of q('erHand').querySelectorAll('.er-in')) n.style.animationDelay = (k++ * 60) + 'ms';
+    FRESH.clear();
+  }
+  GROWC = null;
+}
+function render() {
+  if (!G) return;
+  q('er').classList.toggle('tut', !!TUT);
+  q('erTurn').textContent = G.turn;
+  q('erPush').textContent = G.st.push;
+  q('erChaosN').textContent = G.chaos.length;
+  // 混沌の山：次に湧く1枚と、層ごとの中身
+  const nx = G.chaos[0];
+  q('erNext').className = 'er-next' + (nx && nx.d ? ' deep' : '');
+  q('erNext').innerHTML = nx ? `${orbIcon(nx.e, nx.t, 34)}<span>次：${EL[nx.e].name}の${TI[nx.t].name}</span>` : '<span>尽きた</span>';
+  const sh = G.chaos.filter(c => !c.d).length, dp = G.chaos.length - sh, cnt = [0, 0, 0, 0], gem = [0, 0, 0, 0];
+  for (const c of G.chaos) (c.t === 1 ? cnt : gem)[c.e]++;
+  q('erRemain').innerHTML = `<span class="layer">浅層 <b>${sh}</b>・深層 <b>${dp}</b>${dp && !sh ? '　<em>深層に入った</em>' : ''}</span>`
+    + [0, 1, 2, 3].map(e => `<span class="${cnt[e] ? '' : 'zero'}">${orbIcon(e, 1, 16)}<b>${cnt[e]}</b></span>`).join('')
+    + [0, 1, 2, 3].filter(e => gem[e]).map(e => `<span>${orbIcon(e, 2, 16)}<b>${gem[e]}</b></span>`).join('');
+  renderFront(); renderHand();
+  // 前線のようす
+  const n = G.front.length, dmg = dmgOf(), play = G.phase === 'play';
+  q('erStatus').innerHTML = !play ? '' : `<span>前線 <b>${n}</b>体・崩れ <b>${dmg}</b></span>`
+    + (n <= 1 ? `<span class="ok">${n ? 'このまま迎え撃てば押し返せる' : '前線は空'}</span>` : `<span class="ng">押し返すには、あと${n - 1}体</span>`);
+  // 結界：いまの量と、このまま終えたときに崩れる分
+  const hp = G.hp, loss = play && !BUSY ? Math.min(dmg, hp) : 0;
+  q('erHpBar').style.width = ((hp - loss) / G.maxHp * 100) + '%';
+  const ls = q('erLoss'); ls.style.left = ((hp - loss) / G.maxHp * 100) + '%'; ls.style.width = (loss / G.maxHp * 100) + '%';
+  q('erHpN').innerHTML = `${hp}<small> / ${G.maxHp}</small>`;
+  // 操作
+  const sc = !BUSY && play ? selCard() : null, st = tutStep();
+  let acts = '';
+  if (play) {
+    if (sc) acts += `<button type="button" class="btn" id="erRelease">手放す</button><button type="button" class="btn" id="erCancel">やめる</button>`;
+    if (!TUT && !sc) acts += `<button type="button" class="btn" id="erUndo" ${G.acted && !BUSY ? '' : 'disabled'}>手番の初めに戻す</button>`;
+    const fatal = hp - dmg <= 0 && dmg > 0, tut = st && st.go && st.go.act === 'end' && !BUSY;
+    acts += `<button type="button" class="btn ${fatal ? 'warn' : 'primary'}${tut ? ' tut' : ''}" id="erEnd" ${BUSY ? 'disabled' : ''}>迎え撃つ${n <= 1 ? '（押し返す）' : '（居座られる）'}</button>`;
+  } else if (G.phase === 'end' && !G.tut) acts = `<button type="button" class="btn primary" id="erShowRes">結果を見る</button>`;
+  q('erActs').innerHTML = acts;
+  // 案内
+  const info = q('erInfo'); info.classList.remove('warn');
+  let t = '';
+  if (MSG) t = MSG;
+  else if (G.phase === 'end') t = G.end ? (G.end.win ? '守りきった。' : '結界が崩れ落ちた。') : '';
+  else if (BUSY) t = '…';
+  else if (sc) {
+    const fT = G.front.some((p, i) => canOn(sc, { f: i })), hT = G.hand.some(d => canOn(sc, { h: d.id }));
+    if (sc.k === 'el') t = `${cname(sc)}：反対の元素で同じ段階の侵食（${EL[opp(sc.e)].name}の${TI[sc.t].name}）にぶつけると対消滅。手札の同じ札に重ねると合成。`;
+    else if (sc.k === 'light') t = '光〈昇華〉：手札か侵食を一段上げる。侵食を上げて、隣の反対の元素と段階をそろえれば誘爆。';
+    else t = '闇〈反転〉：手札か侵食を反対の元素に変える。';
+    if (!fT && !hT) t += '（いま使える相手はいない）';
+  } else if (!G.hand.length) t = '手札はない。「迎え撃つ」で手番を終える。';
+  else t = '手札を選んで、前線の侵食にぶつける。同じ手札どうしは重ねて合成できる。';
+  if (play && !BUSY && dmg && hp - dmg <= 0) { t += ' このまま終えると結界が崩れ落ちる。'; info.classList.add('warn'); }
+  info.textContent = t;
+  if (TUT) renderCoach(); else q('erCoach').hidden = true;
+}
+
+/* ---------- 入力 ---------- */
+function onHand(e) {
+  const b = e.target.closest('[data-id]'); if (!b || BUSY || !G || G.phase !== 'play') return;
+  const c = card(+b.dataset.id); if (!c) return;
+  const sc = selCard();
+  if (sc && sc.id === c.id) { SEL = null; SFX.tap(); render(); return; }
+  if (sc && canOn(sc, { h: c.id })) { use(sc, { h: c.id }); return; }
+  if (!tutSelOk(c)) return;
+  SEL = c.id; SFX.tap(); render();
+}
+function onFront(e) {
+  const b = e.target.closest('.er-pc'); if (!b || BUSY || !G || G.phase !== 'play') return;
+  const i = fidx(+b.dataset.id), sc = selCard();
+  if (i < 0) return;
+  if (!sc) { toast('先に手札を選んでから、侵食をタップする。'); return; }
+  if (!use(sc, { f: i })) { SFX.tap(); toast(sc.k === 'el' ? `${cname(sc)}で消せるのは、${EL[opp(sc.e)].name}の${TI[sc.t].name}だけ。` : 'その侵食には使えない。'); }
+}
+function onActs(e) {
+  const b = e.target.closest('button'); if (!b || b.disabled) return;
+  if (b.id === 'erEnd') endTurn();
+  else if (b.id === 'erRelease') { const c = selCard(); if (c) release(c); }
+  else if (b.id === 'erCancel') { SEL = null; render(); }
+  else if (b.id === 'erUndo') undoTurn();
+  else if (b.id === 'erShowRes') showResult(false);
+}
+
+/* ---------- チュートリアル ----------
+   決まった並びで二手番：合流・対消滅・誘爆・合成・押し返し、光〈昇華〉で誘爆・闇〈反転〉を一つずつ体験する */
+const D = (e, t = 1) => ({ e, t });
+const TSTEPS = [
+  { say: '<em>侵食</em>へようこそ。上の<em>混沌の山</em>から、毎手番<em>侵食</em>が湧いて<em>前線</em>（4マス）に並ぶ。手番の終わりに前線に残った侵食は、その量だけ<em>結界</em>を崩す。結界が0になれば負け。', go: 'next', hl: 'erFront' },
+  { say: '左端は<em>火の輝石</em>。火の雫が二つ続けて湧いたので、<em>合流</em>して一段上がった。<em>同じ元素・同じ段階は合成する</em>。このきまりは侵食にも働く。駒の下の数字は、残したときの<em>崩れ</em>の量（雫1・輝石2・光核4・真理8）。', go: 'next', hl: 'erFront' },
+  { say: '<em>反対の元素・同じ段階</em>をぶつけると<em>対消滅</em>して両方消える。手札の<em>火の雫</em>を選んで、前線の<em>水の雫</em>をタップしよう。', go: { act: 'anni', c: D(0), f: 2 }, do: '火の雫 → 水の雫' },
+  { say: '水の雫が消えて右側が詰まり、<em>風の雫と土の雫が新しく隣り合った</em>。反対の元素・同じ段階なので、手札を使わずに打ち消し合った。これが<em>誘爆</em>。どこから消すかで、前線の並びが変わる。', go: 'next' },
+  { say: '残るは<em>火の輝石</em>。消すには<em>水の輝石</em>が要る。手札の<em>水の雫</em>を選んで、もう1枚の<em>水の雫</em>に重ねよう。手札どうしも合成できる。', go: { act: 'fuse', c: D(1), h: D(1) }, do: '水の雫 → 水の雫' },
+  { say: 'できた<em>水の輝石</em>を、前線の<em>火の輝石</em>にぶつけよう。', go: { act: 'anni', c: D(1, 2), f: 0 }, do: '水の輝石 → 火の輝石' },
+  { say: '前線が空になった。「<em>迎え撃つ</em>」で手番を終える。残った侵食が<em>1体以下</em>なら<em>押し返し</em>で、次の手番は新しい4マスから。使わなかった火の雫と土の雫は持ち越して、5枚まで引き直す。', go: { act: 'end' }, do: '迎え撃つ' },
+  { say: '新しく湧いた侵食。土の雫が二つ続いて<em>土の輝石</em>に合流した。右の<em>火の雫と水の雫</em>は隣どうしだが、打ち消し合わない。<em>湧くときは合流だけ</em>で、誘爆は新しく出会った組にだけ起きる。', go: 'next', hl: 'erFront' },
+  { say: '<em>光〈昇華〉</em>は、手札か侵食を一段上げる。光を選んで、前線の<em>風の雫</em>をタップしよう。風の輝石になり、隣の<em>土の輝石</em>と出会う。', go: { act: 'raise', c: { k: 'light' }, f: 1 }, do: '光 → 風の雫' },
+  { say: '<em>闇〈反転〉</em>は、手札か侵食を反対の元素に変える。闇を選んで、手札の<em>火の雫</em>をタップしよう。水の雫になる。（前線の火の雫を反転すると、隣の水の雫と合流してしまう）', go: { act: 'flip', c: { k: 'dark' }, h: D(0) }, do: '闇 → 手札の火の雫' },
+  { say: 'できた<em>水の雫</em>を、前線の<em>火の雫</em>にぶつけよう。', go: { act: 'anni', c: D(1), f: 0 }, do: '水の雫 → 火の雫' },
+  { say: '水の雫が1体残った。1体以下なら押し返せるが、残った量（崩れ1）だけ結界は崩れる。「<em>迎え撃つ</em>」で手番を終えよう。', go: { act: 'end' }, do: '迎え撃つ' },
+  { say: '<em>2体以上</em>残すと<em>居座られる</em>。居座った侵食は次の手番にも残り、空いたマスにだけ湧く。新しく湧いた侵食と合流して、どんどん重くなる。混沌の山は浅層16枚のあとに<em>深層</em>16枚。深層には<em>輝石</em>の侵食が混じる。山を尽くして前線を空にすれば<em>守りきった</em>。札を選んで「手放す」と捨て札にでき、「手番の初めに戻す」で打ち直せる。', go: 'final' },
+];
+const matchCard = (c, m) => !!c && !!m && (m.k ? c.k === m.k : c.k === 'el' && c.e === m.e && c.t === (m.t || 1));
+function startTutorial() {
+  SFX.init();
+  G = blank(0); G.tut = true;
+  G.chaos = [D(0), D(0), D(2), D(1), D(3), D(3), D(3), D(2), D(0), D(1)];
+  G.own = [{ k: 'el', e: 0 }, { k: 'el', e: 1 }, { k: 'el', e: 1 }, { k: 'el', e: 0 }, { k: 'el', e: 3 }, { k: 'light' }, { k: 'dark' }, { k: 'el', e: 2 }];
+  TUT = { i: 0 }; show(); startTurn();
+}
+function tutStep() { return TUT && TSTEPS[TUT.i]; }
+function nudge() { const c = q('erCoach'); c.classList.remove('nudge'); void c.offsetWidth; c.classList.add('nudge'); SFX.tap(); }
+function tutSelOk(c) {
+  const st = tutStep(); if (!st) return true;
+  if (typeof st.go !== 'object' || !st.go.c || matchCard(c, st.go.c)) return true;
+  nudge(); return false;
+}
+function tutOk(a) {
+  const st = tutStep(); if (!st) return true;
+  const g = st.go;
+  let ok = typeof g === 'object' && g.act === a.act;
+  if (ok && g.c) ok = matchCard(a.c, g.c);
+  if (ok && g.f != null) ok = a.tgt && a.tgt.f === g.f;
+  if (ok && g.h) ok = a.tgt && a.tgt.h != null && matchCard(card(a.tgt.h), g.h);
+  if (!ok) nudge();
+  return ok;
+}
+function tutAdvance() { if (!TUT) return; TUT.i++; render(); }
+function renderCoach() {
+  const box = q('erCoach'), st = tutStep();
+  document.querySelectorAll('#er .tut-hl').forEach(n => n.classList.remove('tut-hl'));
+  if (!st) { box.hidden = true; return; }
+  box.hidden = false;
+  const btns = st.go === 'next' ? `<div class="row end"><button type="button" class="btn primary" id="erTutNext" ${BUSY ? 'disabled' : ''}>次へ</button></div>`
+    : st.go === 'final' ? '<div class="row end"><button type="button" class="btn" id="erTutAgain">もう一度</button><button type="button" class="btn" id="erTutTitle">タイトルへ</button><button type="button" class="btn primary" id="erTutPlay">本番を始める</button></div>' : '';
+  box.className = 'al-coach';
+  box.innerHTML = `<div class="row"><span class="ey">Tutorial ${TUT.i + 1} / ${TSTEPS.length}</span>${st.do ? `<span class="do">${st.do}</span>` : ''}</div><p>${st.say}</p>${btns}`;
+  if (!BUSY && st.hl) { const n = q(st.hl); if (n) n.classList.add('tut-hl'); }
+}
+function onCoach(e) {
+  const b = e.target.closest('button'); if (!b || b.disabled) return;
+  if (b.id === 'erTutNext') { if (BUSY) return; SFX.tap(); tutAdvance(); }
+  else if (b.id === 'erTutAgain') startTutorial();
+  else if (b.id === 'erTutTitle') { store.set('er.tutDone', true); showTitle(); }
+  else if (b.id === 'erTutPlay') { store.set('er.tutDone', true); begin(); }
+}
+
+/* ---------- 保存 ---------- */
+function save() { if (G && !G.tut && G.phase === 'play' && !BUSY) store.set('er.run', G); }
+function loadRun() { const r = store.get('er.run', null); return r && r.v === 1 && r.phase === 'play' && Array.isArray(r.front) && Array.isArray(r.hand) ? r : null; }
+
+/* ---------- 画面の出入り ---------- */
+function show() {
+  hideOverlays(); q('erStartOv').hidden = true; ['erMenuOv', 'erResOv', 'erRulesOv'].forEach(id => q(id).hidden = true);
+  app.hidden = true; q('er').hidden = false; S.screen = 'erosion'; S.paused = false; BUSY = false; SEL = null; HL = {}; MOVE = {}; SPAWN = null; MSG = null; OUT = {};
+  q('erCall').innerHTML = ''; q('erFx').innerHTML = ''; q('erFly').innerHTML = ''; clearPieces();
+  render();
+}
+function begin(seed) { newGame(seed); show(); startTurn(); }
+function open() {
+  SFX.init();
+  const run = loadRun(), first = !store.get('er.tutDone', false);
+  q('erContinue').hidden = !run;
+  q('erStartSub').textContent = run ? `遊びかけ：第${run.turn}手番・結界 ${run.hp}・混沌の山 ${run.chaos.length}枚`
+    : first ? 'はじめてなら、まずチュートリアルで、打ち消す・誘爆・押し返しを動かして覚えよう。' : '湧き出る侵食を打ち消し、結界を守りきる。';
+  q('erTutorial').className = 'btn' + (first && !run ? ' primary' : '');
+  q('erNew').className = 'btn' + (!first && !run ? ' primary' : '');
+  el.titleOv.hidden = true; q('erStartOv').hidden = false;
+  (run ? q('erContinue') : first ? q('erTutorial') : q('erNew')).focus();
+}
+function openRules() { q('erRulesOv').hidden = false; q('erRulesOv').querySelector('.panel').scrollTop = 0; q('erRulesClose').focus({ preventScroll: true }); }
+function hide() {
+  const k = q('er'); if (k) k.hidden = true;
+  ['erMenuOv', 'erResOv', 'erRulesOv', 'erStartOv'].forEach(id => { const n = q(id); if (n) n.hidden = true; });
+  if (G && !G.tut) save();
+  G = null; TUT = null; BUSY = false; SEL = null; app.hidden = false;
+  const b = q('bestErosion'); if (b) b.textContent = loadRun() ? '遊びかけ' : bestText(store.get('er.best', null));
+}
+function esc() {
+  if (!q('erStartOv').hidden) { q('erStartOv').hidden = true; el.titleOv.hidden = false; return true; }
+  if (S.screen !== 'erosion') return false;
+  if (!q('erRulesOv').hidden) q('erRulesOv').hidden = true;
+  else if (!q('erMenuOv').hidden) q('erMenuOv').hidden = true;
+  else if (!q('erResOv').hidden) q('erResOv').hidden = true;
+  else if (SEL != null) { SEL = null; render(); }
+  else q('erMenuOv').hidden = false;
+  return true;
+}
+function updateSound() { const b = q('erSound'); b.classList.toggle('off', !SFX.on); b.setAttribute('aria-pressed', String(SFX.on)); }
+function init() {
+  const ic = q('icErosion');
+  if (ic) ic.innerHTML = orbIcon(0, 2, 22) + orbIcon(1, 1, 18) + orbIcon(3, 1, 18);
+  q('erRulesTiers').innerHTML = [1, 2, 3, 4].map(t => `<span class="ks-mini">${orbIcon(0, t, 20)}${TI[t].name} 崩れ${CNT[t]}</span>`).join('　');
+  q('goErosion').addEventListener('click', open);
+  q('erContinue').addEventListener('click', () => { const r = loadRun(); if (!r) return open(); G = r; TUT = null; show(); toast('続きから'); });
+  q('erNew').addEventListener('click', () => begin());
+  q('erTutorial').addEventListener('click', startTutorial);
+  q('erStartBack').addEventListener('click', () => { q('erStartOv').hidden = true; el.titleOv.hidden = false; });
+  q('erHand').addEventListener('click', onHand);
+  q('erPieces').addEventListener('click', onFront);
+  q('erActs').addEventListener('click', onActs);
+  q('erCoach').addEventListener('click', onCoach);
+  q('erMenuBtn').addEventListener('click', () => { SFX.tap(); q('erMenuOv').hidden = false; q('erResume').focus(); });
+  q('erResume').addEventListener('click', () => { q('erMenuOv').hidden = true; });
+  q('erMenuRules').addEventListener('click', () => { q('erMenuOv').hidden = true; openRules(); });
+  q('erRulesBtn').addEventListener('click', () => { SFX.tap(); openRules(); });
+  q('erRulesClose').addEventListener('click', () => { q('erRulesOv').hidden = true; });
+  q('erRulesTut').addEventListener('click', () => { if (BUSY) return; if (G && !G.tut) save(); startTutorial(); });
+  q('erRetrySame').addEventListener('click', () => { if (BUSY) return; if (G && G.tut) return startTutorial(); begin(G ? G.seed : undefined); });
+  q('erRetryNew').addEventListener('click', () => { if (BUSY) return; begin(); });
+  q('erToTitle').addEventListener('click', () => { if (BUSY) return; showTitle(); });
+  q('erResNew').addEventListener('click', () => begin());
+  q('erResSame').addEventListener('click', () => begin(G ? G.seed : undefined));
+  q('erResTitle').addEventListener('click', showTitle);
+  q('erSound').addEventListener('click', () => { SFX.on = !SFX.on; store.set('sound', SFX.on); if (SFX.on) SFX.init(); updateSound(); updateSoundBtn(); });
+  for (const id of ['erMenuOv', 'erRulesOv']) q(id).addEventListener('click', e => { if (e.target.id === id) q(id).hidden = true; });
+  const relayout = () => { if (S.screen === 'erosion' && G && !BUSY) render(); };
+  if (window.ResizeObserver) new ResizeObserver(relayout).observe(q('erFront'));
+  else window.addEventListener('resize', relayout);
+  updateSound();
+  hide();
+}
+return { init, hide, esc };
+})();
+
+/* ================================================================
    ループと起動
    ================================================================ */
 let lastT = performance.now();
 function frame(t) {
   let dt = t - lastT; lastT = t; if (dt > 50) dt = 50; if (dt < 0) dt = 0;
-  if (S.screen === 'alch' || S.screen === 'kasane') { requestAnimationFrame(frame); return; } // 錬成の書・重ね札：盤は描かない
+  if (S.screen === 'alch' || S.screen === 'kasane' || S.screen === 'erosion') { requestAnimationFrame(frame); return; } // 錬成の書・重ね札・侵食：盤は描かない
   const stop = performance.now() < (S.hitStop || 0); // ヒットストップ：時間が止まる
   const clock = (S.screen === 'play' || S.screen === 'result') && !S.paused && !stop;
   if (clock) S.now += dt;
@@ -6028,6 +6885,7 @@ function bindUI() {
     if (e.key !== 'Escape') return;
     if (ALCH.esc()) return;
     if (KS.esc()) return;
+    if (ER.esc()) return;
     if (!el.rulesOv.hidden) closeRules();
     else if (!$('#tuneOv').hidden) closeTune();
     else if (!el.pauseOv.hidden) resume();
@@ -6048,6 +6906,7 @@ function start(data) {
   bindUI();
   ALCH.init();
   KS.init();
+  ER.init();
   fillRules();
   updateSoundBtn();
   if (data && data.v === 1 && data.screen === 'play' && Array.isArray(data.orbs) && data.orbs.length) restore(data);
