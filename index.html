@@ -1016,6 +1016,156 @@ button{font:inherit;color:inherit}
   .sh>.al-coach{min-height:0}
   .sh-hand{min-height:96px;padding-top:8px}
 }
+
+/* ================= 共鳴の列 =================
+   上＝得点・ラウンドと山札の中身／中＝響き×束、一列に並ぶ札（右端が反応する）、予報／下＝光・闇・星読み、奉納とめくる */
+.rt{position:fixed;inset:0;z-index:15;display:flex;flex-direction:column;gap:6px;overflow:hidden;
+  background-color:var(--ink);background-image:radial-gradient(120% 70% at 50% 0%,#191530 0%,var(--ink) 62%);
+  padding-top:calc(env(safe-area-inset-top,0px) + 8px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 14px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.rt>.ks-top,.rt>.rt-deck,.rt>.rt-field,.rt>.ks-info,.rt>.rt-hand,.rt>.er-bot,.rt>.al-coach{width:100%;max-width:720px;margin-inline:auto}
+.rt>.ks-top,.rt>.rt-deck,.rt>.ks-info,.rt>.rt-hand,.rt>.er-bot,.rt>.al-coach{flex:none}
+.rt>.al-coach{min-height:7.2em}
+.rt .ks-stat.day b{color:var(--umbra);font-size:13px}
+.rt-deck{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;font-size:12px;color:var(--muted);min-height:22px}
+.rt-deck .lbl b{color:var(--text);font-variant-numeric:tabular-nums}
+.rt-deck span.c{display:inline-flex;align-items:center;gap:3px;font-variant-numeric:tabular-nums}
+.rt-deck span.c b{color:var(--text);font-weight:700}
+.rt-deck span.c.zero{opacity:.32}
+.rt-deck .oi{width:16px !important;height:16px !important}
+.rt-field{flex:1 1 auto;min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.rt-pot{display:flex;align-items:baseline;justify-content:center;flex-wrap:wrap;gap:2px 8px;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;min-height:32px}
+.rt-pot b{font-family:var(--f-display);font-weight:800;font-size:24px;color:var(--text);line-height:1}
+.rt-pot b.pot{color:var(--lumen)}
+.rt-pot b.sum{font-size:28px;color:var(--lumen);text-shadow:0 0 16px rgba(255,227,160,.35)}
+.rt-pot .x{font-family:var(--f-latin);font-size:18px;color:var(--brass)}
+.rt-pot.bump b.sum{animation:rtBump .35s ease-out}
+@keyframes rtBump{40%{transform:scale(1.18)}}
+.rt-stage{position:relative;width:100%;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.rt-stage.shake{animation:rtShake .45s ease}
+@keyframes rtShake{20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
+.rt-slots,.rt-pieces,.rt-stage .rt-fx{position:absolute;inset:0;pointer-events:none}
+.rt-stage .rt-fx{z-index:6}
+.rt-slot{position:absolute;top:0;left:0;border-radius:50%;border:1px dashed rgba(201,173,114,.18)}
+.rt-slot.over{border-color:rgba(255,82,114,.38);background:rgba(255,82,114,.05)}
+.rt-capline{position:absolute;top:0;width:0;border-left:1.5px dashed rgba(255,82,114,.5)}
+.rt-caplbl{position:absolute;font-size:10px;color:#ff8ea3;white-space:nowrap;transform:translateX(-50%)}
+.rt-endlbl{position:absolute;font-size:10px;color:var(--lumen);white-space:nowrap;transform:translateX(-50%);transition:left .25s ease}
+.rt-baseline{position:absolute;height:1px;background:linear-gradient(90deg,rgba(201,173,114,0),rgba(201,173,114,.3) 10%,rgba(201,173,114,.3) 90%,rgba(201,173,114,0))}
+.rt-pc{position:absolute;left:0;top:0;z-index:2;border-radius:50%;will-change:transform;pointer-events:none;
+  transition:transform .26s cubic-bezier(.3,.75,.25,1),width .22s,height .22s,opacity .2s}
+.rt-pc .oi{display:block;width:100% !important;height:100% !important}
+.rt-pc.float{z-index:4}
+.rt-pc.hl{z-index:3;outline:3px solid var(--lumen);outline-offset:2px;filter:drop-shadow(0 0 10px rgba(255,227,160,.85))}
+.rt-pc.anni{z-index:3;outline:3px solid #e4dcff;outline-offset:2px;filter:drop-shadow(0 0 12px rgba(185,163,255,.95))}
+.rt-pc.hz{z-index:5;outline:3px solid var(--danger);outline-offset:2px;filter:drop-shadow(0 0 14px rgba(255,82,114,1))}
+.rt-pc.exposed{animation:rtExpose 1.1s ease-in-out infinite alternate}
+.rt-pc.exposed::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:2px solid rgba(255,82,114,.75);
+  -webkit-mask:conic-gradient(#000 0 8%,transparent 8% 14%,#000 14% 40%,transparent 40% 45%,#000 45% 72%,transparent 72% 78%,#000 78%);mask:conic-gradient(#000 0 8%,transparent 8% 14%,#000 14% 40%,transparent 40% 45%,#000 45% 72%,transparent 72% 78%,#000 78%)}
+@keyframes rtExpose{from{filter:drop-shadow(0 0 2px rgba(255,82,114,.3))}to{filter:drop-shadow(0 0 12px rgba(255,82,114,.9))}}
+.rt-pc.tg{pointer-events:auto;cursor:pointer;outline:2px dashed var(--lumen);outline-offset:4px}
+.rt-pc.tg.dk{outline-color:var(--umbra)}
+.rt-pc.tg:hover{filter:brightness(1.25)}
+.rt-pc.tut{outline:3px solid var(--lumen);outline-offset:4px;animation:erTutC .9s ease-in-out infinite alternate}
+.rt-pc.peek{opacity:.6;filter:saturate(.75)}
+.rt-pc.peek::before{content:"次";position:absolute;left:50%;top:-16px;transform:translateX(-50%);font-size:10px;color:var(--umbra);white-space:nowrap}
+.rt-pc.leaving{z-index:4;transition:none;outline:0;filter:none}
+.rt-pc.rise{transition:transform .7s cubic-bezier(.3,.1,.3,1),opacity .7s}
+.rt-pts{position:absolute;left:0;top:0;transform:translate(-50%,-50%);font-family:var(--f-display);font-weight:800;font-size:15px;color:var(--lumen);white-space:nowrap;
+  text-shadow:0 0 10px rgba(0,0,0,.9),0 0 14px rgba(255,227,160,.5);pointer-events:none;animation:shPts 1s ease-out forwards;z-index:7}
+.rt-pts small{font-family:var(--f-latin);font-size:12px;color:#dcd0ff;margin-left:3px}
+.rt-pts.safe{color:#fff;font-size:18px;text-shadow:0 0 12px rgba(255,227,160,.9)}
+.rt-stage .al-call{z-index:8}
+.rt-tag{position:absolute;transform:translate(-50%,-100%);font-size:11px;font-weight:700;color:#e4dcff;white-space:nowrap;pointer-events:none;
+  text-shadow:0 0 8px rgba(0,0,0,.9);animation:rtTag 1.2s ease-out forwards;z-index:7}
+@keyframes rtTag{0%{opacity:0;translate:0 6px}15%{opacity:1;translate:0 0}80%{opacity:1}100%{opacity:0;translate:0 -8px}}
+/* 予報：次にめくる札の元素ごとに、何が起きるか */
+.rt-fore{display:flex;flex-direction:column;align-items:center;gap:6px;min-height:58px}
+.rt-risk{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rt-risk b{font-family:var(--f-display);font-weight:800;font-size:20px;color:var(--text);margin:0 2px}
+.rt-risk.mid b{color:#ffc58a}
+.rt-risk.hi b{color:var(--danger)}
+.rt-risk.zero b{color:var(--wind)}
+.rt-fc-row{display:flex;flex-wrap:wrap;justify-content:center;gap:5px}
+.rt-fc{display:inline-flex;align-items:center;gap:4px;padding:2px 9px 2px 4px;border-radius:999px;border:1px solid var(--brass-faint);background:rgba(0,0,0,.2);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.rt-fc .oi{width:18px !important;height:18px !important}
+.rt-fc i{font-style:normal;color:var(--text)}
+.rt-fc b{font-weight:700}
+.rt-fc.k-pull{border-color:rgba(255,227,160,.45)}.rt-fc.k-pull b{color:var(--lumen)}
+.rt-fc.k-ann{border-color:rgba(185,163,255,.45)}.rt-fc.k-ann b{color:#dcd0ff}
+.rt-fc.k-line b{color:var(--muted)}
+.rt-fc.k-hz,.rt-fc.k-cap{border-color:rgba(255,82,114,.6);background:rgba(255,82,114,.1)}.rt-fc.k-hz b,.rt-fc.k-cap b{color:#ff8ea3}
+.rt-fc.zero{opacity:.3}
+.rt-fc.nx{box-shadow:0 0 0 2px var(--umbra)}
+/* ラウンドの区切り（奉納・混沌） */
+.rt-round{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:9;width:min(420px,100%);padding:14px 16px 14px;border-radius:16px;
+  border:1px solid var(--brass-dim);background:linear-gradient(180deg,rgba(22,26,54,.97),rgba(14,17,38,.97));box-shadow:0 18px 50px rgba(0,0,0,.6);text-align:center;animation:rtIn .35s cubic-bezier(.2,.8,.3,1) .85s both}
+.rt-round.bust{border-color:rgba(255,82,114,.55)}
+@keyframes rtIn{from{opacity:0;transform:translate(-50%,-44%) scale(.96)}}
+.rt-round h3{margin:0 0 2px;font-family:var(--f-display);font-weight:800;font-size:22px;letter-spacing:.12em}
+.rt-round.bust h3{color:#ffb3c1}
+.rt-round .big{font-family:var(--f-display);font-weight:800;font-size:34px;color:var(--lumen);line-height:1.15;font-variant-numeric:tabular-nums}
+.rt-round .big small{font-family:var(--f-body);font-size:13px;font-weight:500;color:var(--muted);margin-left:6px}
+.rt-round p{margin:6px 0 0;font-size:13px;line-height:1.6;color:var(--text)}
+.rt-round p.ans{padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.04);color:var(--muted)}
+.rt-round p.ans em{font-style:normal;color:var(--text);font-weight:700}
+.rt-round p.ans .ok{color:var(--wind)}.rt-round p.ans .ng{color:#ff8ea3}
+.rt-round .row{display:flex;justify-content:center;gap:8px;margin-top:12px}
+.rt-hand{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;min-height:44px}
+.rt-hand .lbl{font-size:11px;color:var(--faint)}
+.rt-sp{display:inline-flex;align-items:center;gap:6px;min-height:38px;padding:4px 14px 4px 6px;border-radius:999px;border:1px solid var(--brass-dim);background:rgba(201,173,114,.07);cursor:pointer}
+.rt-sp .oi{width:28px !important;height:28px !important}
+.rt-sp span{display:flex;flex-direction:column;align-items:flex-start;line-height:1.2;font-size:12.5px;font-weight:700}
+.rt-sp small{font-size:10px;font-weight:500;color:var(--muted)}
+.rt-sp.light{border-color:rgba(255,211,107,.55)}
+.rt-sp.dark{border-color:rgba(185,163,255,.55)}
+.rt-sp.sel{box-shadow:0 0 0 2px var(--lumen),0 0 16px rgba(255,227,160,.45)}
+.rt-sp.dark.sel{box-shadow:0 0 0 2px var(--umbra),0 0 16px rgba(185,163,255,.5)}
+.rt-sp.tut{animation:erTutC .9s ease-in-out infinite alternate}
+.rt-sp.er-in{animation:erIn .38s cubic-bezier(.2,.8,.3,1) both}
+.rt-sp:disabled{opacity:.4;cursor:default}
+.rt-bot{justify-content:space-between !important;flex-wrap:nowrap !important}
+.rt-bot .btn{min-height:46px;font-size:15px}
+.rt-bot #rtFlip{min-width:42%;font-size:17px}
+.rt-bot #rtBank{min-width:30%}
+.rt-bot #rtBank b{margin-left:4px}
+.rt-bot .btn.tut{box-shadow:0 0 0 3px rgba(255,227,160,.5);animation:erTutC .9s ease-in-out infinite alternate}
+.rt-res .rank{display:inline-flex;align-items:center;gap:8px;margin:2px auto 4px;padding:3px 14px;border-radius:999px;border:1px solid var(--lumen);color:var(--lumen);font-family:var(--f-display);font-weight:800;font-size:16px;letter-spacing:.1em}
+.rt-res .next{font-size:12px;color:var(--muted);margin:0 0 6px}
+.rt-res .tl{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:8px 0 2px}
+.rt-res .tl span{display:inline-flex;flex-direction:column;align-items:center;min-width:52px;padding:4px 8px;border-radius:10px;border:1px solid var(--brass-faint);font-size:10.5px;color:var(--muted);line-height:1.3}
+.rt-res .tl span b{font-family:var(--f-display);font-weight:800;font-size:15px;color:var(--text)}
+.rt-res .tl span.bank b{color:var(--lumen)}
+.rt-res .tl span.bust{border-color:rgba(255,82,114,.4)}.rt-res .tl span.bust b{color:#ff8ea3}
+.rt-res .fork{font-size:12.5px;color:var(--muted);margin:8px auto 0;max-width:46ch;text-align:center}
+.rt-res .fork em{font-style:normal;color:var(--text);font-weight:700}
+.rt-res .newach{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:6px 0 0}
+.rt-res .newach span{font-size:11.5px;padding:2px 10px;border-radius:999px;background:rgba(255,227,160,.12);border:1px solid rgba(255,227,160,.5);color:var(--lumen)}
+.rt-ach{width:min(560px,100%)}
+.rt-ach ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.rt-ach li{display:grid;grid-template-columns:26px 1fr;gap:2px 10px;align-items:start;padding:8px 10px;border-radius:12px;border:1px solid var(--brass-faint);background:rgba(0,0,0,.16)}
+.rt-ach li i{grid-row:span 2;font-style:normal;font-size:18px;line-height:1.3;text-align:center;color:var(--faint)}
+.rt-ach li b{font-family:var(--f-display);font-weight:800;font-size:14.5px;color:var(--muted)}
+.rt-ach li small{font-size:12px;color:var(--muted)}
+.rt-ach li.got{border-color:rgba(255,227,160,.45);background:rgba(255,227,160,.06)}
+.rt-ach li.got i{color:var(--lumen)}
+.rt-ach li.got b{color:var(--text)}
+.rt-ach .sum{font-size:12.5px;color:var(--muted);margin:0}
+.rt-rules .ks-mini{display:inline-flex;align-items:center;gap:3px;vertical-align:middle}
+.rt-rules .ks-mini .oi{width:20px !important;height:20px !important}
+@media (prefers-reduced-motion:reduce){.rt-round{animation-delay:.3s}.rt-pc{transition-duration:.08s}.rt-pc.exposed,.rt-pc.tut,.rt-sp.tut,.rt-bot .btn.tut{animation:none}.rt-stage.shake{animation:none}}
+@media (max-width:480px){.rt>.ks-top .ks-name{display:none}}
+@media (max-width:560px){
+  .rt>.ks-top{flex-wrap:nowrap;gap:4px 10px}
+  .rt>.ks-top .ks-stat b{font-size:16px}
+  .rt-pot b{font-size:20px}.rt-pot b.sum{font-size:24px}
+}
+@media (max-height:720px){
+  .rt.tut>.ks-info{display:none}
+  .rt>.al-coach{min-height:0}
+  .rt-fore{min-height:0}
+}
 </style>
 
 <div id="app" class="on-title">
@@ -1105,6 +1255,12 @@ button{font:inherit;color:inherit}
         <span class="mode-desc">4×4の盤に札を置く。消えた跡へ、四方の刻印に引かれた札が滑り込み、連鎖する。詰め将棋のように読みきる。</span>
         <span class="mode-best">記録 <b id="bestShiho">—</b></span>
       </button>
+      <button class="mode" id="goRetsu" type="button">
+        <span class="mode-ic drops" id="icRetsu"></span>
+        <span class="mode-name">共鳴の列<small>Resonance Row</small></span>
+        <span class="mode-desc">山札を一枚ずつめくって一列に。同じ元素は引き合い、抜けた跡で両隣が響き合う。どこで止めて奉納するか、運と確率の勝負。</span>
+        <span class="mode-best">記録 <b id="bestRetsu">—</b></span>
+      </button>
       <div class="links"><button class="link" id="goRules" type="button">あそびかた</button><button class="link" id="goTune" type="button">バランス調整</button></div>
     </div>
   </div>
@@ -1166,6 +1322,10 @@ button{font:inherit;color:inherit}
       <div>
         <h3>侵食</h3>
         <p>混沌の山から毎手番湧く<em>侵食</em>を、<em>4マスの前線</em>で手札の札をぶつけて打ち消す迎撃戦。同じ元素・同じ段階は合成、反対の元素・同じ段階は対消滅、というきまりが侵食にも働き、侵食どうしは合流して重くなる一方、新しく隣り合えば誘爆して消える。手番の終わりに前線に残った量だけ結界が崩れ、残りが1体以下なら押し返し、2体以上なら居座られる。混沌の山32枚を尽くせば守りきり。チュートリアルつき。</p>
+      </div>
+      <div>
+        <h3>共鳴の列</h3>
+        <p>山札34枚を一枚ずつめくり、一列に並べる運試し。<em>同じ元素の雫は列のどこからでも右端へ飛んできて合成し、抜けた跡では両隣が触れ合って連鎖する。</em>反対の元素は右端で対消滅。反応するたびに〈響き〉が貯まり、止めて奉納すると響き×列の束の数が得点。右端の輝石に反対の元素の雫が来ると〈ひずみ〉、束が7つを超えると混沌で、そのラウンドの響きは消える。予報で確率を見ながら、もう1枚めくるか決める。今日の山札・称号・チュートリアルつき。</p>
       </div>
       <div>
         <h3>四方の盤</h3>
@@ -1716,7 +1876,129 @@ button{font:inherit;color:inherit}
   </div>
 </section>
 
-<div class="ver" aria-hidden="true">v1.60.0</div>
+<section class="rt" id="rt" hidden aria-label="共鳴の列">
+  <header class="ks-top">
+    <span class="ks-name">共鳴の列</span>
+    <span id="rtStats" style="display:contents"></span>
+    <div class="ks-tbtns">
+      <button class="btn icon" id="rtRulesBtn" type="button" aria-label="あそびかた" title="あそびかた">?</button>
+      <button class="btn icon" id="rtSound" type="button" aria-label="音のオン・オフ">♪</button>
+      <button class="btn icon" id="rtMenuBtn" type="button" aria-label="メニュー">≡</button>
+    </div>
+  </header>
+  <div class="rt-deck" id="rtDeck"></div>
+  <main class="rt-field" id="rtField">
+    <div class="rt-pot" id="rtPot" aria-live="off"></div>
+    <div class="rt-stage" id="rtStage">
+      <div class="rt-slots" id="rtSlots" aria-hidden="true"></div>
+      <div class="rt-pieces" id="rtPieces" role="group" aria-label="列"></div>
+      <div class="rt-fx" id="rtFx" aria-hidden="true"></div>
+      <div id="rtCall" aria-hidden="true"></div>
+    </div>
+    <div class="rt-fore" id="rtFore"></div>
+    <div class="rt-round" id="rtRound" hidden></div>
+  </main>
+  <div id="rtCoach" hidden></div>
+  <p class="ks-info" id="rtInfo" role="status" aria-live="polite"></p>
+  <div class="rt-hand" id="rtHand"></div>
+  <footer class="er-bot rt-bot" id="rtActs"></footer>
+
+  <section class="overlay" id="rtMenuOv" hidden>
+    <div class="panel pause" role="dialog" aria-modal="true" aria-labelledby="rtMenuH">
+      <p class="eyebrow">Resonance Row</p>
+      <h2 id="rtMenuH">共鳴の列</h2>
+      <div class="stack">
+        <button class="btn primary" id="rtResume" type="button">続ける</button>
+        <button class="btn" id="rtMenuRules" type="button">あそびかた</button>
+        <button class="btn" id="rtMenuAch" type="button">称号</button>
+        <button class="btn" id="rtRetrySame" type="button">同じ山札で最初から</button>
+        <button class="btn" id="rtRetryNew" type="button">新しい山札で始める</button>
+        <button class="btn" id="rtToTitle" type="button">タイトルへ（続きは保存される）</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="overlay" id="rtResOv" hidden>
+    <div class="panel result rt-res" role="dialog" aria-modal="true" aria-labelledby="rtResH">
+      <p class="eyebrow" id="rtResEy">Resonance Row</p>
+      <h2 id="rtResH">終局</h2>
+      <div class="res-score"><b id="rtResPts">0</b><span class="badge" id="rtResRec" hidden>新記録</span></div>
+      <div style="text-align:center"><span class="rank" id="rtResRank"></span></div>
+      <p class="next" id="rtResNext" style="text-align:center"></p>
+      <div class="tl" id="rtResTl"></div>
+      <p class="fork" id="rtResFork"></p>
+      <div class="newach" id="rtResAch"></div>
+      <dl class="res-stats" id="rtResStats"></dl>
+      <div class="panel-btns">
+        <button class="btn" id="rtResShare" type="button" hidden>結果をコピー</button>
+        <button class="btn" id="rtResSame" type="button">同じ山札でもう一度</button>
+        <button class="btn" id="rtResTitle" type="button">タイトルへ</button>
+        <button class="btn primary" id="rtResNew" type="button">新しい山札で</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="overlay" id="rtRulesOv" hidden>
+    <div class="panel rules al-rules rt-rules" role="dialog" aria-modal="true" aria-labelledby="rtRulesH">
+      <p class="eyebrow">How to play</p>
+      <h2 id="rtRulesH">共鳴の列 あそびかた</h2>
+      <p class="rules-lede">山札から一枚ずつめくって、一列に並べる運試し。反応するほど〈響き〉が貯まる。好きなときに止めて奉納すれば得点、欲張って混沌になれば、そのラウンドの響きは消える。</p>
+      <div class="al-tutcall"><span>実際に動かして覚えるなら</span><button class="btn primary" id="rtRulesTut" type="button">チュートリアルを始める</button></div>
+      <h3>山札と段階</h3>
+      <p>山札は34枚：火・水・風・土の<em>雫</em>が8枚ずつと、<em>光</em>と<em>闇</em>が1枚ずつ。中身は決まっていて、残りの枚数はいつも上に出ている。段階は <span id="rtRulesTiers"></span>。反対の元素は火と水、風と土。</p>
+      <h3>めくる</h3>
+      <p>めくった雫は、列の<em>右端</em>へ来る。起きることは、次のどれか一つ。</p>
+      <ol class="al-steps">
+        <li><b>引き寄せ</b>列のどこかに<em>同じ元素の雫</em>があれば（いちばん右のもの）、その雫が<em>右端へ飛んできて</em>、めくった雫と合成し、輝石になる。</li>
+        <li><b>両隣</b>雫が抜けた跡では、<em>両隣どうしが触れ合う</em>。同じ元素・同じ段階なら合成、反対の元素・同じ段階なら対消滅。</li>
+        <li><b>対消滅</b>同じ元素の雫がなく、右端が<em>反対の元素の雫</em>なら、二つは対消滅する。</li>
+        <li><b>並ぶ</b>どれでもなければ、めくった雫は右端に並ぶ（列が一つ伸びる）。</li>
+      </ol>
+      <p><em>連鎖</em>：合成でできた束は両隣と、対消滅で消えた跡では両隣どうしが、新しく触れ合って反応する。一回のめくりで起きたn回目の反応は、響きがn倍。</p>
+      <h3>混沌（ラウンドの響きが消える）</h3>
+      <p><em>〈ひずみ〉</em>：めくった雫に合成・対消滅の相手がおらず、右端が<em>反対の元素の輝石以上</em>だと、打ち消しきれずに混沌になる。合成した束はいつも右端に来るので、作るほど危うい。反応しない雫が右端を覆えば守られる。右端の束が赤くひび割れて光るのが、その印。</p>
+      <p><em>あふれ</em>：列の束が<em>7つを超えたら</em>混沌（反応で7つ以下に戻れば平気）。</p>
+      <h3>光と闇</h3>
+      <p>めくった光と闇は列に入らず、手元に置かれる。そのラウンドのうちなら好きなときに、列の束を選んで使える（ラウンドが終わると消える）。<em>光〈昇華〉</em>：束を一段上げる（光核なら真理に）。<em>闇〈反転〉</em>：束を反対の元素にする。どちらも、変わった束は両隣と反応する。</p>
+      <h3>真理の昇天</h3>
+      <p>真理ができた瞬間、列を離れて天へ昇り、<em>+50点がすぐ確定</em>する（そのあと混沌になっても失われない）。抜けた跡では両隣が触れ合う。</p>
+      <h3>響きと奉納</h3>
+      <p>反応するたびに響きが貯まる：合成 輝石2・光核8・真理32、対消滅 雫1・輝石2・光核4・真理8（n回目の反応はn倍）。<em>止めて奉納すると、響き × 列の束の数</em>が得点になり、列は片付いて次のラウンドへ。反応しない雫は倍率を、反応する雫は響きを増やす。山札が尽きたら自動で奉納して一局が終わる。</p>
+      <h3>予報と星読み</h3>
+      <p>画面の<em>予報</em>は、次にめくる雫の元素ごとに何が起きるか（◎合成・○対消滅・・並ぶ・✕ひずみ・✕あふれ）と残りの枚数、そして<em>混沌になる確率</em>を示す。<em>星読み</em>は一局に2回、次の札を見られる。</p>
+      <h3>一局と記録</h3>
+      <p>山札を使いきるまで、ラウンドを重ねる（4ラウンドほど）。合計点で<em>段位</em>が決まる。奉納のあとには次の札を見せる〈答え合わせ〉、混沌のあとには生還の確率を見せる。<em>今日の山札</em>は、その日だれもが同じ並び（本番は一日一回）。<em>称号</em>は、技を覚えるたびに増えていく。</p>
+      <div class="panel-btns"><button class="btn primary" id="rtRulesClose" type="button">閉じる</button></div>
+    </div>
+  </section>
+
+  <section class="overlay" id="rtAchOv" hidden>
+    <div class="panel rt-ach" role="dialog" aria-modal="true" aria-labelledby="rtAchH">
+      <p class="eyebrow">Titles</p>
+      <h2 id="rtAchH">称号</h2>
+      <div id="rtAchList"></div>
+      <div class="panel-btns" style="margin-top:14px"><button class="btn primary" id="rtAchClose" type="button">閉じる</button></div>
+    </div>
+  </section>
+</section>
+
+<section class="overlay" id="rtStartOv" hidden>
+  <div class="panel pause" role="dialog" aria-modal="true" aria-labelledby="rtStartH">
+    <p class="eyebrow">Resonance Row</p>
+    <h2 id="rtStartH">共鳴の列</h2>
+    <p class="res-sub" id="rtStartSub"></p>
+    <div class="stack">
+      <button class="btn primary" id="rtContinue" type="button">続きから</button>
+      <button class="btn" id="rtNew" type="button">新しい山札で始める</button>
+      <button class="btn" id="rtDaily" type="button">今日の山札</button>
+      <button class="btn" id="rtAch" type="button">称号</button>
+      <button class="btn" id="rtTutorial" type="button">チュートリアル</button>
+      <button class="btn" id="rtStartBack" type="button">戻る</button>
+    </div>
+  </div>
+</section>
+
+<div class="ver" aria-hidden="true">v1.61.0</div>
 
 <script id="genso-images">window.GENSO_IMAGES = {
   "fire-1": "data:image/jpeg;base64,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",
@@ -4536,7 +4818,7 @@ let rulesBack = null;
 function hideOverlays() { el.titleOv.hidden = el.rulesOv.hidden = el.pauseOv.hidden = el.resultOv.hidden = true; $('#tuneOv').hidden = true; $('#soundOv').hidden = true; }
 function showScreen() { hideOverlays(); app.classList.remove('on-title'); }
 function showTitle() {
-  ALCH.hide(); KS.hide(); ER.hide(); SH.hide();
+  ALCH.hide(); KS.hide(); ER.hide(); SH.hide(); RT.hide();
   S.token++; tweens.length = 0; S.screen = 'title'; S.paused = false; S.drag = null; S.orbs = [];
   FX.parts.length = FX.rings.length = FX.wells.length = FX.texts.length = FX.beams.length = 0;
   hideOverlays(); hideTip(); el.crit.hidden = true;
@@ -8410,6 +8692,873 @@ function init() {
 return { init, hide, esc };
 })();
 
+/* ---------- 共鳴の列のきまり（描画と切り離した純粋な計算。予報・答え合わせ・チュートリアルも同じものを使う）----------
+   列 row：左から右へ {id, e, t}。e：0火 1水 2風 3土（反対は e^1）、t：1雫 2輝石 3光核 4真理
+   めくった雫 c：
+    ① 列に同じ元素の雫があれば（いちばん右のもの）、それが右端へ飛んできて c と合成し、輝石になって右端に並ぶ。
+       雫が抜けた跡では、両隣が触れ合う。
+    ② なければ、右端が反対の元素の雫なら対消滅。
+    ③ 右端が反対の元素の輝石以上なら〈ひずみ〉（混沌）。
+    ④ どれでもなければ、右端に並ぶ。
+   新しく触れ合った2つ（合成でできた束とその両隣、消えた跡の両隣）は、反応できれば反応する（連鎖）。
+   同じ元素・同じ段階は合成、反対の元素・同じ段階は対消滅。一回のめくりの n 回目の反応は、響きが n 倍。
+   真理はできた瞬間に昇天（列を離れ、TRUTH 点がすぐ確定）。跡で両隣が触れ合う。束が CAP を超えたら混沌（あふれ）。
+   ---------------------------------------------------------------- */
+const RTR = (() => {
+const CAP = 7, SYN = [0, 0, 2, 8, 32], ANN = [0, 1, 2, 4, 8], TRUTH = 50;
+const opp = e => e ^ 1;
+const snap = r => r.map(p => ({ id: p.id, e: p.e, t: p.t }));
+function react(a, b) {
+  if (!a || !b || a.t !== b.t) return null;
+  if (a.e === b.e) return a.t < 4 ? 'm' : null;
+  return opp(a.e) === b.e ? 'a' : null;
+}
+const ctx = log => ({ n: 0, pts: 0, gap: -1, truths: 0, touch: 0, cores: 0, ann: 0, syn: 0, log });
+const emit = (x, ev) => { if (x.log) x.log.push(ev); };
+// i 番目の束が新しく（変わって）なった：両隣と触れ合い、反応が続くかぎり連鎖する
+function settle(G, i, x) {
+  const row = G.row; let stack = [i];
+  while (stack.length) {
+    const k = stack.pop(); if (k < 0 || k >= row.length) continue;
+    for (const j of [k - 1, k + 1]) {
+      if (j < 0 || j >= row.length) continue;
+      const lo = Math.min(k, j), a = row[lo], b = row[lo + 1], r = react(a, b);
+      if (!r) continue;
+      const touch = x.gap === lo; x.gap = -1; x.n++; if (touch) x.touch++;
+      if (r === 'm') {
+        const n = { id: ++G.nid, e: a.e, t: a.t + 1 }, p = SYN[n.t] * x.n; x.pts += p; x.syn++; if (n.t === 3) x.cores++;
+        row.splice(lo, 2, n);
+        emit(x, { k: 'syn', a: a.id, b: b.id, n: n.id, e: n.e, t: n.t, at: lo, chain: x.n, pts: p, touch, row: snap(row) });
+        stack = [lo];
+      } else {
+        const p = ANN[a.t] * x.n; x.pts += p; x.ann++;
+        row.splice(lo, 2);
+        emit(x, { k: 'ann', a: a.id, b: b.id, e: [a.e, b.e], t: a.t, at: lo, chain: x.n, pts: p, touch, row: snap(row) });
+        x.gap = lo - 1; stack = lo > 0 ? [lo - 1, lo] : [];
+      }
+      break;
+    }
+  }
+  x.gap = -1;
+}
+// 真理の昇天：列を離れ、跡で両隣が触れ合う
+function ascend(G, x) {
+  for (;;) {
+    const k = G.row.findIndex(p => p.t === 4); if (k < 0) return;
+    const p = G.row[k]; G.row.splice(k, 1); x.truths++;
+    emit(x, { k: 'asc', id: p.id, e: p.e, at: k, pts: TRUTH, row: snap(G.row) });
+    if (k > 0 && k < G.row.length) { x.gap = k - 1; settle(G, k, x); }
+  }
+}
+// めくった雫 c を列に入れる。G：{row, nid}。返り値 x：kind（pull 引き寄せ・ann 対消滅・line 並ぶ・hz ひずみ・cap あふれ）、bust、pts、n（反応の数）ほか
+function drop(G, c, log) {
+  const row = G.row, x = ctx(log), end = row[row.length - 1];
+  let k = -1; for (let i = row.length - 1; i >= 0; i--) if (row[i].t === 1 && row[i].e === c.e) { k = i; break; }
+  if (k >= 0) {
+    const pd = row[k]; row.splice(k, 1);
+    emit(x, { k: 'pull', id: pd.id, c: c.id, e: c.e, from: k, row: snap(row) });
+    if (k > 0 && k < row.length) { x.gap = k - 1; settle(G, k, x); }
+    const n = { id: ++G.nid, e: c.e, t: 2 }; x.n++; x.syn++; const p = SYN[2] * x.n; x.pts += p;
+    row.push(n);
+    emit(x, { k: 'fuse', a: c.id, b: pd.id, n: n.id, e: c.e, t: 2, at: row.length - 1, chain: x.n, pts: p, row: snap(row) });
+    settle(G, row.length - 1, x);
+    x.kind = 'pull';
+  } else if (end && end.t === 1 && end.e === opp(c.e)) {
+    row.pop(); x.n++; x.ann++; const p = ANN[1] * x.n; x.pts += p;
+    emit(x, { k: 'meet', a: end.id, b: c.id, e: [end.e, c.e], t: 1, at: row.length, chain: x.n, pts: p, row: snap(row) });
+    x.kind = 'ann';
+  } else if (end && end.t >= 2 && end.e === opp(c.e)) {
+    emit(x, { k: 'hz', id: end.id, c: c.id, e: c.e });
+    x.kind = 'hz'; x.bust = 'hz'; return x;
+  } else {
+    row.push({ id: c.id, e: c.e, t: 1 });
+    emit(x, { k: 'place', id: c.id, row: snap(row) });
+    x.kind = 'line';
+  }
+  ascend(G, x);
+  if (row.length > CAP) { emit(x, { k: 'cap' }); x.bust = 'cap'; x.kind = 'cap'; }
+  return x;
+}
+const canUse = (G, kind, k) => { const p = G.row[k]; return !!p && (kind === 'dark' || p.t < 4); };
+// 光〈昇華〉：一段上げる／闇〈反転〉：反対の元素に。変わった束は両隣と反応する
+function use(G, kind, k, log) {
+  const x = ctx(log), p = G.row[k];
+  if (kind === 'light') p.t++; else p.e = opp(p.e);
+  emit(x, { k: kind === 'light' ? 'raise' : 'flip', id: p.id, e: p.e, t: p.t, at: k, row: snap(G.row) });
+  settle(G, k, x); ascend(G, x);
+  x.kind = kind;
+  return x;
+}
+// 予報：次にめくる雫の元素ごとに、何が起きるか
+function forecast(row, nid) {
+  return [0, 1, 2, 3].map(e => {
+    const g = { row: snap(row), nid }, x = drop(g, { id: -1, e, t: 1 }, null);
+    return { e, kind: x.kind, bust: !!x.bust, pts: x.pts, len: g.row.length, n: x.n, truths: x.truths };
+  });
+}
+const bank = (pot, row) => pot * Math.max(1, row.length);
+return { CAP, SYN, ANN, TRUTH, opp, react, snap, drop, use, canUse, forecast, bank };
+})();
+
+/* ================================================================
+   共鳴の列
+   山札34枚（四元素の雫8枚ずつ・光・闇）を一枚ずつめくって一列に並べる運試し。きまりは RTR。
+   反応のたびに〈響き〉が貯まり、止めて奉納すると 響き×束の数 が得点。〈ひずみ〉かあふれで混沌（そのラウンドの響きは消える）。
+   予報（元素ごとの結果と混沌の確率）・星読み（次の札を見る）・答え合わせ・段位・振り返り・今日の山札・称号・チュートリアル。
+   状態 G はそのまま JSON で保存できる形に保つ
+   ================================================================ */
+const RT = (() => {
+const q = id => document.getElementById(id);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const T = RM ? { draw: 60, place: 80, pull: 110, meet: 70, syn: 120, ann: 140, asc: 300, hz: 300, flip: 120, bank: 300 }
+             : { draw: 170, place: 200, pull: 300, meet: 150, syn: 280, ann: 320, asc: 820, hz: 650, flip: 300, bank: 650 };
+const PSZ = [0, .58, .7, .82, .92];
+const KIND = { pull: ['◎', '合成'], ann: ['○', '対消滅'], line: ['・', '並ぶ'], hz: ['✕', 'ひずみ'], cap: ['✕', 'あふれ'] };
+const RANKS = [{ at: 0, name: '見習い' }, { at: 40, name: '巡礼者' }, { at: 80, name: '共鳴師' }, { at: 140, name: '調律師' }, { at: 220, name: '賢者' }, { at: 330, name: '真理の使徒' }];
+const ACH = [
+  { id: 'first', name: '初めての奉納', desc: '止めて奉納し、響きを得点にする' },
+  { id: 'ryou', name: '両隣の共鳴', desc: '雫が抜けた跡・消えた跡で、両隣どうしが反応する' },
+  { id: 'trio', name: '三重奏', desc: '一回のめくりで、3回反応させる' },
+  { id: 'core', name: '光核の輝き', desc: '光核を作る' },
+  { id: 'truth', name: '真理の昇天', desc: '真理を天へ昇らせる' },
+  { id: 'darkhand', name: '闇の一手', desc: '闇〈反転〉で対消滅を起こす' },
+  { id: 'rope', name: '綱渡り', desc: '混沌の確率が40%以上のときにめくって、生き延びる' },
+  { id: 'seven', name: '七束の奉納', desc: '束が7つ並んだ列で奉納する' },
+  { id: 'hundred', name: '百の響き', desc: '一度の奉納で100点以上' },
+  { id: 'star', name: '星読みの的中', desc: '星読みで混沌を見抜いて、奉納する' },
+  { id: 'clean', name: '無傷の一局', desc: '一度も混沌にならずに一局を終える' },
+  { id: 'sage', name: '賢者の域', desc: '一局で220点以上' },
+  { id: 'pilgrim', name: '七日の巡礼', desc: '今日の山札を7日遊ぶ' },
+];
+const pname = p => `${EL[p.e].name}の${TI[p.t].name}`;
+const cname = c => c.k === 'light' ? '光' : c.k === 'dark' ? '闇' : `${EL[c.e].name}の雫`;
+let G = null, BUSY = false, SEL = null, TUT = null, VIEW = null, HL = {}, MOVE = {}, OUT = {}, GROW = null, NEWP = null, MSG = null;
+let DISP = 0, DPOT = 0, GEO = null, BEAT = null, SLOTKEY = '';
+const PIECES = new Map(), FRESH = new Set();
+
+/* ---------- 乱数（種と状態を G に持つので、同じ山札を再現でき、保存もできる）---------- */
+function rnd() { let t = G.rs = (G.rs + 0x6D2B79F5) | 0; t = Math.imul(t ^ t >>> 15, 1 | t); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const daySeed = day => { let h = 2166136261; for (const ch of 'genso-retsu-' + day) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+
+/* ---------- 新しい一局 ---------- */
+function blank(mode, seed) {
+  return { v: 1, mode, seed, rs: seed | 0, nid: 0, day: null, official: false,
+    deck: [], row: [], hand: [], pot: 0, score: 0, round: 1, rounds: [], peeks: 2, peekId: null,
+    phase: 'play', last: null, flips: 0, rmax: 0, rtruths: 0, bet: null,
+    st: { banks: 0, busts: 0, truths: 0, maxChain: 0, touch: 0, cores: 0, syn: 0, ann: 0 }, newAch: [] };
+}
+function newRun(seed, mode = 'run', day = null) {
+  if (seed == null) seed = Math.floor(Math.random() * 4294967296);
+  G = blank(mode, seed); G.day = day;
+  const d = [];
+  for (let e = 0; e < 4; e++) for (let i = 0; i < 8; i++) d.push({ k: 'el', e, t: 1 });
+  d.push({ k: 'light' }); d.push({ k: 'dark' });
+  shuffle(d); for (const c of d) c.id = ++G.nid;
+  G.deck = d; DISP = 0; DPOT = 0; TUT = null;
+}
+function counts() {
+  const n = [0, 0, 0, 0], sp = { light: 0, dark: 0 };
+  for (const c of G.deck) if (c.k === 'el') n[c.e]++; else sp[c.k]++;
+  return { n, sp };
+}
+const playing = () => G && G.phase === 'play';
+const canAct = () => playing() && !BUSY;
+const peeked = () => G && G.peekId != null && G.deck.length && G.deck[0].id === G.peekId ? G.deck[0] : null;
+// いまの予報と、次で混沌になる確率（星読みで次の札を見ていれば、その札で決まる）
+function fore() {
+  if (!G || !G.deck.length) return null;
+  const f = RTR.forecast(G.row, G.nid), { n, sp } = counts();
+  f.forEach(x => { x.cnt = n[x.e]; });
+  const bad = f.reduce((s, x) => s + (x.bust ? x.cnt : 0), 0), tot = G.deck.length;
+  const pk = peeked();
+  let p = bad / tot;
+  if (pk) p = pk.k === 'el' && f[pk.e].bust ? 1 : 0;
+  return { f, sp, bad, tot, p, pk };
+}
+const riskNow = () => { if (!playing()) return 0; const r = fore(); return r ? r.p : 0; };
+// 右端の束が〈ひずみ〉にさらされているか（反対の元素の雫が山札に残っている輝石以上）
+function exposed() {
+  const end = G.row[G.row.length - 1]; if (!end || end.t < 2) return null;
+  const { n } = counts(), o = RTR.opp(end.e);
+  if (!n[o] || G.row.some(p => p.t === 1 && p.e === o)) return null;
+  return { id: end.id, o };
+}
+
+/* ---------- めくる ---------- */
+async function flip() {
+  if (!canAct() || !G.deck.length) return;
+  if (!tutOk('flip')) return;
+  const rk = riskNow(), before = RTR.bank(G.pot, G.row);
+  const c = G.deck.shift(); G.flips++;
+  if (G.peekId === c.id) G.peekId = null;
+  if (rk > G.rmax) G.rmax = rk;
+  SEL = null; MSG = null;
+  if (c.k !== 'el') { // 光と闇は手元へ
+    G.hand.push(c); FRESH.add(c.id);
+    if (c.k === 'light') { SFX.light(); call('光', '〈昇華〉を手にした', 'calm'); } else { SFX.dark(); call('闇', '〈反転〉を手にした', 'calm'); }
+    return after(null, rk, before);
+  }
+  BUSY = true;
+  VIEW = { row: RTR.snap(G.row), fl: [{ id: c.id, e: c.e, t: 1 }] }; NEWP = c.id; render(); SFX.tap();
+  await wait(T.draw);
+  const log = [], x = RTR.drop(G, c, log);
+  try { await playLog(log, c); } finally { BUSY = false; VIEW = null; HL = {}; MOVE = {}; }
+  after(x, rk, before);
+}
+function tally(x) {
+  G.pot += x.pts; G.score += x.truths * RTR.TRUTH; G.rtruths += x.truths;
+  const s = G.st; s.truths += x.truths; s.maxChain = Math.max(s.maxChain, x.n); s.touch += x.touch; s.cores += x.cores; s.syn += x.syn; s.ann += x.ann;
+  if (x.n >= 3) ach('trio'); if (x.touch) ach('ryou'); if (x.cores) ach('core'); if (x.truths) ach('truth');
+  DISP = G.score; DPOT = G.pot;
+}
+function after(x, rk, before) {
+  if (x) tally(x);
+  if (rk > 0 && (!G.bet || rk > G.bet.p)) G.bet = { round: G.round, p: rk, ok: !(x && x.bust) };
+  if (x && x.bust) return bust(x, rk, before);
+  if (x && rk >= .4) ach('rope');
+  if (!G.deck.length && !TUT) return bankRound(true);
+  save(); render();
+  if (TUT) tutAfter('flip');
+}
+async function useSpecial(kind, k) {
+  if (!canAct() || !RTR.canUse(G, kind, k)) return;
+  if (!tutOk('use', { kind, k })) return;
+  const ci = G.hand.findIndex(c => c.k === kind); if (ci < 0) return;
+  G.hand.splice(ci, 1); SEL = null; BUSY = true; MSG = null;
+  const log = [], x = RTR.use(G, kind, k, log);
+  try { await playLog(log, null); } finally { BUSY = false; VIEW = null; HL = {}; MOVE = {}; }
+  tally(x);
+  if (kind === 'dark' && x.ann) ach('darkhand');
+  save(); render();
+  if (TUT) tutAfter('use');
+}
+function peek() {
+  if (!canAct() || G.peeks <= 0 || peeked() || !G.deck.length || TUT) return;
+  G.peeks--; G.peekId = G.deck[0].id; SFX.orbit();
+  const pk = G.deck[0], r = fore(), fx = pk.k === 'el' ? r.f[pk.e] : null;
+  toast(`星読み：次は${cname(pk)}。` + (fx ? `${KIND[fx.kind][0]}${KIND[fx.kind][1]}${fx.bust ? '（混沌）' : ''}` : '手元に置かれる（安全）'));
+  save(); render();
+}
+
+/* ---------- ラウンドの終わり ---------- */
+// 答え合わせ：奉納した列に、次の札が来ていたら
+function answer(row, pot) {
+  const c = G.deck[0]; if (!c) return null;
+  if (c.k !== 'el') return { c, text: `次は<em>${cname(c)}</em>だった（手元に置かれる札）。` };
+  const g = { row: RTR.snap(row), nid: G.nid }, x = RTR.drop(g, c, null), was = RTR.bank(pot, row);
+  if (x.bust) return { c, bust: true, text: `次は<em>${cname(c)}</em>だった。めくっていたら<span class="ng">${x.kind === 'hz' ? '〈ひずみ〉' : 'あふれ'}で混沌</span>。<span class="ok">止めて正解。</span>` };
+  const would = RTR.bank(pot + x.pts, g.row) + x.truths * RTR.TRUTH, d = would - was;
+  const what = x.kind === 'pull' ? '合成' : x.kind === 'ann' ? '対消滅' : '並んで倍率が上がり';
+  return { c, text: `次は<em>${cname(c)}</em>だった。めくっていたら${what}、` + (d > 0 ? `<span class="ng">${fmt(would)}点（+${fmt(d)}）になっていた。</span>` : d < 0 ? `${fmt(would)}点に減っていた。<span class="ok">止めて正解。</span>` : '点は変わらなかった。') };
+}
+function clearRow(how) {
+  for (const p of G.row) OUT[p.id] = how;
+  G.row = []; G.pot = 0; G.hand = []; SEL = null; DPOT = 0; G.peekId = peeked() ? G.peekId : null;
+}
+function bankRound(auto) {
+  if (!G || (!auto && !canAct())) return;
+  if (!auto && !tutOk('bank')) return;
+  if (!auto && !G.row.length && !G.pot) return;
+  const mult = Math.max(1, G.row.length), pts = G.pot * mult, len = G.row.length;
+  const pk = peeked(), ans = answer(G.row, G.pot);
+  G.score += pts; DISP = G.score; G.st.banks++;
+  G.last = { kind: 'bank', auto, pot: G.pot, mult, pts, len, truths: G.rtruths, ans: ans && ans.text };
+  G.rounds.push({ kind: 'bank', pts, truths: G.rtruths, risk: G.rmax });
+  ach('first'); if (len >= 7) ach('seven'); if (pts >= 100) ach('hundred'); if (pk && ans && ans.bust) ach('star');
+  clearRow('rise');
+  G.phase = 'round';
+  SFX.relief(); if (pts) [0, 2, 4].forEach((k, i) => SFX.bell(SFX.note(8 + k), .05, .1 + i * .07, 1));
+  call(auto ? '山札が尽きた' : '奉納', pts ? `+${fmt(pts)}` : '響きはなかった', pts >= 60 ? 'lv2' : 'calm');
+  save(); render();
+  if (TUT) tutAfter('bank');
+}
+function bust(x, rk, before) {
+  G.st.busts++;
+  G.last = { kind: 'bust', why: x.bust, lost: before, p: rk, truths: G.rtruths };
+  G.rounds.push({ kind: 'bust', pts: 0, lost: before, truths: G.rtruths, risk: rk });
+  clearRow('burst');
+  G.phase = 'round';
+  q('rtStage').classList.remove('shake'); void q('rtStage').offsetWidth; q('rtStage').classList.add('shake');
+  SFX.over(); SFX.noise(.6, 900, 120, .1);
+  call('混沌', before ? `−${fmt(before)}` : '', 'back');
+  save(); render();
+}
+function nextRound() {
+  if (!G || G.phase !== 'round') return;
+  if (TUT) return;
+  if (!G.deck.length) return finish();
+  G.round++; G.phase = 'play'; G.rmax = 0; G.rtruths = 0; G.last = null; MSG = null;
+  SFX.tap(); save(); render();
+}
+
+/* ---------- 一局の終わり ---------- */
+const rankOf = s => { let r = RANKS[0], i = 0; RANKS.forEach((x, k) => { if (s >= x.at) { r = x; i = k; } }); return { ...r, i, next: RANKS[i + 1] || null }; };
+function finish() {
+  G.phase = 'end';
+  if (!G.st.busts) ach('clean');
+  if (G.score >= 220) ach('sage');
+  const best = store.get('rt.best', null), counted = G.mode === 'run' || (G.mode === 'daily' && G.official);
+  const better = counted && (!best || G.score > best.score);
+  if (better) store.set('rt.best', { score: G.score });
+  if (counted) store.set('rt.games', (store.get('rt.games', 0) || 0) + 1);
+  if (G.mode === 'daily' && G.official) {
+    const log = store.get('rt.dailyLog', {}) || {}; log[G.day] = G.score;
+    const keys = Object.keys(log).sort(); while (keys.length > 120) delete log[keys.shift()];
+    store.set('rt.dailyLog', log);
+    store.set('rt.daily', { day: G.day, started: true, done: true, score: G.score, share: shareText() });
+    if (Object.keys(log).length >= 7) ach('pilgrim');
+  }
+  store.set('rt.run', null);
+  render(); SFX.win();
+  setTimeout(() => showResult(better), 650);
+}
+function shareText() {
+  const head = G.mode === 'daily' && G.day ? `共鳴の列〈今日の山札〉${G.day.slice(5).replace('-', '/')}${G.official ? '' : '（練習）'}` : '共鳴の列';
+  const tl = G.rounds.map(r => (r.truths ? '✨' : '') + (r.kind === 'bust' ? '💥' : `✅${r.pts}`)).join(' ');
+  return `${head}\n${tl}\n${G.score}点・${rankOf(G.score).name}`;
+}
+function showResult(rec) {
+  if (!G || G.phase !== 'end') return;
+  const rk = rankOf(G.score), s = G.st;
+  q('rtResEy').textContent = G.mode === 'daily' ? `今日の山札 ${G.day ? G.day.slice(5).replace('-', '/') : ''}${G.official ? '' : '・練習'}` : 'Resonance Row';
+  q('rtResH').textContent = s.busts ? '終局' : '終局〈無傷〉';
+  q('rtResPts').textContent = fmt(G.score);
+  q('rtResRec').hidden = !rec;
+  q('rtResRank').textContent = `段位　${rk.name}`;
+  q('rtResNext').textContent = rk.next ? `次の段位〈${rk.next.name}〉まで、あと${fmt(rk.next.at - G.score)}点` : '最上の段位に達した';
+  q('rtResTl').innerHTML = G.rounds.map((r, i) => `<span class="${r.kind}">第${i + 1}<b>${r.kind === 'bust' ? '混沌' : fmt(r.pts)}</b>${r.truths ? `真理${r.truths > 1 ? '×' + r.truths : ''}` : r.kind === 'bust' && r.lost ? `−${fmt(r.lost)}` : ''}</span>`).join('');
+  const b = G.bet;
+  q('rtResFork').innerHTML = b ? `いちばんの賭け：第${b.round}ラウンド、<em>混沌の確率${Math.round(b.p * 100)}%</em>でめくって、${b.ok ? '<em>生き延びた</em>' : '混沌に呑まれた'}。` : '危ない橋は一度も渡らなかった。';
+  q('rtResAch').innerHTML = G.newAch.map(id => { const a = ACH.find(x => x.id === id); return a ? `<span>称号〈${a.name}〉</span>` : ''; }).join('');
+  q('rtResStats').innerHTML = [['奉納', s.banks], ['混沌', s.busts], ['真理', s.truths], ['最大連鎖', s.maxChain], ['両隣', s.touch], ['めくった', G.flips]]
+    .map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+  q('rtResShare').hidden = false;
+  q('rtResSame').textContent = G.mode === 'daily' ? '今日の山札で練習' : '同じ山札でもう一度';
+  q('rtResOv').hidden = false; q('rtResNew').focus();
+}
+function copyShare() {
+  const t = shareText();
+  const done = () => toast('結果をコピーした');
+  const fallback = () => { const ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) { toast('コピーできなかった'); } ta.remove(); };
+  try { if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, fallback); else fallback(); } catch (e) { fallback(); }
+}
+
+/* ---------- 称号 ---------- */
+function ach(id) {
+  if (!G || TUT) return;
+  const got = store.get('rt.ach', {}) || {}; if (got[id]) return;
+  got[id] = today(); store.set('rt.ach', got);
+  if (!G.newAch.includes(id)) G.newAch.push(id);
+  const a = ACH.find(x => x.id === id);
+  if (a) setTimeout(() => toast(`称号〈${a.name}〉を得た`), 900);
+}
+function openAch() {
+  const got = store.get('rt.ach', {}) || {}, n = ACH.filter(a => got[a.id]).length;
+  q('rtAchList').innerHTML = `<p class="sum">${n} / ${ACH.length}。称号は、技のひとつひとつ。</p><ul>` + ACH.map(a => `<li class="${got[a.id] ? 'got' : ''}"><i>${got[a.id] ? '✦' : '・'}</i><b>${a.name}</b><small>${a.desc}${got[a.id] ? `（${got[a.id].slice(5).replace('-', '/')}）` : ''}</small></li>`).join('') + '</ul>';
+  q('rtAchOv').hidden = false; q('rtAchClose').focus();
+}
+
+/* ---------- 位置 ---------- */
+function geo() {
+  const st = q('rtStage'), W = st.clientWidth; if (!W) return null;
+  const slot = Math.max(30, Math.min(66, Math.floor(W / 8.3)));
+  const H = Math.round(slot * 2.75);
+  return GEO = { W, slot, x0: Math.round((W - slot * 8) / 2), H, rowY: Math.round(slot * 1.75), upY: Math.round(slot * .62) };
+}
+const sizeOf = t => Math.round((GEO || geo() || { slot: 40 }).slot * PSZ[t]);
+const xOf = at => { const g = GEO || geo(); return g ? g.x0 + (at + .5) * g.slot : 0; };
+const yOf = up => { const g = GEO || geo(); return g ? (up ? g.upY : g.rowY) : 0; };
+
+/* ---------- 演出 ---------- */
+function fxEl(cls, x, y, size) {
+  const n = document.createElement('span'); n.className = cls;
+  n.style.width = n.style.height = size + 'px'; n.style.left = (x - size / 2) + 'px'; n.style.top = (y - size / 2) + 'px';
+  q('rtFx').appendChild(n); return n;
+}
+function anim(n, frames, o) { const a = n.animate(frames, o); a.onfinish = () => n.remove(); return a; }
+function burstMerge(x, y, t) {
+  const s = sizeOf(t);
+  anim(fxEl('ks-burst glow', x, y, s * 1.5), [{ opacity: 0, scale: .3 }, { opacity: 1, scale: 1, offset: .35 }, { opacity: 0, scale: 1.25 }], { duration: RM ? 200 : 520, easing: 'ease-out' });
+  anim(fxEl('ks-burst m', x, y, s), [{ opacity: .95, scale: .5 }, { opacity: 0, scale: 2.2 }], { duration: RM ? 200 : 560, easing: 'cubic-bezier(.2,.7,.3,1)' });
+}
+function burstAnni(x, y, ea, eb, t) {
+  const s = sizeOf(t);
+  anim(fxEl('ks-burst flash', x, y, s * 1.6), [{ opacity: 1, scale: .4 }, { opacity: .9, scale: 1, offset: .25 }, { opacity: 0, scale: 1.4 }], { duration: RM ? 200 : 420, easing: 'ease-out' });
+  anim(fxEl('ks-burst a', x, y, s), [{ opacity: 1, scale: .6 }, { opacity: 0, scale: 3 }], { duration: RM ? 220 : 620, easing: 'cubic-bezier(.15,.7,.3,1)' });
+  if (RM) return;
+  const cols = [EL[ea].color, EL[eb].color, '#ffffff'], n = 8 + t * 3;
+  for (let i = 0; i < n; i++) {
+    const a = Math.PI * 2 * i / n + Math.random() * .4, d = s * (.8 + Math.random() * .8);
+    const sp = fxEl('ks-spark', x, y, 6); sp.style.background = cols[i % 3]; sp.style.boxShadow = `0 0 8px ${cols[i % 3]}`;
+    anim(sp, [{ translate: '0 0', opacity: 1, scale: 1 }, { translate: `${Math.cos(a) * d}px ${Math.sin(a) * d}px`, opacity: 0, scale: .3 }], { duration: 420 + Math.random() * 260, easing: 'cubic-bezier(.1,.7,.3,1)' });
+  }
+}
+function floatPts(x, y, pts, chain, safe) {
+  if (!pts) return;
+  const n = document.createElement('span'); n.className = 'rt-pts' + (safe ? ' safe' : '');
+  n.innerHTML = `+${fmt(pts)}${chain >= 2 ? `<small>×${chain}</small>` : ''}`;
+  n.style.left = x + 'px'; n.style.top = (y - 12) + 'px';
+  n.addEventListener('animationend', () => n.remove()); q('rtFx').appendChild(n);
+}
+function tag(x, y, text) {
+  const n = document.createElement('span'); n.className = 'rt-tag'; n.textContent = text;
+  n.style.left = x + 'px'; n.style.top = (y - sizeOf(2) * .7) + 'px';
+  n.addEventListener('animationend', () => n.remove()); q('rtFx').appendChild(n);
+}
+function call(text, sub, cls = '') {
+  const box = q('rtCall'); box.innerHTML = '';
+  const n = document.createElement('div'); n.className = 'al-call ' + cls;
+  n.innerHTML = `<b>${text}</b>${sub ? `<i>${sub}</i>` : ''}`;
+  n.addEventListener('animationend', () => n.remove()); box.appendChild(n);
+}
+function toast(m) { MSG = m; render(); setTimeout(() => { if (MSG === m) { MSG = null; if (G) render(); } }, 2600); }
+function bumpPot() { const p = q('rtPot'); p.classList.remove('bump'); void p.offsetWidth; p.classList.add('bump'); }
+// 列の出来事を順に見せる（G はもう反応を終えた形。VIEW に途中の形を置いて描く）
+async function playLog(log, c) {
+  let fl = c ? [{ id: c.id, e: c.e, t: 1 }] : [];
+  for (const x of log) {
+    if (x.k === 'place') { VIEW = { row: x.row, fl: [] }; render(); SFX.place(); await wait(T.place); }
+    else if (x.k === 'pull') {
+      const at = x.row.length; fl = [{ id: c.id, e: c.e, t: 1, at }, { id: x.id, e: x.e, t: 1, at }];
+      VIEW = { row: x.row, fl }; HL = { [x.id]: 'hl', [c.id]: 'hl' }; render();
+      tag(xOf(at), yOf(true), '引き寄せ'); SFX.spawn(); SFX.bell(SFX.note(6), .045, 0, .6);
+      await wait(T.pull);
+    } else if (x.k === 'fuse') {
+      HL = {}; OUT[x.a] = OUT[x.b] = 'fuse'; GROW = x.n; VIEW = { row: x.row, fl: [] }; DPOT += x.pts;
+      const px = xOf(x.at), py = yOf(false); burstMerge(px, py, 2); floatPts(px, py, x.pts, x.chain);
+      SFX.merge(2, x.chain); render(); bumpPot(); await wait(T.syn);
+    } else if (x.k === 'syn') {
+      HL = { [x.a]: 'hl', [x.b]: 'hl' }; MOVE = { [x.a]: { at: x.at + .5 }, [x.b]: { at: x.at + .5 } }; render(); await wait(T.meet);
+      HL = {}; MOVE = {}; OUT[x.a] = OUT[x.b] = 'fuse'; GROW = x.n; VIEW = { row: x.row, fl: VIEW ? VIEW.fl : [] }; DPOT += x.pts;
+      const px = xOf(x.at), py = yOf(false); burstMerge(px, py, x.t); floatPts(px, py, x.pts, x.chain);
+      if (x.touch) tag(px, py, '両隣');
+      SFX.merge(x.t, x.chain);
+      if (x.t === 3) call('光核', `${EL[x.e].name}の光核`, 'lv2'); else if (x.chain >= 3) call(`${x.chain}連鎖`, `×${x.chain}`, 'lv2');
+      render(); bumpPot(); await wait(T.syn);
+    } else if (x.k === 'ann' || x.k === 'meet') {
+      const mid = x.at + .5;
+      HL = { [x.a]: 'anni', [x.b]: 'anni' }; MOVE = { [x.a]: { at: mid }, [x.b]: { at: mid } }; render(); await wait(T.meet);
+      HL = {}; MOVE = {}; OUT[x.a] = OUT[x.b] = 'burst'; VIEW = { row: x.row, fl: x.k === 'meet' ? [] : (VIEW ? VIEW.fl : []) }; DPOT += x.pts;
+      const px = xOf(mid), py = yOf(false); burstAnni(px, py, x.e[0], x.e[1], x.t); floatPts(px, py, x.pts, x.chain);
+      if (x.touch) tag(px, py, '両隣');
+      if (x.t >= 3) SFX.nova(x.t); else SFX.anni(x.t, x.chain);
+      if (x.chain >= 3) call(`${x.chain}連鎖`, `×${x.chain}`, 'lv2');
+      render(); bumpPot(); await wait(T.ann);
+    } else if (x.k === 'hz') {
+      HL = { [x.id]: 'hz', [x.c]: 'hz' }; render();
+      q('rtStage').classList.remove('shake'); void q('rtStage').offsetWidth; q('rtStage').classList.add('shake');
+      call('ひずみ', '打ち消しきれない', 'back'); SFX.dark(); SFX.noise(.5, 2400, 200, .08);
+      await wait(T.hz);
+    } else if (x.k === 'cap') {
+      HL = {}; for (const p of (VIEW ? VIEW.row : [])) HL[p.id] = 'hz';
+      render(); call('あふれ', `束が${RTR.CAP}つを超えた`, 'back'); SFX.dark(); await wait(T.hz);
+    } else if (x.k === 'asc') {
+      OUT[x.id] = 'rise'; VIEW = { row: x.row, fl: VIEW ? VIEW.fl : [] }; DISP += x.pts;
+      const px = xOf(x.at), py = yOf(false); floatPts(px, py - sizeOf(4), x.pts, 0, true);
+      call('真理', `${EL[x.e].name}の真理、天へ +${x.pts}`, 'lv3'); SFX.harmony();
+      render(); await wait(T.asc);
+    } else if (x.k === 'raise' || x.k === 'flip') {
+      VIEW = { row: x.row, fl: [] }; GROW = x.id; render();
+      if (x.k === 'raise') { SFX.light(); call('昇華', pname(x), 'calm'); } else { SFX.dark(); call('反転', pname(x), 'calm'); }
+      await wait(T.flip);
+    }
+  }
+}
+
+/* ---------- 描画 ---------- */
+function renderSlots(g) {
+  const key = `${g.W}|${g.slot}`; if (SLOTKEY === key) return; SLOTKEY = key;
+  const s = Math.round(g.slot * .82); let h = '';
+  for (let i = 0; i <= RTR.CAP; i++) h += `<span class="rt-slot${i === RTR.CAP ? ' over' : ''}" style="width:${s}px;height:${s}px;transform:translate(${(xOf(i) - s / 2).toFixed(1)}px,${(g.rowY - s / 2).toFixed(1)}px)"></span>`;
+  const cx = g.x0 + RTR.CAP * g.slot;
+  h += `<span class="rt-capline" style="left:${cx}px;top:${g.rowY - g.slot * .55}px;height:${g.slot * 1.1}px"></span>`;
+  h += `<span class="rt-caplbl" style="left:${xOf(RTR.CAP)}px;top:${g.rowY + g.slot * .48}px">混沌</span>`;
+  h += `<span class="rt-baseline" style="left:${g.x0}px;width:${g.slot * RTR.CAP}px;top:${g.rowY + g.slot * .5}px"></span>`;
+  h += `<span class="rt-endlbl" id="rtEndLbl"></span>`;
+  q('rtSlots').innerHTML = h;
+}
+function renderRow() {
+  const g = geo(); if (!g) return;
+  const st = q('rtStage'); st.style.height = g.H + 'px';
+  renderSlots(g);
+  const v = VIEW || { row: G.row, fl: [] }, items = [];
+  v.row.forEach((p, i) => items.push({ p, at: i, up: false }));
+  (v.fl || []).forEach(p => items.push({ p, at: p.at != null ? p.at : v.row.length, up: true, fl: true }));
+  const pk = !BUSY && playing() ? peeked() : null;
+  if (pk) items.push({ p: { id: 'pk', e: pk.k === 'el' ? pk.e : pk.k, t: 1, sp: pk.k !== 'el' }, at: G.row.length, up: true, peek: true });
+  const ex = !BUSY && playing() && !VIEW ? exposed() : null, tg = tutGoal();
+  const seen = new Set(), layer = q('rtPieces');
+  for (const it of items) {
+    const { p } = it, id = p.id; seen.add(id);
+    let el = PIECES.get(id), fresh = false;
+    const sz = sizeOf(p.t || 1), m = MOVE[id], at = m && m.at != null ? m.at : it.at;
+    const x = xOf(at) - sz / 2, y = yOf(it.up && !(m && m.at != null)) - sz / 2;
+    if (!el) {
+      el = document.createElement('span'); el.className = 'rt-pc'; layer.appendChild(el); PIECES.set(id, el); fresh = true;
+      el.style.transition = 'none'; el.style.width = el.style.height = sz + 'px';
+      el.style.transform = `translate(${x.toFixed(1)}px,${(it.fl && NEWP === id ? y - 26 : y).toFixed(1)}px)`;
+      void el.offsetWidth; el.style.transition = '';
+    }
+    const key = `${p.e}|${p.t}|${sz}`;
+    if (el.dataset.k !== key) {
+      const changed = !fresh && el.dataset.k && el.dataset.k.split('|').slice(0, 2).join('|') !== `${p.e}|${p.t}`;
+      el.dataset.k = key; el.dataset.i = it.fl || it.peek ? '' : String(it.at);
+      el.innerHTML = p.sp ? orbIcon(p.e, 0, sz) : orbIcon(p.e, p.t, sz);
+      if (changed && GROW !== id) el.firstElementChild.animate([{ scale: 1.3, filter: 'brightness(2)' }, { scale: 1, filter: 'brightness(1)' }], { duration: RM ? 120 : 380, easing: 'ease-out' });
+    }
+    el.dataset.i = it.fl || it.peek ? '' : String(it.at);
+    if (fresh && GROW !== id) el.firstElementChild.animate(NEWP === id ? [{ scale: .4, opacity: 0 }, { scale: 1.12, opacity: 1, offset: .7 }, { scale: 1 }] : [{ opacity: 0 }, { opacity: 1 }], { duration: RM ? 100 : 280, easing: 'ease-out' });
+    if (GROW === id) {
+      GROW = null;
+      el.firstElementChild.animate([{ scale: .25, opacity: .2, filter: 'brightness(2.4)' }, { scale: 1.22, opacity: 1, filter: 'brightness(1.6)', offset: .6 }, { scale: 1, filter: 'brightness(1)' }], { duration: RM ? 140 : 460, easing: 'cubic-bezier(.2,.8,.3,1)' });
+    }
+    el.style.width = el.style.height = sz + 'px';
+    el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+    const target = SEL && !BUSY && !it.fl && !it.peek && RTR.canUse(G, SEL, it.at);
+    const tut = tg && tg.k === it.at && !it.fl && !it.peek && !BUSY;
+    el.className = 'rt-pc' + (it.fl ? ' float' : '') + (it.peek ? ' peek' : '') + (HL[id] ? ' ' + HL[id] : '') + (ex && ex.id === id ? ' exposed' : '')
+      + (target ? ' tg' + (SEL === 'dark' ? ' dk' : '') : '') + (tut && SEL ? ' tut' : '');
+    if (target) { el.setAttribute('role', 'button'); el.setAttribute('tabindex', '0'); el.setAttribute('aria-label', `${pname(p)}に${SEL === 'light' ? '光' : '闇'}を使う`); }
+    else { el.removeAttribute('role'); el.removeAttribute('tabindex'); el.setAttribute('aria-label', p.sp ? cname({ k: p.e }) : pname(p)); }
+  }
+  if (NEWP && seen.has(NEWP)) NEWP = null;
+  for (const [id, el] of PIECES) if (!seen.has(id)) {
+    PIECES.delete(id); const how = OUT[id]; delete OUT[id];
+    if (id === 'pk') { el.remove(); continue; }
+    el.classList.add('leaving');
+    const g2 = GEO;
+    const fr = how === 'fuse' ? [{ scale: 1, opacity: 1 }, { scale: .45, opacity: 0, filter: 'brightness(2.6)' }]
+      : how === 'burst' ? [{ scale: 1, opacity: 1, filter: 'brightness(1)' }, { scale: 1.3, opacity: 1, filter: 'brightness(3) saturate(.3)', offset: .3 }, { scale: 1.9, opacity: 0, filter: 'brightness(3) saturate(0)' }]
+      : how === 'rise' ? [{ translate: '0 0', scale: 1, opacity: 1, filter: 'brightness(1)' }, { translate: `0 ${-(g2 ? g2.slot : 40) * 1.6}px`, scale: 1.25, opacity: 0, filter: 'brightness(2.2)' }]
+      : [{ opacity: 1 }, { opacity: 0 }];
+    const a = (el.firstElementChild || el).animate(fr, { duration: RM ? 120 : how === 'rise' ? 760 : how === 'burst' ? 380 : 240, easing: how === 'rise' ? 'cubic-bezier(.3,.1,.3,1)' : 'ease-out', fill: 'forwards' });
+    a.onfinish = () => el.remove();
+  }
+  const lbl = q('rtEndLbl');
+  if (lbl) { const n = (VIEW ? VIEW.row : G.row).length; lbl.style.left = (n ? xOf(n - 1) : xOf(0)) + 'px'; lbl.style.top = (g.rowY + g.slot * .48) + 'px'; lbl.textContent = n && playing() ? '右端' : ''; }
+}
+function clearPieces() { for (const el of PIECES.values()) el.remove(); PIECES.clear(); }
+function renderTop() {
+  let s = `<span class="ks-stat pts">得点<b>${fmt(DISP)}</b></span><span class="ks-stat">ラウンド<b>${G.round}</b></span>`;
+  if (G.mode === 'daily') s += `<span class="ks-stat day"><b>${G.official ? '今日の山札' : '今日・練習'}</b></span>`;
+  if (G.mode === 'tut') s = `<span class="ks-stat">チュートリアル</span>`;
+  q('rtStats').innerHTML = s;
+  const { n, sp } = counts();
+  q('rtDeck').innerHTML = `<span class="lbl">山札 <b>${G.deck.length}</b></span>`
+    + [0, 1, 2, 3].map(e => `<span class="c${n[e] ? '' : ' zero'}" title="${EL[e].name}の雫 残り${n[e]}枚">${orbIcon(e, 1, 16)}<b>${n[e]}</b></span>`).join('')
+    + `<span class="c${sp.light ? '' : ' zero'}" title="光">${orbIcon('light', 0, 16)}<b>${sp.light}</b></span><span class="c${sp.dark ? '' : ' zero'}" title="闇">${orbIcon('dark', 0, 16)}<b>${sp.dark}</b></span>`;
+  q('rtDeck').setAttribute('aria-label', `山札 ${G.deck.length}枚：` + [0, 1, 2, 3].map(e => `${EL[e].name}${n[e]}`).join('・') + `・光${sp.light}・闇${sp.dark}`);
+}
+function renderPot() {
+  const pot = BUSY ? DPOT : G.pot, row = VIEW ? VIEW.row : G.row, mult = Math.max(1, row.length);
+  const box = q('rtPot');
+  if (G.phase !== 'play') { box.innerHTML = `<span>得点</span><b class="sum">${fmt(G.score)}</b>`; return; }
+  box.innerHTML = `<span>響き</span><b class="pot">${fmt(pot)}</b><span class="x">×</span><b>${mult}</b><span>束</span><span class="x">=</span><b class="sum">${fmt(pot * mult)}</b>`;
+}
+function renderFore() {
+  const box = q('rtFore');
+  if (!playing() || BUSY || !G.deck.length) { box.innerHTML = ''; return; }
+  const r = fore(), pct = Math.round(r.p * 100);
+  const cls = r.p === 0 ? 'zero' : r.p >= .35 ? 'hi' : r.p >= .15 ? 'mid' : '';
+  const head = r.pk ? `星読み：次は<b style="font-size:15px">${cname(r.pk)}</b>` + (r.pk.k === 'el' ? `　${r.p ? '<b>混沌</b>になる' : '混沌にはならない'}` : '　手元に置かれる')
+    : `次で混沌<b>${pct}%</b>（残り${r.tot}枚中${r.bad}枚）`;
+  const chips = r.f.map(x => `<span class="rt-fc k-${x.kind}${x.cnt ? '' : ' zero'}${r.pk && r.pk.k === 'el' && r.pk.e === x.e ? ' nx' : ''}" title="${EL[x.e].name}の雫が来たら：${KIND[x.kind][1]}">${orbIcon(x.e, 1, 18)}<i>${x.cnt}</i><b>${KIND[x.kind][0]}${KIND[x.kind][1]}${x.pts && !x.bust ? ` +${x.pts}` : ''}</b></span>`).join('');
+  const spc = r.sp.light + r.sp.dark ? `<span class="rt-fc k-line${r.pk && r.pk.k !== 'el' ? ' nx' : ''}" title="光・闇は手元に置かれる">${r.sp.light ? orbIcon('light', 0, 18) : ''}${r.sp.dark ? orbIcon('dark', 0, 18) : ''}<i>${r.sp.light + r.sp.dark}</i><b>手元へ</b></span>` : '';
+  box.innerHTML = `<div class="rt-risk ${r.pk ? (r.p ? 'hi' : 'zero') : cls}">${head}</div><div class="rt-fc-row" aria-label="予報">${chips}${spc}</div>`;
+}
+function renderHand() {
+  const box = q('rtHand'), tg = tutGoal(); let h = '';
+  if (G.phase === 'play' && G.mode !== 'tut' || (TUT && G.hand.length)) {
+    for (const c of G.hand) {
+      const sel = SEL === c.k, tut = tg && tg.kind === c.k && !SEL;
+      h += `<button type="button" class="rt-sp ${c.k}${sel ? ' sel' : ''}${tut ? ' tut' : ''}${FRESH.has(c.id) ? ' er-in' : ''}" data-sp="${c.k}" ${!canAct() || !G.row.length ? 'disabled' : ''} aria-pressed="${sel}">${orbIcon(c.k, 0, 28)}<span>${c.k === 'light' ? '光〈昇華〉' : '闇〈反転〉'}<small>${c.k === 'light' ? '束を一段上げる' : '束を反対の元素に'}</small></span></button>`;
+    }
+    if (G.mode !== 'tut') h += `<button type="button" class="rt-sp" id="rtPeek" ${canAct() && G.peeks > 0 && !peeked() && G.deck.length ? '' : 'disabled'}><span style="padding-left:8px">✦ 星読み<small>次の札を見る・残り${G.peeks}回</small></span></button>`;
+  }
+  FRESH.clear();
+  if (box.dataset.h !== h) { box.innerHTML = h; box.dataset.h = h; }
+}
+function renderRound() {
+  const box = q('rtRound'), L = G.last;
+  if (G.phase !== 'round' || !L || BUSY) { box.hidden = true; box.dataset.h = ''; return; }
+  let h;
+  if (L.kind === 'bank') {
+    h = `<h3>${L.auto ? '山札が尽きた' : '奉納'}</h3><div class="big">${fmt(L.pts)}<small>響き ${fmt(L.pot)} × ${L.mult}束</small></div>`
+      + (L.truths ? `<p>真理の昇天 +${fmt(L.truths * RTR.TRUTH)}（確定済み）</p>` : '')
+      + (L.ans ? `<p class="ans">〈答え合わせ〉${L.ans}</p>` : '');
+  } else {
+    h = `<h3>混沌</h3><div class="big" style="color:#ff8ea3">${L.lost ? `−${fmt(L.lost)}` : '0'}<small>${L.why === 'hz' ? '〈ひずみ〉' : 'あふれ'}で、このラウンドの響きが消えた</small></div>`
+      + `<p class="ans">生き延びる確率は<em>${Math.round((1 - L.p) * 100)}%</em>だった。${L.p < .3 ? '分の良い賭けだった。運がなかった。' : L.p < .45 ? '危うい賭けだった。' : '分の悪い賭けだった。'}</p>`
+      + (L.truths ? `<p>昇天した真理 +${fmt(L.truths * RTR.TRUTH)} は残る。</p>` : '');
+  }
+  if (!TUT) h += `<div class="row"><button type="button" class="btn primary" id="rtNext">${G.deck.length ? `第${G.round + 1}ラウンドへ` : '結果を見る'}</button></div>`;
+  if (box.dataset.h !== h) { box.innerHTML = h; box.dataset.h = h; }
+  box.className = 'rt-round' + (L.kind === 'bust' ? ' bust' : '');
+  box.hidden = false;
+}
+function render() {
+  if (!G) return;
+  q('rt').classList.toggle('tut', !!TUT); q('rt').dataset.busy = BUSY ? '1' : '';
+  renderTop(); renderPot(); renderRow(); renderFore(); renderHand(); renderRound();
+  // 操作
+  const tg = tutGoal(); let acts = '';
+  if (G.phase === 'play') {
+    const v = RTR.bank(G.pot, G.row), canB = canAct() && (G.row.length || G.pot) && (!TUT || (tg && tg.act === 'bank'));
+    const canF = canAct() && G.deck.length && (!TUT || (tg && tg.act === 'flip'));
+    acts = `<button type="button" class="btn${tg && tg.act === 'bank' ? ' tut' : ''}" id="rtBank" ${canB ? '' : 'disabled'}>奉納する<b>${fmt(v)}</b></button>`
+      + `<button type="button" class="btn primary${tg && tg.act === 'flip' ? ' tut' : ''}" id="rtFlip" ${canF ? '' : 'disabled'}>めくる</button>`;
+  } else if (G.phase === 'round' && !TUT) acts = `<span></span><button type="button" class="btn primary" id="rtNext2" ${BUSY ? 'disabled' : ''}>${G.deck.length ? `第${G.round + 1}ラウンドへ` : '結果を見る'}</button>`;
+  else if (G.phase === 'end') acts = `<span></span><button type="button" class="btn primary" id="rtShowRes">結果を見る</button>`;
+  const ab = q('rtActs'); if (ab.dataset.h !== acts) { ab.innerHTML = acts; ab.dataset.h = acts; }
+  // 案内
+  const info = q('rtInfo'); info.classList.remove('warn'); let t = '';
+  if (MSG) t = MSG;
+  else if (BUSY) t = '…';
+  else if (G.phase === 'round') t = G.last && G.last.kind === 'bust' ? '混沌。列は崩れた。次のラウンドで取り返そう。' : '響きを得点に変えた。';
+  else if (G.phase === 'end') t = '山札を使いきった。';
+  else if (SEL) t = SEL === 'light' ? '光〈昇華〉：列の束を選ぶ。一段上がり、両隣と反応する。光核なら真理になって天へ昇る。' : '闇〈反転〉：列の束を選ぶ。反対の元素になり、両隣と反応する。';
+  else if (!G.row.length && !G.pot) t = 'めくって列を作ろう。';
+  else {
+    const ex = exposed(), r = fore();
+    if (ex) { t = `右端の${pname(G.row[G.row.length - 1])}に${EL[ex.o].name}の雫が来ると〈ひずみ〉で混沌。`; if (r && r.p >= .25) info.classList.add('warn'); }
+    else if (G.row.length >= RTR.CAP) { t = `束が${G.row.length}つ。並ぶ雫が来たら、あふれて混沌。`; info.classList.add('warn'); }
+    else t = r && r.p === 0 ? 'いまは混沌にならない。めくり得。' : 'もう一枚めくるか、奉納するか。';
+  }
+  info.textContent = t;
+  if (TUT) renderCoach(); else q('rtCoach').hidden = true;
+}
+
+/* ---------- 入力 ---------- */
+function onStage(e) {
+  if (!SEL || !canAct()) return;
+  const el = e.target.closest('.rt-pc'); if (!el || el.dataset.i === '' || el.dataset.i == null) return;
+  const k = +el.dataset.i; if (!RTR.canUse(G, SEL, k)) return;
+  useSpecial(SEL, k);
+}
+function onHand(e) {
+  const b = e.target.closest('button'); if (!b || b.disabled || !canAct()) return;
+  if (b.id === 'rtPeek') return peek();
+  const k = b.dataset.sp; if (!k) return;
+  if (TUT) { const g = tutGoal(); if (!g || g.kind !== k) { nudge(); return; } }
+  SEL = SEL === k ? null : k; SFX.tap(); render();
+}
+function onActs(e) {
+  const b = e.target.closest('button'); if (!b || b.disabled) return;
+  if (b.id === 'rtFlip') flip();
+  else if (b.id === 'rtBank') bankRound(false);
+  else if (b.id === 'rtNext2') nextRound();
+  else if (b.id === 'rtShowRes') showResult(false);
+}
+function onKey(e) {
+  if (S.screen !== 'retsu' || !G || e.repeat) return;
+  if (!q('rtMenuOv').hidden || !q('rtRulesOv').hidden || !q('rtResOv').hidden || !q('rtAchOv').hidden) return;
+  const tgt = e.target && e.target.closest && e.target.closest('button,input,select,textarea');
+  if ((e.key === ' ' || e.key === 'Enter') && !tgt) {
+    e.preventDefault();
+    if (G.phase === 'play') flip(); else if (G.phase === 'round') nextRound();
+  }
+}
+
+/* ---------- 心音：混沌の確率が上がるほど速く（20%以上で鳴る）---------- */
+function beat() {
+  clearTimeout(BEAT); BEAT = null;
+  if (S.screen !== 'retsu' || !G || TUT) return;
+  const p = playing() && !BUSY ? riskNow() : 0;
+  const calm = !q('rtMenuOv').hidden || !q('rtRulesOv').hidden || !q('rtResOv').hidden || !q('rtAchOv').hidden || document.hidden;
+  if (p >= .2 && p < 1 && !calm) { SFX.tone(54, { dur: .2, gain: .05 + .1 * p, attack: .008, lp: 300 }); SFX.tone(47, { dur: .24, gain: .04 + .08 * p, at: .16, attack: .008, lp: 300 }); }
+  BEAT = setTimeout(beat, p >= .2 ? Math.max(480, 1250 - p * 1000) : 800);
+}
+
+/* ---------- チュートリアル ----------
+   札の並びと列を決めておき、めくる・引き寄せ・両隣・端の対消滅・予報とひずみ・奉納・光と真理を一つずつ動かす */
+const TSTEPS = [
+  { say: '<em>共鳴の列</em>へようこそ。山札から一枚ずつめくって、一列に並べていく。まずは<em>めくる</em>を押そう。', go: { act: 'flip' }, do: 'めくる', set: { row: '', deck: 'F1 A1' } },
+  { say: 'めくった雫は、列の<em>右端</em>に来る。もう一枚めくろう。', go: { act: 'flip' }, do: 'めくる' },
+  { say: '風は火と反応しないので、<em>右端に並んだ</em>。列の<em>束の数</em>は、あとで得点の倍率になる。ただし束が<em>7つを超えると混沌</em>。', go: 'next' },
+  { say: '<em>同じ元素は引き合う</em>。列の真ん中に火の雫がある。火の雫をめくってみよう。', go: { act: 'flip' }, do: 'めくる', set: { row: 'A1 F1 W1', deck: 'F1' } },
+  { say: '真ん中の火が<em>右端へ飛んできて</em>、めくった火と合成し、<em>輝石</em>になった。反応するたびに<em>〈響き〉</em>が貯まる（上の数字）。', go: 'next' },
+  { say: '雫が抜けた跡では、<em>両隣どうしが触れ合う</em>。水の雫をめくろう。土と風のあいだにいる水が飛んでいく。', go: { act: 'flip' }, do: 'めくる', set: { row: 'E1 W1 A1 E1', deck: 'W1' } },
+  { say: '水が抜けて<em>土と風が触れ合い、対消滅</em>した。これが<em>〈両隣〉の連鎖</em>。一回のめくりの2回目の反応は、響きが2倍。', go: 'next' },
+  { say: '同じ元素の雫がなく、右端が<em>反対の元素の雫</em>なら、そこで対消滅する。水の雫をめくろう。', go: { act: 'flip' }, do: 'めくる', set: { row: 'A1 F1', deck: 'W1' } },
+  { say: 'ここからが運試し。右端に<em>火の輝石</em>がある。下の<em>予報</em>を見よう：水の雫が来ると<em>✕ひずみ</em>。打ち消しきれずに混沌になり、このラウンドの響きは消える。残り5枚中3枚が水で、<em>混沌の確率60%</em>。ここは<em>奉納する</em>を押そう。', go: { act: 'bank' }, do: '奉納する', set: { row: 'A1 F2', deck: 'W1 E1 W1 F1 W1', pot: 6 } },
+  { say: '奉納の得点は<em>響き × 列の束の数</em>。そして<em>〈答え合わせ〉</em>：次の札は水の雫だった。めくっていたら、ひずみで混沌。止めて正解。反応しない雫が右端を覆えば、輝石は守られる。', go: 'next' },
+  { say: '最後に<em>光</em>。めくった光と闇は手元に置かれ、そのラウンドのうちなら好きなときに使える。<em>光〈昇華〉</em>を選んで、列の<em>火の光核</em>に使おう。', go: { act: 'use', kind: 'light', k: 1 }, do: '光 → 火の光核', set: { row: 'W1 F3 A1', deck: 'E1 W1', hand: 'L' } },
+  { say: '光核が<em>真理</em>になり、<em>天へ昇って+50点が確定</em>した（混沌でも消えない）。<em>闇〈反転〉</em>は束を反対の元素に変える札。<em>星読み</em>は一局に2回、次の札を見られる。山札34枚を使いきるまでラウンドを重ね、合計点で段位が決まる。', go: 'final' },
+];
+const TOK = s => s === 'L' ? { k: 'light' } : s === 'D' ? { k: 'dark' } : { k: 'el', e: 'FWAE'.indexOf(s[0]), t: +s[1] };
+function tutStep() { return TUT && TSTEPS[TUT.i]; }
+function tutGoal() { const st = tutStep(); return st && typeof st.go === 'object' ? st.go : null; }
+function tutSet(st) {
+  if (!st.set) return;
+  const s = st.set, sp = x => x ? x.split(' ') : [];
+  G.row = sp(s.row).map(x => { const c = TOK(x); return { id: ++G.nid, e: c.e, t: c.t }; });
+  G.deck = sp(s.deck).map(x => Object.assign(TOK(x), { id: ++G.nid }));
+  G.hand = sp(s.hand).map(x => Object.assign(TOK(x), { id: ++G.nid }));
+  G.pot = s.pot || 0; DPOT = G.pot; G.phase = 'play'; G.last = null; G.peekId = null;
+  SEL = null; clearPieces(); q('rtHand').dataset.h = '';
+}
+function startTutorial() {
+  SFX.init();
+  G = blank('tut', 0); TUT = { i: 0 }; tutSet(TSTEPS[0]); DISP = 0; show(); render();
+}
+function nudge() { const c = q('rtCoach'); c.classList.remove('nudge'); void c.offsetWidth; c.classList.add('nudge'); SFX.tap(); }
+function tutOk(act, a) {
+  if (!TUT) return true;
+  const g = tutGoal();
+  if (g && g.act === act && (act !== 'use' || (a && a.kind === g.kind && a.k === g.k))) return true;
+  nudge(); return false;
+}
+function tutAfter() { if (!TUT) return; setTimeout(() => { if (TUT) { TUT.i++; const st = tutStep(); if (st) tutSet(st); render(); } }, RM ? 100 : 350); }
+function tutAdvance() {
+  if (!TUT) return;
+  TUT.i++; const st = tutStep(); if (st) tutSet(st);
+  if (G.phase === 'round' && !(st && st.set)) { G.phase = 'play'; G.last = null; }
+  render();
+}
+function renderCoach() {
+  const box = q('rtCoach'), st = tutStep();
+  if (!st) { box.hidden = true; return; }
+  box.hidden = false;
+  const btns = st.go === 'next' ? `<div class="row end"><button type="button" class="btn primary" id="rtTutNext" ${BUSY ? 'disabled' : ''}>次へ</button></div>`
+    : st.go === 'final' ? '<div class="row end"><button type="button" class="btn" id="rtTutAgain">もう一度</button><button type="button" class="btn" id="rtTutDaily">今日の山札</button><button type="button" class="btn primary" id="rtTutPlay">一局を始める</button></div>' : '';
+  box.className = 'al-coach';
+  box.innerHTML = `<div class="row"><span class="ey">Tutorial ${TUT.i + 1} / ${TSTEPS.length}</span>${st.do ? `<span class="do">${st.do}</span>` : ''}</div><p>${st.say}</p>${btns}`;
+}
+function onCoach(e) {
+  const b = e.target.closest('button'); if (!b || b.disabled) return;
+  if (b.id === 'rtTutNext') { if (BUSY) return; SFX.tap(); tutAdvance(); }
+  else if (b.id === 'rtTutAgain') startTutorial();
+  else if (b.id === 'rtTutDaily') { store.set('rt.tutDone', true); daily(); }
+  else if (b.id === 'rtTutPlay') { store.set('rt.tutDone', true); begin(); }
+}
+
+/* ---------- 保存 ---------- */
+function save() { if (G && G.mode !== 'tut' && G.phase !== 'end' && !BUSY) store.set('rt.run', G); }
+function loadRun() { const r = store.get('rt.run', null); return r && r.v === 1 && (r.mode === 'run' || r.mode === 'daily') && r.phase !== 'end' && Array.isArray(r.row) && Array.isArray(r.deck) ? r : null; }
+
+/* ---------- 画面の出入り ---------- */
+function show() {
+  hideOverlays(); ['rtStartOv'].forEach(id => q(id).hidden = true); ['rtMenuOv', 'rtResOv', 'rtRulesOv', 'rtAchOv'].forEach(id => q(id).hidden = true);
+  app.hidden = true; q('rt').hidden = false; S.screen = 'retsu'; S.paused = false; BUSY = false; SEL = null; HL = {}; MOVE = {}; OUT = {}; MSG = null; VIEW = null;
+  q('rtCall').innerHTML = ''; q('rtFx').innerHTML = ''; clearPieces(); q('rtHand').dataset.h = ''; q('rtActs').dataset.h = ''; q('rtRound').dataset.h = ''; SLOTKEY = '';
+  DISP = G.score; DPOT = G.pot;
+  menuBtns(); render(); beat();
+}
+function menuBtns() {
+  const tut = !!TUT, dly = G && G.mode === 'daily';
+  q('rtRetrySame').textContent = tut ? 'チュートリアルを最初から' : dly ? '今日の山札で練習（記録に残らない）' : '同じ山札で最初から';
+  q('rtRetryNew').hidden = tut;
+}
+function begin(seed) { newRun(seed); show(); toast('山札34枚の中身は、上にいつも出ている。'); save(); }
+function daily() {
+  SFX.init();
+  const day = today(); let d = store.get('rt.daily', null);
+  if (!d || d.day !== day) d = { day, started: false, done: false };
+  const run = loadRun();
+  if (run && run.mode === 'daily' && run.day === day) { G = run; TUT = null; show(); toast('今日の山札の続きから'); return; }
+  const official = !d.started;
+  newRun(daySeed(day), 'daily', day); G.official = official;
+  if (official) { d.started = true; store.set('rt.daily', d); }
+  show(); save();
+  toast(official ? '今日の山札（本番）。記録は一日一回だけ。' : '今日の山札（練習）。記録には残らない。');
+}
+function practiceDaily() { const day = (G && G.day) || today(); newRun(daySeed(day), 'daily', day); G.official = false; show(); save(); toast('今日の山札（練習）。記録には残らない。'); }
+function streak() {
+  const log = store.get('rt.dailyLog', {}) || {}; let n = 0; const d = new Date();
+  if (!log[today()]) d.setDate(d.getDate() - 1);
+  for (;;) { const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; if (!log[k]) break; n++; d.setDate(d.getDate() - 1); }
+  return n;
+}
+function bestText() {
+  const b = store.get('rt.best', null), got = Object.keys(store.get('rt.ach', {}) || {}).length;
+  const parts = []; if (b) parts.push(`${fmt(b.score)}点`); if (got) parts.push(`称号 ${got}/${ACH.length}`);
+  return parts.length ? parts.join('・') : '—';
+}
+function open() {
+  SFX.init();
+  const run = loadRun(), first = !store.get('rt.tutDone', false), b = store.get('rt.best', null);
+  const d = store.get('rt.daily', null), day = today(), doneToday = d && d.day === day && d.done, sk = streak();
+  const got = Object.keys(store.get('rt.ach', {}) || {}).length;
+  q('rtContinue').hidden = !run;
+  q('rtStartSub').textContent = run ? `遊びかけ${run.mode === 'daily' ? '（今日の山札）' : ''}：第${run.round}ラウンド・得点 ${fmt(run.score)}・山札 ${run.deck.length}枚`
+    : first ? 'はじめてなら、まずチュートリアルで（約2分）。めくるか止めるか、確率を読んで決める運試し。'
+    : `最高 ${b ? fmt(b.score) + '点（' + rankOf(b.score).name + '）' : '—'}・称号 ${got}/${ACH.length}`;
+  q('rtDaily').textContent = doneToday ? `今日の山札（${fmt(d.score)}点・済み。練習できる）` : `今日の山札 ${day.slice(5).replace('-', '/')}` + (sk ? `（${sk}日連続）` : '');
+  q('rtAch').textContent = `称号（${got}/${ACH.length}）`;
+  q('rtTutorial').className = 'btn' + (first && !run ? ' primary' : '');
+  q('rtNew').className = 'btn' + (!first && !run ? ' primary' : '');
+  el.titleOv.hidden = true; q('rtStartOv').hidden = false;
+  (run ? q('rtContinue') : first ? q('rtTutorial') : q('rtNew')).focus();
+}
+function openRules() { q('rtRulesOv').hidden = false; q('rtRulesOv').querySelector('.panel').scrollTop = 0; q('rtRulesClose').focus({ preventScroll: true }); }
+function hideGame() {
+  q('rt').hidden = true; ['rtMenuOv', 'rtResOv', 'rtRulesOv', 'rtAchOv'].forEach(id => q(id).hidden = true);
+  if (G && G.mode !== 'tut' && G.phase !== 'end') save();
+  G = null; TUT = null; BUSY = false; SEL = null; app.hidden = false; clearTimeout(BEAT); BEAT = null;
+}
+function hide() {
+  const k = q('rt'); if (!k) return;
+  hideGame(); q('rtStartOv').hidden = true;
+  const b = q('bestRetsu'); if (b) b.textContent = loadRun() ? '遊びかけ' : bestText();
+}
+function esc() {
+  if (!q('rtAchOv').hidden) { q('rtAchOv').hidden = true; return true; }
+  if (!q('rtStartOv').hidden) { q('rtStartOv').hidden = true; el.titleOv.hidden = false; return true; }
+  if (S.screen !== 'retsu') return false;
+  if (!q('rtRulesOv').hidden) q('rtRulesOv').hidden = true;
+  else if (!q('rtMenuOv').hidden) q('rtMenuOv').hidden = true;
+  else if (!q('rtResOv').hidden) q('rtResOv').hidden = true;
+  else if (SEL) { SEL = null; render(); }
+  else q('rtMenuOv').hidden = false;
+  return true;
+}
+function updateSound() { const b = q('rtSound'); b.classList.toggle('off', !SFX.on); b.setAttribute('aria-pressed', String(SFX.on)); }
+function init() {
+  const ic = q('icRetsu');
+  if (ic) ic.innerHTML = orbIcon(0, 1, 18) + orbIcon(0, 2, 20) + orbIcon(1, 1, 18);
+  q('rtRulesTiers').innerHTML = [1, 2, 3, 4].map(t => `<span class="ks-mini">${orbIcon(0, t, 20)}${TI[t].name}</span>`).join(' → ');
+  q('goRetsu').addEventListener('click', open);
+  q('rtContinue').addEventListener('click', () => { const r = loadRun(); if (!r) return open(); G = r; TUT = null; show(); toast('続きから'); });
+  q('rtNew').addEventListener('click', () => begin());
+  q('rtDaily').addEventListener('click', daily);
+  q('rtAch').addEventListener('click', openAch);
+  q('rtTutorial').addEventListener('click', startTutorial);
+  q('rtStartBack').addEventListener('click', () => { q('rtStartOv').hidden = true; el.titleOv.hidden = false; });
+  q('rtStage').addEventListener('click', onStage);
+  q('rtStage').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const el = e.target.closest('.rt-pc.tg'); if (el) { e.preventDefault(); onStage(e); } } });
+  q('rtHand').addEventListener('click', onHand);
+  q('rtActs').addEventListener('click', onActs);
+  q('rtRound').addEventListener('click', e => { if (e.target.closest('#rtNext')) nextRound(); });
+  q('rtCoach').addEventListener('click', onCoach);
+  document.addEventListener('keydown', onKey);
+  q('rtMenuBtn').addEventListener('click', () => { SFX.tap(); menuBtns(); q('rtMenuOv').hidden = false; q('rtResume').focus(); });
+  q('rtResume').addEventListener('click', () => { q('rtMenuOv').hidden = true; });
+  q('rtMenuRules').addEventListener('click', () => { q('rtMenuOv').hidden = true; openRules(); });
+  q('rtMenuAch').addEventListener('click', () => { q('rtMenuOv').hidden = true; openAch(); });
+  q('rtRulesBtn').addEventListener('click', () => { SFX.tap(); openRules(); });
+  q('rtRulesClose').addEventListener('click', () => { q('rtRulesOv').hidden = true; });
+  q('rtRulesTut').addEventListener('click', () => { if (BUSY) return; if (G && G.mode !== 'tut') save(); startTutorial(); });
+  q('rtAchClose').addEventListener('click', () => { q('rtAchOv').hidden = true; });
+  q('rtRetrySame').addEventListener('click', () => { if (BUSY) return; q('rtMenuOv').hidden = true; if (TUT) return startTutorial(); if (G && G.mode === 'daily') return practiceDaily(); begin(G ? G.seed : undefined); });
+  q('rtRetryNew').addEventListener('click', () => { if (BUSY) return; begin(); });
+  q('rtToTitle').addEventListener('click', () => { if (BUSY) return; showTitle(); });
+  q('rtResNew').addEventListener('click', () => { q('rtResOv').hidden = true; begin(); });
+  q('rtResSame').addEventListener('click', () => { q('rtResOv').hidden = true; if (G && G.mode === 'daily') return practiceDaily(); begin(G ? G.seed : undefined); });
+  q('rtResShare').addEventListener('click', copyShare);
+  q('rtResTitle').addEventListener('click', showTitle);
+  q('rtSound').addEventListener('click', () => { SFX.on = !SFX.on; store.set('sound', SFX.on); if (SFX.on) SFX.init(); updateSound(); updateSoundBtn(); });
+  for (const id of ['rtMenuOv', 'rtRulesOv', 'rtAchOv']) q(id).addEventListener('click', e => { if (e.target.id === id) q(id).hidden = true; });
+  const relayout = () => { if (S.screen === 'retsu' && G && !BUSY) { SLOTKEY = ''; render(); } };
+  if (window.ResizeObserver) new ResizeObserver(relayout).observe(q('rt'));
+  else window.addEventListener('resize', relayout);
+  updateSound();
+  hide();
+}
+return { init, hide, esc };
+})();
+
 /* ================================================================
    ループと起動
    ================================================================ */
@@ -8418,7 +9567,7 @@ function frame(t) {
   let dt = t - lastT; lastT = t;
   if (S.screen === 'play' && !document.hidden) perfTick(dt);
   if (dt > 50) dt = 50; if (dt < 0) dt = 0;
-  if (S.screen === 'alch' || S.screen === 'kasane' || S.screen === 'erosion' || S.screen === 'shiho') { requestAnimationFrame(frame); return; } // 錬成の書・重ね札・侵食・四方の盤：盤は描かない
+  if (S.screen === 'alch' || S.screen === 'kasane' || S.screen === 'erosion' || S.screen === 'shiho' || S.screen === 'retsu') { requestAnimationFrame(frame); return; } // 錬成の書・重ね札・侵食・四方の盤・共鳴の列：盤は描かない
   const stop = performance.now() < (S.hitStop || 0); // ヒットストップ：時間が止まる
   const clock = (S.screen === 'play' || S.screen === 'result') && !S.paused && !stop;
   if (clock) S.now += dt;
@@ -8483,6 +9632,7 @@ function bindUI() {
     if (KS.esc()) return;
     if (ER.esc()) return;
     if (SH.esc()) return;
+    if (RT.esc()) return;
     if (!el.rulesOv.hidden) closeRules();
     else if (!$('#tuneOv').hidden) closeTune();
     else if (!$('#soundOv').hidden) closeSound();
@@ -8506,6 +9656,7 @@ function start(data) {
   KS.init();
   ER.init();
   SH.init();
+  RT.init();
   fillRules();
   updateSoundBtn();
   if (data && data.v === 1 && data.screen === 'play' && Array.isArray(data.orbs) && data.orbs.length) restore(data);
