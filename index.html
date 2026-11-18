@@ -735,6 +735,49 @@ button{font:inherit;color:inherit}
 
 /* ================= 重ね札（ソリティア）=================
    上＝山札の残りと響き／中＝五つの座（円環。座5と座1も隣）／下＝宙・めくった札・操作 */
+.du{position:fixed;inset:0;z-index:15;display:flex;flex-direction:column;gap:6px;overflow:auto;
+  background-color:var(--ink);background-image:radial-gradient(120% 70% at 50% 0%,var(--ink-2) 0%,var(--ink) 62%);
+  padding-top:calc(env(safe-area-inset-top,0px) + 8px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 16px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.du-top{display:flex;align-items:center;justify-content:space-between}
+.du-title{font-family:var(--f-display);font-weight:800;font-size:18px}
+.du-title small{font-family:var(--f-body);font-size:11px;color:var(--brass);margin-left:8px;letter-spacing:.1em}
+.du-side{position:relative;display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:14px}
+.du-side.foe{border:1px solid rgba(255,82,114,.32);background:linear-gradient(160deg,rgba(255,82,114,.07),rgba(255,255,255,.01))}
+.du-side.you{border:1px solid var(--brass-dim)}
+.du-who{display:flex;align-items:baseline;justify-content:space-between;gap:8px;font-family:var(--f-display)}
+.du-piles{font-family:var(--f-body);font-size:11px;color:var(--muted)}
+.du-hp{display:flex;align-items:center;gap:8px}
+.du-side.foe .du-hp .al-bar i{background:linear-gradient(90deg,var(--gauge-b),var(--danger))}
+.du-side.you .du-hp .al-bar i{background:linear-gradient(90deg,var(--brass),var(--lumen))}
+.du-hp b{font-family:var(--f-display);font-size:14px;min-width:52px;text-align:right}
+.du-hand.foe{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.du-hand.foe .al-card{flex:0 1 54px;max-width:60px;pointer-events:none}
+.du-hand.foe .al-card .al-cs{display:none}
+.du-hand.foe .al-card .al-cn{font-size:9px}
+.du-next{display:inline-flex;align-items:center;gap:3px;font-size:10px;color:var(--muted);padding:1px 7px;border-radius:999px;border:1px dashed var(--brass-faint)}
+.du-next .oi{width:16px;height:16px}
+.du-cru{padding-bottom:4px}
+.du-marks{height:44px}
+.du-marks span{position:relative}
+.al-sock .du-hook,.du-hook.in{position:absolute;top:-6px;left:-4px;z-index:2;font-size:10px;font-weight:800;line-height:1.5;padding:0 4px;border-radius:999px;color:#fff;background:var(--danger);box-shadow:0 0 8px rgba(255,82,114,.6)}
+.du-hook.in{position:static;display:inline-block;margin-right:4px}
+.du-pv{position:absolute;left:50%;bottom:-17px;transform:translateX(-50%);z-index:3;white-space:nowrap;font-size:10px;font-weight:800;line-height:1.35;padding:0 5px;border-radius:999px;background:var(--ink);border:1px solid var(--lumen);color:var(--lumen);pointer-events:none}
+.du-pv em{font-style:normal;color:var(--danger);margin-left:4px}
+.du-marks .du-pv{bottom:-14px;left:13px}
+.du-info{min-height:2.6em}
+.du-log{list-style:none;margin:0;padding:0;font-size:11px;color:var(--muted);line-height:1.6}
+.du-acts{display:flex;flex-direction:column;align-items:center;gap:6px}
+.du-stuck{margin:0;color:var(--danger);font-size:12px;text-align:center}
+.du-myhand{margin-top:0;min-height:110px}
+.du-start .du-lbl{margin:10px 0 4px;font-size:12px;color:var(--muted)}
+.du-opts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.du-opts .btn{display:flex;flex-direction:column;gap:2px;padding:8px 6px;font-size:13px}
+.du-opts .btn small{font-size:10px;color:var(--muted);font-weight:400;line-height:1.35}
+.du-opts .btn.primary small{color:inherit;opacity:.8}
+.du-rec{font-size:12px;color:var(--brass);margin:8px 0 2px}
+.du-rules{padding-left:0;list-style:none;display:grid;gap:8px}
+.du-rules b{display:block;font-family:var(--f-display);color:var(--brass)}
 .ks{position:fixed;inset:0;z-index:15;display:flex;flex-direction:column;gap:8px;overflow:hidden;
   background-color:var(--ink);background-image:radial-gradient(120% 70% at 50% 0%,var(--ink-2) 0%,var(--ink) 62%);
   padding-top:calc(env(safe-area-inset-top,0px) + 8px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 22px);
@@ -1566,8 +1609,62 @@ button{font:inherit;color:inherit}
       <button class="btn primary" id="alContinue" type="button">続きから</button>
       <button class="btn" id="alNewRun" type="button">新しい冒険を始める</button>
       <button class="btn" id="alTutorial" type="button">チュートリアル（練習の戦闘）</button>
+      <button class="btn" id="duOpen" type="button">試しの対局（新しい戦い方の試作）</button>
       <button class="btn" id="alStartBack" type="button">戻る</button>
     </div>
+  </div>
+</section>
+
+<section class="du" id="du" hidden aria-label="試しの対局">
+  <header class="du-top"><span class="du-title">試しの対局<small>試作</small></span><button class="btn icon" id="duMenuBtn" type="button" aria-label="メニュー">≡</button></header>
+  <section class="du-side foe" id="duFoe" aria-label="相手">
+    <div class="du-who"><b id="duFoeName">練習の影</b><span class="du-piles" id="duFoePiles"></span></div>
+    <div class="du-hp" id="duFoeHp"></div>
+    <div class="du-hand foe" id="duFoeHand" aria-label="相手の手札"></div>
+  </section>
+  <section class="al-cru du-cru" id="duCru" aria-label="坩堝"><span class="al-cru-lbl">坩堝<b id="duCruN"></b></span>
+    <div class="al-row" id="duRow"></div><div class="al-marks du-marks" id="duMarks"></div>
+    <div class="al-legend"><span><i class="o"></i>あなたの札</span><span><i class="f"></i>相手の札</span><span><b class="du-hook in">狙</b>相手の手札で狙われる</span></div></section>
+  <p class="al-info du-info" id="duInfo"></p>
+  <ul class="du-log" id="duLog"></ul>
+  <div class="du-acts" id="duActs"></div>
+  <section class="al-hand du-myhand" id="duHand" aria-label="あなたの手札"></section>
+  <section class="du-side you" id="duYou" aria-label="あなた"><div class="du-who"><b>あなた</b><span id="duYouNext"></span><span class="du-piles" id="duYouPiles"></span></div><div class="du-hp" id="duYouHp"></div></section>
+
+  <section class="overlay" id="duMenuOv" hidden><div class="panel pause" role="dialog" aria-modal="true"><p class="eyebrow">Duel</p><h2>試しの対局</h2>
+    <div class="stack"><button class="btn primary" id="duResume" type="button">続ける</button><button class="btn" id="duMenuRules" type="button">あそびかた</button>
+    <button class="btn" id="duRetry" type="button">同じ設定でやり直す</button><button class="btn" id="duToStart" type="button">設定を変える</button><button class="btn" id="duToTitle" type="button">タイトルへ</button></div></div></section>
+  <section class="overlay" id="duResOv" hidden><div class="panel pause" role="dialog" aria-modal="true"><p class="eyebrow">Result</p><h2 id="duResH"></h2><div id="duResBody"></div>
+    <div class="stack"><button class="btn primary" id="duResAgain" type="button">もう一局</button><button class="btn" id="duResSet" type="button">設定を変える</button><button class="btn" id="duResTitle" type="button">タイトルへ</button></div></div></section>
+</section>
+<section class="overlay" id="duStartOv" hidden>
+  <div class="panel pause du-start" role="dialog" aria-modal="true" aria-labelledby="duStartH">
+    <p class="eyebrow">Duel ・ 試作</p><h2 id="duStartH">試しの対局</h2>
+    <p class="res-sub">新しい戦い方の試作。互いに手札5枚を見せ合い、7マスの坩堝に1枚ずつ。冒険とは別に、一局だけ遊べる。</p>
+    <p class="du-lbl">山札（あなたも相手も、同じ組み立て）</p>
+    <div class="du-opts"><button class="btn" data-act="1" type="button">第一幕のころ<small>雫12・輝石2</small></button><button class="btn" data-act="2" type="button">第二幕のころ<small>雫6・輝石6・光核2・光・闇</small></button><button class="btn" data-act="3" type="button">第三幕のころ<small>雫4・輝石5・光核4・真理2・光・闇</small></button></div>
+    <p class="du-lbl">相手の読み</p>
+    <div class="du-opts"><button class="btn" data-lv="1" type="button">弱<small>迷いが多い</small></button><button class="btn" data-lv="2" type="button">中<small>反撃まで読む</small></button><button class="btn" data-lv="3" type="button">強<small>その先の返しまで</small></button></div>
+    <p class="du-rec" id="duStartRec"></p>
+    <div class="stack"><button class="btn primary" id="duGo" type="button">対局を始める</button><button class="btn" id="duStartRules" type="button">あそびかた</button><button class="btn" id="duStartBack" type="button">戻る</button></div>
+  </div>
+</section>
+<section class="overlay" id="duRulesOv" hidden>
+  <div class="panel rules" role="dialog" aria-modal="true" aria-labelledby="duRulesH">
+    <p class="eyebrow">How to play ・ 試作</p><h2 id="duRulesH">試しの対局 あそびかた</h2>
+    <p class="rules-lede">互いに手札を見せ合い、坩堝に1枚ずつ。相手の器を0にすれば勝ち。</p>
+    <ul class="du-rules">
+      <li><b>手番</b>手番の始めに、手札が5枚になるまで引く。それから<em>必ず1枚</em>使う（パスはない）。手札と、<em>山札のいちばん上（次に引く札）</em>は相手にも見えている。</li>
+      <li><b>使い方</b>坩堝（7マス）の好きな位置に<em>置く</em>か、坩堝の札に<em>重ねる</em>。あなたも相手も同じ。</li>
+      <li><b>反応</b>坩堝で隣り合えば反応する。同じ元素・同じ段階は<em>合成</em>（一段上に）、反対の元素・同じ段階は<em>対消滅</em>。光は昇華、闇は反転、光と闇で〈調律〉。</li>
+      <li><b>反応は手番の側のもの</b>合成してできた札は、その手番の側の札になる（相手の札も奪える）。対消滅は、その手番の側から相手への<em>攻撃</em>。</li>
+      <li><b>傷</b>器は40（第一幕のころ）・50・60。対消滅の傷は 雫3・輝石7・光核15・真理30。連鎖は足し算で、<em>2回目からは1回ごとに+2</em>（合成も1回に数える）。</li>
+      <li><b>読み合い</b>あなたが置いた札は、相手の的にもなる。相手の手札で狙われる坩堝の札には「狙」の印。手札を選ぶと、打てる場所に<em>与える傷</em>と<em>相手のいちばん痛い反撃</em>が出る。</li>
+      <li><b>使える手がない</b>坩堝が満ちて重ねる相手もないときは、手札を1枚捨てて、その段階ぶん器が削れる（雫2・輝石4・光核8・真理16、光・闇は2）。</li>
+      <li><b>手札で錬成</b>1手番に1回、手札の同じ札2枚を一段上に、光・闇と札で昇華・反転できる（手番は使わない）。相手も同じ。</li>
+      <li><b>札のめぐり</b>使った札は捨て札・除外へ。山札が尽きたら、捨て札と除外を混ぜて新しい山札に。</li>
+    </ul>
+    <div class="panel-btns"><button class="btn primary" id="duRulesClose" type="button">閉じる</button></div>
   </div>
 </section>
 
@@ -2034,7 +2131,7 @@ button{font:inherit;color:inherit}
   </div>
 </section>
 
-<div class="ver" aria-hidden="true">v1.67.0</div>
+<div class="ver" aria-hidden="true">v1.68.0</div>
 
 <script id="genso-images">window.GENSO_IMAGES = {
   "fire-1": "data:image/jpeg;base64,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",
@@ -4859,7 +4956,7 @@ let rulesBack = null;
 function hideOverlays() { el.titleOv.hidden = el.rulesOv.hidden = el.pauseOv.hidden = el.resultOv.hidden = true; $('#tuneOv').hidden = true; $('#soundOv').hidden = true; }
 function showScreen() { hideOverlays(); app.classList.remove('on-title'); }
 function showTitle() {
-  ALCH.hide(); KS.hide(); ER.hide(); SH.hide(); RT.hide();
+  ALCH.hide(); KS.hide(); ER.hide(); SH.hide(); RT.hide(); DU.hide();
   S.token++; tweens.length = 0; S.screen = 'title'; S.paused = false; S.drag = null; S.orbs = [];
   FX.parts.length = FX.rings.length = FX.wells.length = FX.texts.length = FX.beams.length = 0;
   hideOverlays(); hideTip(); el.crit.hidden = true;
@@ -9761,6 +9858,401 @@ return { init, hide, esc };
 })();
 
 /* ================================================================
+   試しの対局（錬成の書の試作）
+   互いに手札5枚を見せ合い、7マスの坩堝に1枚ずつ。パスはなし。
+   反応はその手番の側のもの：合成した札はその側の札、対消滅は相手への攻撃（連鎖は足し算＋1回ごとの上乗せ）
+   ================================================================ */
+const DU = (() => {
+const q = id => document.getElementById(id);
+const C = {
+  SLOTS: 7, HAND: 5, HP: 50,
+  PEEK: true,              // 山札のいちばん上（次に引く札）も見えている
+  HPS: [0, 40, 50, 60],    // 器（山札の幕ごと）
+  ANNI: [0, 3, 7, 15, 30], // 対消滅の調律力（段階ごと）
+  BONUS: 2,                // 連鎖の上乗せ：k回目の反応は +BONUS×(k−1)
+  BACK: [0, 2, 4, 8, 16],  // 使える手がないとき、捨てた札の段階ぶんの傷（光・闇は2）
+  STEP: 380,
+};
+const OPPE = e => EL[e].opp;
+const other = s => (s === 'you' ? 'foe' : 'you');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let G = null, SEL = [], BUSY = false, VIEW = null, NID = 1, OPT = { act: 1, lv: 2 };
+const mk = (k, e, t) => ({ id: NID++, k, e, t });
+const origs = c => (c.parts ? c.parts.flatMap(origs) : [c]);
+const cname = c => (c.k === 'el' ? `${EL[c.e].name}の${TI[c.t].name}` : c.k === 'light' ? '光' : '闇');
+const sameKind = (a, b) => a.k === b.k && a.t === b.t && (a.k !== 'el' || a.e === b.e);
+
+/* ---------- 規則（盤の札は { id, k, e, t, side, src:[{ side, c }] }）---------- */
+function stackKind(H, T) {
+  if (!H || !T) return null;
+  if (H.k === 'el' && T.k === 'el') { if (H.t !== T.t) return null; if (H.e === T.e) return H.t < 4 ? 'merge' : null; return H.e === OPPE(T.e) ? 'anni' : null; }
+  if (H.k === 'light') return T.k === 'el' ? (T.t < 4 ? 'raise' : null) : T.k === 'dark' ? 'tune' : null;
+  if (H.k === 'dark') return T.k === 'el' ? 'invert' : T.k === 'light' ? 'tune' : null;
+  return null;
+}
+function pairKind(a, b) {
+  if (!a || !b) return null;
+  if (a.k === 'el' && b.k === 'el' && a.t === b.t) { if (a.e === b.e) return a.t < 4 ? 'merge' : null; if (a.e === OPPE(b.e)) return 'anni'; }
+  if ((a.k === 'light' && b.k === 'dark') || (a.k === 'dark' && b.k === 'light')) return 'tune';
+  return null;
+}
+// 盤と手札だけを写す（読みのため。山札は写さない）
+function cl(g) {
+  const sd = P => ({ hp: P.hp, hand: P.hand.slice(), deck: P.deck.slice(), disc: [], exile: [] });
+  return { cru: g.cru.map(c => ({ ...c })), you: sd(g.you), foe: sd(g.foe), sim: true };
+}
+// 手を打つ：side が mv（{h, p} 置く／{h, s} 重ねる）を打つ。rec があれば、一段ごとの盤を記録する
+function act(g, side, mv, rec) {
+  const P = g[side], O = g[other(side)], H = P.hand[mv.h];
+  P.hand.splice(mv.h, 1);
+  const st = { k: 0, dmg: 0, maxK: 0 };
+  const snap = (msg, o = {}) => { if (rec) rec.push({ cru: g.cru.map(c => ({ ...c })), hp: { you: g.you.hp, foe: g.foe.hp }, msg, side, ...o }); };
+  const board = c => ({ id: c.id, k: c.k, e: c.e, t: c.t, side, src: origs(c).map(x => ({ side, c: x })) });
+  const back = (bc, pile) => { if (!g.sim) for (const s of bc.src) g[s.side][pile].push(s.c); };
+  const toPile = (c, pile) => { if (!g.sim) P[pile].push(...origs(c)); };
+  const hit = (t, why) => { st.k++; st.maxK = Math.max(st.maxK, st.k); const d = C.ANNI[t] + C.BONUS * (st.k - 1); O.hp -= d; st.dmg += d; snap(why, { dmg: d, to: other(side), k: st.k }); };
+  const fuse = (a, b) => { st.k++; st.maxK = Math.max(st.maxK, st.k); return { id: NID++, k: a.k, e: a.e, t: a.t + 1, side, src: a.src.concat(b.src) }; };
+  let qu = [];
+  if (mv.p != null) {
+    const B = board(H); g.cru.splice(Math.min(mv.p, g.cru.length), 0, B); snap('置く', { mark: B.id }); qu = [{ c: B }];
+  } else {
+    const T = g.cru[mv.s], kind = stackKind(H, T);
+    if (kind === 'merge') { const N = fuse(T, board(H)); g.cru[mv.s] = N; snap('合成', { mark: N.id }); qu = [{ c: N }]; }
+    else if (kind === 'anni') {
+      const L = g.cru[mv.s - 1], R = g.cru[mv.s + 1];
+      g.cru.splice(mv.s, 1); back(T, 'exile'); toPile(H, 'exile'); hit(T.t, '対消滅');
+      if (L && R) qu = [{ g: [L, R] }];
+    } else if (kind === 'raise') { T.t++; toPile(H, 'disc'); snap('昇華', { mark: T.id }); qu = [{ c: T }]; }
+    else if (kind === 'invert') { T.e = OPPE(T.e); toPile(H, 'disc'); snap('反転', { mark: T.id }); qu = [{ c: T }]; }
+    else if (kind === 'tune') { g.cru.splice(mv.s, 1); back(T, 'disc'); toPile(H, 'disc'); qu = tuneAll(g, hit, back, snap); }
+  }
+  // 連鎖：変化した札（c）と、すき間が詰まって新しく隣り合った組（g）を順に確かめる
+  let guard = 0;
+  while (qu.length && guard++ < 60 && g.you.hp > 0 && g.foe.hp > 0) {
+    const f = qu.shift(); let i = -1, kind = null;
+    if (f.g) { const [a, b] = f.g, j = g.cru.indexOf(a); if (j >= 0 && g.cru[j + 1] === b) { kind = pairKind(a, b); i = j; } }
+    else {
+      const j = g.cru.indexOf(f.c); if (j < 0) continue;
+      kind = pairKind(g.cru[j - 1], f.c); i = j - 1;
+      if (!kind) { kind = pairKind(f.c, g.cru[j + 1]); i = j; }
+    }
+    if (!kind) continue;
+    const a = g.cru[i], b = g.cru[i + 1];
+    if (kind === 'merge') { const N = fuse(a, b); g.cru.splice(i, 2, N); snap('合成', { mark: N.id }); qu.push({ c: N }); }
+    else if (kind === 'anni') {
+      const L = g.cru[i - 1], R = g.cru[i + 2];
+      g.cru.splice(i, 2); back(a, 'exile'); back(b, 'exile'); hit(a.t, st.k >= 1 ? '共鳴' : '対消滅');
+      if (L && R) qu.push({ g: [L, R] });
+    } else if (kind === 'tune') { g.cru.splice(i, 2); back(a, 'disc'); back(b, 'disc'); qu.push(...tuneAll(g, hit, back, snap)); }
+  }
+  return st;
+}
+// 光×闇〈調律〉：坩堝の反対の元素・同じ段階の組が、すべて一斉に対消滅する
+function tuneAll(g, hit, back, snap) {
+  const before = g.cru.slice(), els = g.cru.filter(c => c.k === 'el'), used = new Set(), pairs = [];
+  for (const a of els) { if (used.has(a)) continue; const b = els.find(x => x !== a && !used.has(x) && x.t === a.t && x.e === OPPE(a.e)); if (b) { used.add(a); used.add(b); pairs.push([a, b]); } }
+  snap('調律');
+  for (const [a, b] of pairs) { g.cru.splice(g.cru.indexOf(a), 1); g.cru.splice(g.cru.indexOf(b), 1); back(a, 'exile'); back(b, 'exile'); hit(a.t, '調律'); }
+  const qu = [];
+  for (let i = 0; i + 1 < g.cru.length; i++) { const a = g.cru[i], b = g.cru[i + 1]; if (before.indexOf(b) - before.indexOf(a) !== 1) qu.push({ g: [a, b] }); }
+  return qu;
+}
+// 打てる手（同じ札は一度だけ数える）
+function legal(g, side) {
+  const P = g[side], out = [], seen = new Set();
+  P.hand.forEach((H, h) => {
+    const key = `${H.k}${H.e}${H.t}`; if (seen.has(key)) return; seen.add(key);
+    g.cru.forEach((T, s) => { if (stackKind(H, T)) out.push({ h, s }); });
+    if (g.cru.length < C.SLOTS) for (let p = 0; p <= g.cru.length; p++) out.push({ h, p });
+  });
+  return out;
+}
+const backDmg = c => (c.k === 'el' ? C.BACK[c.t] : 2);
+// 手札での錬成（掌の音叉）：同じ札2枚を一段上に、光・闇と札で昇華・反転。1手番に1回
+function crafts(P) {
+  const out = [], seen = new Set(), h = P.hand;
+  for (let i = 0; i < h.length; i++) for (let j = i + 1; j < h.length; j++) {
+    const a = h[i], b = h[j]; let op = null;
+    if (a.k === 'el' && b.k === 'el') { if (sameKind(a, b) && a.t < 4) op = { kind: 'merge', a: i, b: j }; }
+    else if (a.k === 'el' || b.k === 'el') {
+      const si = a.k !== 'el' ? i : j, ti = si === i ? j : i, sp = h[si], tg = h[ti];
+      if (sp.k === 'light' && tg.t < 4) op = { kind: 'raise', a: si, b: ti }; else if (sp.k === 'dark') op = { kind: 'invert', a: si, b: ti };
+    }
+    if (!op) continue;
+    const key = `${op.kind}${h[op.a].k}${h[op.a].e}${h[op.a].t}${h[op.b].k}${h[op.b].e}${h[op.b].t}`; if (seen.has(key)) continue; seen.add(key); out.push(op);
+  }
+  return out;
+}
+function doCraft(g, side, op) {
+  const P = g[side], a = P.hand[op.a], b = P.hand[op.b]; let N;
+  if (op.kind === 'merge') N = { id: NID++, k: a.k, e: a.e, t: a.t + 1, parts: [a, b] };
+  else if (op.kind === 'raise') { N = { id: NID++, k: b.k, e: b.e, t: b.t + 1, parts: [b] }; if (!g.sim) P.disc.push(a); }
+  else { N = { id: NID++, k: b.k, e: OPPE(b.e), t: b.t, parts: [b] }; if (!g.sim) P.disc.push(a); }
+  P.hand = P.hand.filter(c => c !== a && c !== b); P.hand.splice(Math.min(op.a, op.b, P.hand.length), 0, N);
+  return N;
+}
+function draw(P) {
+  while (P.hand.length < C.HAND) {
+    if (!P.deck.length) { P.deck = shuffle(P.disc.concat(P.exile)); P.disc = []; P.exile = []; if (!P.deck.length) break; }
+    P.hand.push(P.deck.pop());
+  }
+}
+
+/* ---------- 相手の打ち手（読み）----------
+   弱：目の前の一手と、こちらの反撃をざっくり。迷いが大きい
+   中：こちらの反撃（手札が見えている）まで読む
+   強：さらに、その反撃への自分の返しまで読む */
+const LV = [null, { name: '弱', w: .5, noise: 5, slip: .25 }, { name: '中', w: 1, noise: 1.5, slip: .05 }, { name: '強', w: 1, noise: 0, slip: 0, deep: true }];
+// 読みの中で、side の手番の始めに引く札：見えている山札の上から（C.PEEK のとき）
+function peekDraw(g, side) { if (!C.PEEK) return; const P = g[side]; while (P.hand.length < C.HAND && P.deck.length) P.hand.push(P.deck.pop()); }
+function bestDmg(g, side) { // side がこの手番に与えられる最大の傷（使える手がなければ、受ける傷を負の値で）
+  peekDraw(g, side);
+  const mvs = legal(g, side);
+  if (!mvs.length) return -Math.min(...g[side].hand.map(backDmg));
+  let m = 0; for (const mv of mvs) { const h = cl(g); m = Math.max(m, act(h, side, mv).dmg); } return m;
+}
+function choose(g, side, lvl) {
+  const L = LV[lvl], foe = other(side), opts = [];
+  const add = (base, craft) => {
+    for (const mv of legal(base, side)) {
+      const h = cl(base), st = act(h, side, mv);
+      opts.push({ v: st.dmg + (h[foe].hp <= 0 ? 1000 : -L.w * bestDmg(h, foe)), mv, craft, h, dmg: st.dmg });
+    }
+  };
+  add(g, null);
+  for (const cr of crafts(g[side])) { const h = cl(g); doCraft(h, side, cr); add(h, cr); }
+  if (!opts.length) return null;
+  if (L.deep) { // 上位の手だけ、相手の反撃と自分の返しまで読む
+    opts.sort((a, b) => b.v - a.v);
+    opts.forEach((o, n) => {
+      if (n >= 10) { o.v -= 1000; return; }
+      if (o.h[foe].hp <= 0) return;
+      peekDraw(o.h, foe); let worst = -Infinity; const rs = legal(o.h, foe);
+      if (!rs.length) worst = -Math.min(...o.h[foe].hand.map(backDmg));
+      for (const r of rs) { const h2 = cl(o.h), s2 = act(h2, foe, r); const val = s2.dmg + (h2[side].hp <= 0 ? 1000 : -.8 * bestDmg(h2, side)); if (val > worst) worst = val; }
+      o.v = o.dmg - worst;
+    });
+  }
+  for (const o of opts) o.v -= .15 * o.h.cru.length + rand() * L.noise;
+  opts.sort((a, b) => b.v - a.v);
+  if (L.slip && rand() < L.slip) return opts[Math.floor(rand() * Math.min(4, opts.length))];
+  return opts[0];
+}
+
+/* ---------- 対局 ---------- */
+// 山札：幕の段階に合わせた、同じ組み立て（元素は無作為）
+const DECKS = [null,
+  { name: '第一幕のころ', cards: [[1, 12], [2, 2]] },
+  { name: '第二幕のころ', cards: [[1, 6], [2, 6], [3, 2], ['light', 1], ['dark', 1]] },
+  { name: '第三幕のころ', cards: [[1, 4], [2, 5], [3, 4], [4, 2], ['light', 1], ['dark', 1]] }];
+function makeDeck(act) {
+  const out = []; let e = Math.floor(rand() * 4);
+  for (const [t, n] of DECKS[act].cards) for (let i = 0; i < n; i++) out.push(typeof t === 'string' ? mk(t, -1, 0) : mk('el', (e++) % 4, t));
+  return shuffle(out);
+}
+function newGame() {
+  const hp = C.HPS[OPT.act] || C.HP, side = () => ({ hp, max: hp, deck: makeDeck(OPT.act), hand: [], disc: [], exile: [] });
+  G = { cru: [], you: side(), foe: side(), turn: 'you', n: 1, crafted: false, log: [], stats: { dealt: 0, taken: 0, maxK: 0, maxHit: 0 } };
+  draw(G.you); draw(G.foe); SEL = []; VIEW = null; BUSY = false;
+}
+
+/* ---------- 描画 ---------- */
+function orb(c) {
+  const key = imgKey(c.k === 'el' ? 'el' : c.k, c.e, c.t);
+  if (!IMG_SRC[key]) return orbVector(c.k === 'el' ? c.e : c.k, c.t, 40);
+  const col = c.k === 'el' ? EL[c.e].color : c.k === 'light' ? '#ffd36b' : '#9b7bff';
+  return `<span class="oi im-${key}" style="--oi-glow:${rgba(col, .55)}" aria-hidden="true"></span>`;
+}
+function card(c, attrs, cls) {
+  const col = c.k === 'el' ? EL[c.e].color : c.k === 'light' ? '#ffd36b' : '#9b7bff';
+  const sub = c.k === 'el' ? EL[c.e].en : c.k === 'light' ? '〈昇華〉' : '〈反転〉';
+  return `<button type="button" class="al-card t${c.t || 0} ${cls || ''}" style="--c:${col};--cg:${rgba(col, .22)};--cb:${rgba(col, .5)}" ${attrs} aria-label="${cname(c)}">${orb(c)}<span class="al-cn">${cname(c)}</span><span class="al-cs">${sub}</span><span class="pips">${c.k === 'el' ? '<i></i>'.repeat(c.t) : ''}</span>${c.parts ? '<span class="mk">錬</span>' : ''}</button>`;
+}
+// あなたの番に、相手の手札で狙われる坩堝の札（重ねれば対消滅できる）
+const hooked = c => G.turn === 'you' && G.foe.hand.some(H => stackKind(H, c) === 'anni');
+// 選んだ手札で打てる手の見通し：与える傷と、相手のいちばん痛い反撃
+function preview(h) {
+  const out = new Map();
+  for (const mv of legal(G, 'you').filter(m => sameKind(G.you.hand[m.h], G.you.hand[h])).map(m => ({ ...m, h }))) {
+    const x = cl(G), st = act(x, 'you', mv);
+    out.set(mv.s != null ? `s${mv.s}` : `p${mv.p}`, { dmg: st.dmg, rep: x.foe.hp > 0 ? Math.max(0, bestDmg(x, 'foe')) : 0, win: x.foe.hp <= 0 });
+  }
+  return out;
+}
+function render() {
+  const V = VIEW || G, cru = V.cru, hp = VIEW ? VIEW.hp : { you: G.you.hp, foe: G.foe.hp };
+  const bar = (s) => `<div class="al-bar"><i style="width:${Math.max(0, hp[s] / G[s].max * 100)}%"></i></div><b>${Math.max(0, hp[s])}/${G[s].max}</b>`;
+  q('duFoeHp').innerHTML = bar('foe'); q('duYouHp').innerHTML = bar('you');
+  q('duFoeName').textContent = `練習の影（${LV[OPT.lv].name}）`;
+  const nextOf = P => { const c = P.deck[P.deck.length - 1]; return C.PEEK ? (c ? `<span class="du-next">次に引く${orb(c)}${cname(c)}</span>` : '<span class="du-next">次は山札を混ぜ直す</span>') : ''; };
+  q('duFoeHand').innerHTML = G.foe.hand.map(c => card(c, 'tabindex="-1"', 'static mini')).join('') + nextOf(G.foe);
+  q('duYouNext').innerHTML = nextOf(G.you);
+  q('duFoePiles').textContent = `山札${G.foe.deck.length}・捨て札${G.foe.disc.length}・除外${G.foe.exile.length}`;
+  q('duYouPiles').textContent = `山札${G.you.deck.length}・捨て札${G.you.disc.length}・除外${G.you.exile.length}`;
+  const my = !BUSY && !VIEW && G.turn === 'you' && G.you.hp > 0 && G.foe.hp > 0;
+  const one = SEL.length === 1 ? SEL[0] : null, H = one != null ? G.you.hand[one] : null;
+  const pv = my && H ? preview(one) : new Map();
+  const tag = k => { const p = pv.get(k); if (!p) return ''; return `<span class="du-pv">${p.win ? '勝ち' : p.dmg ? `+${p.dmg}` : '±0'}${!p.win && p.rep ? `<em>反撃−${p.rep}</em>` : ''}</span>`; };
+  let row = '';
+  for (let i = 0; i < C.SLOTS; i++) {
+    const c = cru[i];
+    if (c) {
+      const can = pv.has(`s${i}`), k = can ? stackKind(H, c) : null, m = VIEW && VIEW.mark === c.id ? 'pop' : '';
+      row += `<button type="button" class="al-sock ${c.side === 'you' ? 'own' : 'foe'} ${c.k === 'el' ? 't' + c.t : 'sp'} ${can ? 'can' : ''} ${k === 'anni' || k === 'tune' ? 'anni' : ''} ${m}" data-s="${i}" aria-label="${c.side === 'you' ? 'あなたの' : '相手の'}${cname(c)}">${orb(c)}${!VIEW && hooked(c) ? '<span class="du-hook">狙</span>' : ''}${tag(`s${i}`)}</button>`;
+    } else {
+      const put = i === cru.length && pv.has(`p${i}`);
+      row += `<button type="button" class="al-sock ${put ? 'put' : ''}" ${put ? `data-p="${i}"` : 'tabindex="-1"'}>${put ? tag(`p${i}`) : ''}</button>`;
+    }
+  }
+  q('duRow').innerHTML = row;
+  let marks = '';
+  for (let p = 0; p < C.SLOTS; p++) marks += p < cru.length && pv.has(`p${p}`) ? `<span><button type="button" class="al-mark" data-p="${p}" aria-label="${p + 1}番目の前に置く">＋</button>${tag(`p${p}`)}</span>` : '<span></span>';
+  q('duMarks').innerHTML = marks;
+  q('duCruN').textContent = `${cru.length}/${C.SLOTS}`;
+  // 手札
+  q('duHand').innerHTML = G.you.hand.map((c, i) => card(c, `data-h="${i}"`, SEL.includes(i) ? 'sel' : '')).join('');
+  // 操作
+  const cr = my && SEL.length === 2 && !G.crafted ? crafts({ hand: [G.you.hand[SEL[0]], G.you.hand[SEL[1]]] })[0] : null;
+  const stuck = my && !legal(G, 'you').length;
+  q('duActs').innerHTML = `${cr ? `<button type="button" class="btn" id="duCraft">手札で${{ merge: '錬成', raise: '昇華', invert: '反転' }[cr.kind]}（1手番に1回）</button>` : ''}${stuck ? '<p class="du-stuck">使える手がない ― 札を1枚選んで捨てる（その段階ぶん器が削れる）</p>' : ''}`;
+  const msg = VIEW ? (VIEW.dmg ? `${VIEW.msg} ― ${VIEW.to === 'you' ? 'あなた' : '相手'}に ${VIEW.dmg}` : VIEW.msg)
+    : G.you.hp <= 0 || G.foe.hp <= 0 ? '' : G.turn === 'you' ? (H ? `${cname(H)}：光る札に重ねるか、＋に置く（数字は与える傷と、相手のいちばん痛い反撃）` : stuck ? '' : `あなたの番 ― 手札を1枚選ぶ（必ず1枚使う）${G.crafted ? '' : '／同じ札を2枚選ぶと手札で錬成'}`) : '相手が考えている…';
+  q('duInfo').textContent = msg;
+  q('duLog').innerHTML = G.log.slice(-3).map(x => `<li>${x}</li>`).join('');
+  q('du').classList.toggle('my', my);
+}
+function float(side, text) {
+  const box = q(side === 'you' ? 'duYou' : 'duFoe'); if (!box) return;
+  const n = document.createElement('span'); n.className = 'al-float hurt'; n.textContent = text; box.appendChild(n); setTimeout(() => n.remove(), 1200);
+}
+function callout(main) {
+  const box = q('duCru'); box.querySelectorAll('.al-call').forEach(n => n.remove());
+  const n = document.createElement('div'); n.className = 'al-call lv2'; n.innerHTML = `<b>${main}</b>`; box.appendChild(n); setTimeout(() => n.remove(), 1100);
+}
+async function playRec(rec) {
+  for (const s of rec) {
+    VIEW = s; render();
+    if (s.dmg) { float(s.to, `−${s.dmg}`); callout(s.k > 1 ? `${s.msg}<em>+${C.BONUS * (s.k - 1)}</em>` : s.msg); SFX.anni(2, s.k || 1); }
+    else if (s.msg === '合成') SFX.merge(2, 1); else SFX.place();
+    await sleep(RM ? 150 : C.STEP);
+  }
+  VIEW = null;
+}
+const mvText = (side, c, mv, st) => `${side === 'you' ? 'あなた' : '相手'}：${cname(c)}を${mv.s != null ? '重ねた' : '置いた'}${st.dmg ? `（${side === 'you' ? '相手' : 'あなた'}に ${st.dmg}${st.maxK > 1 ? `・${st.maxK}連鎖` : ''}）` : ''}`;
+async function doMove(side, mv) {
+  BUSY = true; SEL = [];
+  const c = G[side].hand[mv.h], rec = [];
+  const st = act(G, side, mv, rec);
+  G.log.push(mvText(side, c, mv, st));
+  if (side === 'you') { G.stats.dealt += st.dmg; G.stats.maxHit = Math.max(G.stats.maxHit, st.dmg); } else G.stats.taken += st.dmg;
+  G.stats.maxK = Math.max(G.stats.maxK, st.maxK);
+  await playRec(rec);
+  BUSY = false;
+  endTurn();
+}
+async function forced(side, h) {
+  BUSY = true; SEL = [];
+  const P = G[side], c = P.hand.splice(h, 1)[0], d = backDmg(c);
+  P.disc.push(...origs(c)); P.hp -= d; if (side === 'you') G.stats.taken += d;
+  G.log.push(`${side === 'you' ? 'あなた' : '相手'}：使える手がなく、${cname(c)}を捨てた（器 −${d}）`);
+  render(); float(side, `−${d}`); SFX.knock(1); await sleep(RM ? 150 : C.STEP * 1.5);
+  BUSY = false; endTurn();
+}
+function endTurn() {
+  if (G.foe.hp <= 0 || G.you.hp <= 0) return finish();
+  G.turn = other(G.turn); G.crafted = false; if (G.turn === 'you') G.n++;
+  draw(G[G.turn]); render();
+  if (G.turn === 'foe') setTimeout(foeTurn, RM ? 200 : 650);
+}
+async function foeTurn() {
+  if (!G || G.turn !== 'foe') return;
+  const pick = choose(G, 'foe', OPT.lv);
+  if (!pick) { const h = G.foe.hand.map((c, i) => [backDmg(c), i]).sort((a, b) => a[0] - b[0])[0][1]; return forced('foe', h); }
+  if (pick.craft) { const N = doCraft(G, 'foe', pick.craft); G.crafted = true; G.log.push(`相手：手札で${cname(N)}を作った`); render(); await sleep(RM ? 150 : C.STEP); }
+  await doMove('foe', pick.mv);
+}
+function finish() {
+  const won = G.foe.hp <= 0, s = G.stats;
+  q('duResH').textContent = won ? '勝ち' : '負け';
+  q('duResBody').innerHTML = `<dl class="al-stats"><div><dt>手番</dt><dd>${G.n}</dd></div><div><dt>与えた傷</dt><dd>${s.dealt}</dd></div><div><dt>受けた傷</dt><dd>${s.taken}</dd></div><div><dt>最大の一手</dt><dd>${s.maxHit}</dd></div><div><dt>最大連鎖</dt><dd>${s.maxK}</dd></div></dl>`;
+  (won ? SFX.win : SFX.over).call(SFX);
+  q('duResOv').hidden = false;
+  const rec = store.get('du.rec', {}); const k = `${OPT.act}-${OPT.lv}`; rec[k] = rec[k] || { w: 0, l: 0 }; rec[k][won ? 'w' : 'l']++; store.set('du.rec', rec);
+}
+
+/* ---------- 操作 ---------- */
+function onClick(e) {
+  if (BUSY || VIEW || !G || G.turn !== 'you' || G.you.hp <= 0 || G.foe.hp <= 0) return;
+  const t = e.target.closest('[data-h],[data-s],[data-p],#duCraft'); if (!t) return;
+  SFX.init();
+  if (t.id === 'duCraft') {
+    const cr = crafts({ hand: [G.you.hand[SEL[0]], G.you.hand[SEL[1]]] })[0]; if (!cr || G.crafted) return;
+    const op = { kind: cr.kind, a: SEL[cr.a], b: SEL[cr.b] };
+    const N = doCraft(G, 'you', op); G.crafted = true; SEL = [G.you.hand.indexOf(N)]; G.log.push(`あなた：手札で${cname(N)}を作った`); SFX.merge(N.t, 1); render(); return;
+  }
+  const d = t.dataset;
+  if (d.h != null) {
+    const i = +d.h;
+    if (!legal(G, 'you').length) return forced('you', i);
+    if (SEL.includes(i)) SEL = SEL.filter(x => x !== i); else SEL = SEL.length === 1 && !G.crafted ? [SEL[0], i] : [i];
+    SFX.tap(); render(); return;
+  }
+  if (SEL.length !== 1) return;
+  const h = SEL[0], H = G.you.hand[h];
+  if (d.s != null) { if (!stackKind(H, G.cru[+d.s])) return; doMove('you', { h, s: +d.s }); }
+  else if (d.p != null) { if (G.cru.length >= C.SLOTS) return; doMove('you', { h, p: +d.p }); }
+}
+
+/* ---------- 画面の出入り ---------- */
+function openStart() { hideOverlays(); el.titleOv.hidden = true; q('duStartOv').hidden = false; paintStart(); }
+function paintStart() {
+  const rec = store.get('du.rec', {});
+  q('duStartOv').querySelectorAll('[data-act]').forEach(b => b.classList.toggle('primary', +b.dataset.act === OPT.act));
+  q('duStartOv').querySelectorAll('[data-lv]').forEach(b => b.classList.toggle('primary', +b.dataset.lv === OPT.lv));
+  const r = rec[`${OPT.act}-${OPT.lv}`]; q('duStartRec').textContent = r ? `この組み合わせ：${r.w}勝 ${r.l}敗` : 'この組み合わせは、まだ遊んでいない';
+}
+function begin() {
+  q('duStartOv').hidden = true; q('duResOv').hidden = true;
+  app.hidden = true; q('du').hidden = false; S.screen = 'duel'; S.paused = false;
+  newGame(); render();
+}
+function hide() { const d = q('du'); if (d) d.hidden = true; ['duStartOv', 'duResOv', 'duMenuOv', 'duRulesOv'].forEach(id => { const n = q(id); if (n) n.hidden = true; }); G = null; BUSY = false; }
+function esc() {
+  if (!q('duStartOv').hidden) { q('duStartOv').hidden = true; el.titleOv.hidden = false; return true; }
+  if (S.screen !== 'duel') return false;
+  if (!q('duRulesOv').hidden) q('duRulesOv').hidden = true;
+  else if (!q('duMenuOv').hidden) q('duMenuOv').hidden = true;
+  else if (SEL.length) { SEL = []; render(); }
+  else q('duMenuOv').hidden = false;
+  return true;
+}
+function init() {
+  q('duOpen').addEventListener('click', () => { SFX.tap(); q('alStartOv').hidden = true; openStart(); });
+  q('duStartOv').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.act) { OPT.act = +b.dataset.act; paintStart(); }
+    else if (b.dataset.lv) { OPT.lv = +b.dataset.lv; paintStart(); }
+    else if (b.id === 'duGo') begin();
+    else if (b.id === 'duStartRules') q('duRulesOv').hidden = false;
+    else if (b.id === 'duStartBack') { q('duStartOv').hidden = true; el.titleOv.hidden = false; }
+  });
+  q('du').addEventListener('click', onClick);
+  q('duMenuBtn').addEventListener('click', () => { q('duMenuOv').hidden = false; });
+  q('duResume').addEventListener('click', () => { q('duMenuOv').hidden = true; });
+  q('duMenuRules').addEventListener('click', () => { q('duMenuOv').hidden = true; q('duRulesOv').hidden = false; });
+  q('duRulesClose').addEventListener('click', () => { q('duRulesOv').hidden = true; });
+  q('duRetry').addEventListener('click', () => { q('duMenuOv').hidden = true; begin(); });
+  q('duToStart').addEventListener('click', () => { hide(); app.hidden = false; S.screen = 'title'; openStart(); });
+  q('duToTitle').addEventListener('click', () => { showTitle(); });
+  q('duResAgain').addEventListener('click', begin);
+  q('duResSet').addEventListener('click', () => { hide(); app.hidden = false; S.screen = 'title'; openStart(); });
+  q('duResTitle').addEventListener('click', () => { showTitle(); });
+  hide();
+}
+return { init, hide, esc, C, _t: { get G() { return G; }, set G(v) { G = v; }, act, legal, choose, draw, crafts, doCraft, makeDeck, cl, bestDmg, OPT } };
+})();
+
+/* ================================================================
    ループと起動
    ================================================================ */
 let lastT = performance.now();
@@ -9768,7 +10260,7 @@ function frame(t) {
   let dt = t - lastT; lastT = t;
   if (S.screen === 'play' && !document.hidden) perfTick(dt);
   if (dt > 50) dt = 50; if (dt < 0) dt = 0;
-  if (S.screen === 'alch' || S.screen === 'kasane' || S.screen === 'erosion' || S.screen === 'shiho' || S.screen === 'retsu') { requestAnimationFrame(frame); return; } // 錬成の書・重ね札・侵食・四方の盤・共鳴の列：盤は描かない
+  if (S.screen === 'alch' || S.screen === 'kasane' || S.screen === 'erosion' || S.screen === 'shiho' || S.screen === 'retsu' || S.screen === 'duel') { requestAnimationFrame(frame); return; } // 錬成の書・重ね札・侵食・四方の盤・共鳴の列：盤は描かない
   const stop = performance.now() < (S.hitStop || 0); // ヒットストップ：時間が止まる
   const clock = (S.screen === 'play' || S.screen === 'result') && !S.paused && !stop;
   if (clock) S.now += dt;
@@ -9834,6 +10326,7 @@ function bindUI() {
     if (ER.esc()) return;
     if (SH.esc()) return;
     if (RT.esc()) return;
+    if (DU.esc()) return;
     if (!el.rulesOv.hidden) closeRules();
     else if (!$('#tuneOv').hidden) closeTune();
     else if (!$('#soundOv').hidden) closeSound();
@@ -9858,6 +10351,7 @@ function start(data) {
   ER.init();
   SH.init();
   RT.init();
+  DU.init();
   fillRules();
   updateSoundBtn();
   if (data && data.v === 1 && data.screen === 'play' && Array.isArray(data.orbs) && data.orbs.length) restore(data);
