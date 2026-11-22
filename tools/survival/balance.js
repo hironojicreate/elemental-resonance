@@ -57,12 +57,20 @@ const ok = (c, m) => { console.log((c ? 'ok   ' : 'FAIL ') + m); if (!c) fails++
   await run(() => { S.bal = 6; T.snap = JSON.parse(JSON.stringify(snapshot())); restore(T.snap); });
   ok(await run(() => S.bal) === 6 && await run(() => S.mode) === 'survival', '中断から再開しても針の位置が残る');
   await run(() => { el.pauseOv.hidden = true; S.paused = false; const L = S.orbs.filter(o => o.kind === 'el' && o.tier === 3); T.c1 = L[0]; T.c2 = L[1]; });
+  // 偏りの重力（バランス調整で入れたとき）：端では雫も半径3.0、反対の対と真理は変わらない
+  await run(() => { TUNE.balGrav = 3; S.bal = -16; });
+  ok(await run(() => leanGrav(0, 1) === 1.5 && leanGrav(1, 2) === 1 && leanGrav(2, 1) === 0 && leanGrav(0, 4) === 0), '偏りの重力：端の火水の雫は+1.5（半径3.0）、輝石は+1.0、風土と真理は0');
+  ok(await run(() => Math.abs(predictPull({ x: 4, y: 3.5 }, 1, [], 1.5).length - predictPull({ x: 4, y: 3.5 }, 1, []).length) >= 0), '偏りの重力：引き寄せの計算が動く');
+  await run(() => { S.bal = -8; });
+  ok(await run(() => leanGrav(0, 1) === .75), '半分の傾きで+0.75');
+  await run(() => { TUNE.balGrav = 0; });
+  ok(await run(() => leanGrav(0, 1) === 0), '「なし」なら広がらない');
   // 端の見た目
   await run(() => { S.bal = -12; S.rhy = 3; });
   await p.waitForTimeout(400);
   await p.screenshot({ path: path.join(OUT, 'bal-left.png') });
-  const cap = await run(() => document.getElementById('balCap').textContent);
-  ok(cap === '輝石まで', `帯の表示「${cap}」`);
+  const cap = await run(() => { const n = document.getElementById('balCap'); return n.dataset.cap + ' ' + n.getAttribute('aria-label') + ' ' + (n.querySelector('.bal-st') || {}).className; });
+  ok(/^2 輝石まで作れる bal-st/.test(cap), `中央の石：${cap}`);
   // 偏りの稼ぎを実際の対消滅で
   await run(() => { S.bal = -16; S.combo = 0; rhyBreak(); const P = findFreeSpot(.3); T.f2 = makeOrb('el', 0, 1, P.x, P.y); const Q = findFreeSpot(.3); T.w2 = makeOrb('el', 1, 1, Q.x, Q.y); T.s = S.score; });
   await run(() => playerAct(T.f2, T.w2, 'anni')); await p.waitForTimeout(900);
@@ -80,6 +88,10 @@ const ok = (c, m) => { console.log((c ? 'ok   ' : 'FAIL ') + m); if (!c) fails++
   await run(() => { TUNE.balOn = 1; TUNE.rhyOn = 1; syncBalHud(); S.bal = 2; S.rhy = 0; });
   await p.waitForTimeout(300);
   await p.screenshot({ path: path.join(OUT, 'bal-center.png') });
+  await run(() => { S.bal = 8; S.rhy = 1; });
+  await p.waitForTimeout(700);
+  await p.screenshot({ path: path.join(OUT, 'bal-right.png'), clip: { x: 0, y: 60, width: 400, height: 60 } });
+  ok(await run(() => document.getElementById('balCap').dataset.cap) === '3', '右へ8：中央の石は光核');
   // バランス調整画面
   await run(() => { S.paused = true; openTune(null); });
   await p.waitForTimeout(300);
