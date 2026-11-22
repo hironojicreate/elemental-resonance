@@ -843,6 +843,32 @@ button{font:inherit;color:inherit}
 .al-relic .oi.a2-bal{width:20px;height:20px;border-radius:5px;vertical-align:middle}
 .a2-hand .al-card.hc{box-shadow:0 0 0 1.5px rgba(255,227,160,.75),0 0 14px rgba(255,227,160,.35)}
 .a2-hc{position:absolute;left:50%;top:-9px;transform:translateX(-50%);z-index:2;padding:1px 8px;border-radius:999px;background:var(--lumen);color:var(--ink);font-family:var(--f-display);font-weight:800;font-size:10.5px;line-height:1.5;white-space:nowrap;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.5);animation:alBreathe 1.1s ease-in-out infinite alternate}
+.a2-int.sealed .a2-chip:not(.seal){opacity:.3;text-decoration:line-through}
+.a2-chip.seal{border-color:var(--lumen);color:var(--ink);background:var(--lumen);font-weight:800}
+.a2-cost{margin-left:6px;padding:0 6px;border-radius:999px;border:1px solid var(--brass-dim);font-size:10px;font-weight:600;color:var(--brass);vertical-align:middle;letter-spacing:.04em}
+.al-relic.off{opacity:.35}
+.a2-capn{display:inline-flex;align-items:baseline;gap:3px;margin-right:4px;font-size:11px;color:var(--muted)}
+.a2-capn b{color:var(--text);font-family:var(--f-display);font-size:13px}
+.a2-prep h3{display:flex;align-items:center;gap:8px;margin-top:14px}
+.a2-slots{display:inline-flex;gap:3px}
+.a2-slots i{width:12px;height:12px;border-radius:3px;border:1px solid var(--brass-dim)}
+.a2-slots i.on{background:var(--lumen);border-color:var(--lumen)}
+.a2-prephint{font-size:12px;color:var(--muted);margin:2px 0 8px}
+.a2-foecard{display:flex;gap:14px;align-items:center;width:min(520px,100%);padding:12px 14px;border-radius:14px;border:1px solid rgba(255,82,114,.35);background:rgba(255,82,114,.05);text-align:left}
+.a2-foecard dl{margin:0;display:grid;gap:4px;font-size:12.5px}
+.a2-foecard dl div{display:flex;gap:10px}
+.a2-foecard dt{flex:none;width:6.5em;color:var(--muted)}
+.a2-foecard dd{margin:0;color:var(--text);display:flex;flex-wrap:wrap;align-items:center;gap:3px}
+.a2-unknown{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px dashed var(--danger);color:var(--danger);font-family:var(--f-display);font-weight:800;font-size:22px}
+.a2-eqlist{display:grid;gap:6px;width:min(520px,100%)}
+.a2-eq{display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:auto auto;column-gap:10px;align-items:center;padding:8px 12px;border-radius:12px;border:1px solid var(--brass-faint);background:rgba(255,255,255,.02);color:var(--muted);font:inherit;text-align:left;cursor:pointer}
+.a2-eq .al-relic{grid-row:1 / span 2}
+.a2-eq b{font-family:var(--f-display);font-weight:800;font-size:13.5px;color:var(--text)}
+.a2-eq small{grid-column:2;font-size:11.5px;line-height:1.45}
+.a2-eqst{grid-column:3;grid-row:1 / span 2;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--brass-faint)}
+.a2-eq.on{border-color:var(--lumen);background:rgba(255,227,160,.07);box-shadow:0 0 12px rgba(255,227,160,.15)}
+.a2-eq.on .a2-eqst{color:var(--ink);background:var(--lumen);border-color:var(--lumen);font-weight:700}
+.a2-eq.full{opacity:.5}
 .a2-hcn{display:inline-flex;align-items:baseline;gap:3px;margin-left:4px;padding-left:9px;border-left:1px solid rgba(255,227,160,.35);font-size:11px;color:var(--brass);letter-spacing:.08em}
 .a2-hcn b{font-size:15px}
 .a2-hcn.out b{color:var(--muted)}
@@ -2046,13 +2072,13 @@ button{font:inherit;color:inherit}
     <h3>手札での錬成（掌の音叉）</h3>
     <p><em>第一幕の主</em>を鎮めると〈掌の音叉〉、<em>第二幕の主</em>を鎮めると〈双掌の音叉〉を必ず授かる。手札の中で、<em>同じ札2枚を一段上の1枚に錬成</em>し、<em>光で昇華・闇で反転</em>できる（光核まで）。<em>手数を使わない</em>。掌で1手番に1回、双掌で2回。札を選ぶと、組める手札の札に「錬成」「昇華」「反転」が出る（押すか、札をその札の上へドラッグ）。手札で錬成した札（「錬」の印）は<em>その戦闘だけ</em>で、戦闘が終われば元の札に戻る。〈溜め〉は坩堝の中の合成でだけ溜まる。</p>
     <h3>真理の力</h3>
-    <p>あなたの真理が坩堝にある間、その元素の力が働く。<em>火〈烈火〉</em>調律力×1.5／<em>水〈慈雨〉</em>手番の終わりに器を3回復／<em>風〈疾風〉</em>手札+1／<em>土〈不動〉</em>手数+1。<em>同じ元素の真理がいくつもあれば、力もその数だけ重なる</em>（烈火は1つにつき+0.5倍：×1.5・×2・×2.5…）。真理どうしの対消滅は〈真理解放〉（50×連鎖）。<em>真理は坩堝の中でだけ生まれる</em>――光核どうしの合成か、光核に光。札は光核まで（報酬・市・泉・手札での錬成では真理にならない）。</p>
+    <p>あなたの真理が坩堝にある間、その元素の力が働く。<em>火〈烈火〉</em>調律力×1.5／<em>水〈慈雨〉</em>手番の終わりに器を3回復／<em>風〈疾風〉</em>手札+1／<em>土〈不動〉</em>手数+1。<em>同じ元素の真理がいくつもあれば、力もその数だけ重なる</em>（烈火は1つにつき+0.5倍：×1.5・×2・×2.5…）。真理どうしの対消滅は〈真理解放〉（50×連鎖）。<em>真理解放すると、次の敵の番の予告を封じる</em>（降らない・撃たない・染めない。残った混沌の蝕みは起きる。1手番に何度解放しても封じるのは次の1手番）。<em>真理は坩堝の中でだけ生まれる</em>――光核どうしの合成か、光核に光。札は光核まで（報酬・市・泉・手札での錬成では真理にならない）。</p>
     <h3>手札と山札</h3>
     <p>手番のはじめに5枚になるまで引く。使わなかった札は、手番の終わりに捨て札へ――ただし手札のすぐ左の置き場<em>〈残す〉</em>に置いた<em>1枚だけ</em>は、次の手番に持ち越せる（手数は使わない。使えない札も置ける）。札は<em>ドラッグ</em>でも動かせる――〈残す〉へ放せば残す、残した札を手札へ放せば戻す、残した札の上や手札の札の上に放せば入れ替え、坩堝の列に放せばそこへ落とす。山札が尽きたら捨て札を混ぜ直す。<em>札は使っても減らない</em>――坩堝に落ちるのは欠片で、札は捨て札へ戻る。戦闘が終われば坩堝は空になる。</p>
     <h3>顕現の仕掛け</h3>
     <p>予告に出る：<em>無垢</em>（白い欠片＝中身のない殻。何とも反応しない。隣の対消滅の衝撃か光でだけ消える）／<em>撃</em>（器を直接削る）／<em>染</em>（あなたのいちばん大きな欠片が混沌に染まる）。混沌の降らせ方には性格がある――あなたの欠片を埋める・高く積む・低い列へ散らす・大きな欠片を狙う。</p>
     <h3>旅</h3>
-    <p>三幕。分かれ道の地図で、<em>戦</em>戦闘・<em>鋭</em>精鋭・<em>泉</em>休息・<em>市</em>買い物・<em>謎</em>出来事・<em>主</em>幕の主。勝てば残響と、札を1枚選んで山札へ。精鋭と主からは<em>音叉</em>（ずっと効く道具。数の制限なし）。主の報酬の札は<em>一段上</em>。第一幕の精鋭の報酬の元素の札は<em>輝石</em>。泉では、休む（器を回復）・錬成（同じ札2枚を一段上の1枚に。光核まで）・手放す（札を1枚取り除く）から一つ。最後の一撃で坩堝が空になれば〈完全なる静寂〉で残響が増える。</p>
+    <p>三幕。分かれ道の地図で、<em>戦</em>戦闘・<em>鋭</em>精鋭・<em>泉</em>休息・<em>市</em>買い物・<em>謎</em>出来事・<em>主</em>幕の主。勝てば残響と、札を1枚選んで山札へ。精鋭と主からは<em>音叉</em>（ずっと効く道具）。音叉には<em>コスト</em>があり、<em>台座</em>（第一幕3・第二幕6・第三幕9）に収まるぶんだけ付けられる。外した音叉は鞄に入り、<em>戦いの前の画面</em>で付け替えられる（そこで顕現のことも少しわかる）。主の報酬の札は<em>一段上</em>。第一幕の精鋭の報酬の元素の札は<em>輝石</em>。泉では、休む（器を回復）・錬成（同じ札2枚を一段上の1枚に。光核まで）・手放す（札を1枚取り除く）から一つ。最後の一撃で坩堝が空になれば〈完全なる静寂〉で残響が増える。</p>
     <p class="al-note">※ 試作です。錬成の書（もとのモード）とは別の冒険として保存されます。</p>
     <div class="panel-btns"><button class="btn primary" id="a2RulesClose" type="button">閉じる</button></div>
   </div>
@@ -2578,7 +2604,7 @@ button{font:inherit;color:inherit}
   </div>
 </section>
 
-<div class="ver" aria-hidden="true">v1.91.0</div>
+<div class="ver" aria-hidden="true">v1.92.0</div>
 
 <script id="genso-images">window.GENSO_IMAGES = {
   "fire-1": "data:image/jpeg;base64,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",
@@ -11005,33 +11031,33 @@ const TRUTH = [
 ];
 // 音叉：数の制限なく、持っているものはすべて鳴る。boss は幕の主の報酬だけに出る
 const RELICS = {
-  kyo:    { ic: '共', name: '共鳴叉', desc: '連鎖の2回目から、調律力の倍率+1' },
-  fw:     { ic: '火水', name: '火水の音叉', desc: '火と水の対消滅の調律力+3' },
-  we:     { ic: '風土', name: '風土の音叉', desc: '風と土の対消滅の調律力+3' },
-  spoon:  { ic: '匙', name: '錬金の匙', desc: '合成で溜まる〈溜め〉が2倍' },
-  steal:  { ic: '奪', name: '奪いの手', desc: '混沌を取り込むたび（混沌の欠片と合成）、山札から1枚引く' },
-  bell:   { ic: '鈴', name: '静寂の鈴', desc: '坩堝を空にして手番を終えると、次の手番の手数+1' },
-  heavy:  { ic: '重', name: '重い器', desc: '器の最大+12（得たとき12回復）' },
-  ward:   { ic: '香', name: '鎮めの香', desc: '蝕みが、手番ごとに2減る' },
-  seed:   { ic: '種', name: '光の種', desc: '戦闘の始めに、その戦闘だけの光を1枚手札に' },
-  dusk:   { ic: '影', name: '闇の種', desc: '戦闘の始めに、その戦闘だけの闇を1枚手札に' },
-  eye:    { ic: '眼', name: '先見の眼', desc: '次の次の予告まで見える' },
-  echo:   { ic: '響', name: '残響の器', desc: '戦闘に勝つたび、器を4回復' },
-  pure:   { ic: '浄', name: '浄き水晶', desc: '降ってくる無垢が、手番ごとに1つ減る' },
-  lamp:   { ic: '灯', name: '真理の灯', desc: '坩堝にあなたの真理が生まれるたび、器を5回復' },
-  mirror: { ic: '鏡', name: '迎えの鏡', desc: '敵の番に起きた対消滅（逃げ場のない混沌）の調律力×2' },
-  linger: { ic: '余', name: '余韻の音叉', desc: '〈残す〉に2枚まで置ける（次の手番に持ち越す）' },
-  linger3:{ ic: '韻', name: '長き余韻', desc: '〈残す〉に3枚まで置ける（次の手番に持ち越す）', boss: true },
-  veil:   { ic: '殻', name: '殻の音叉', desc: '無垢〈包む〉を1手番に2枚まで使える（2枚目は器−2）' },
-  deep:   { ic: '懐', name: '深い懐', desc: '手札+1', boss: true },
-  tall:   { ic: '底', name: '深い坩堝', desc: '坩堝の高さ+1（6段）', boss: true },
-  swift:  { ic: '迅', name: '迅き手', desc: '手数+1', boss: true },
+  kyo:    { c: 2, ic: '共', name: '共鳴叉', desc: '連鎖の2回目から、調律力の倍率+1' },
+  fw:     { c: 1, ic: '火水', name: '火水の音叉', desc: '火と水の対消滅の調律力+3' },
+  we:     { c: 1, ic: '風土', name: '風土の音叉', desc: '風と土の対消滅の調律力+3' },
+  spoon:  { c: 2, ic: '匙', name: '錬金の匙', desc: '合成で溜まる〈溜め〉が2倍' },
+  steal:  { c: 2, ic: '奪', name: '奪いの手', desc: '混沌を取り込むたび（混沌の欠片と合成）、山札から1枚引く' },
+  bell:   { c: 2, ic: '鈴', name: '静寂の鈴', desc: '坩堝を空にして手番を終えると、次の手番の手数+1' },
+  heavy:  { c: 2, ic: '重', name: '重い器', desc: '器の最大+12（得たとき12回復）' },
+  ward:   { c: 2, ic: '香', name: '鎮めの香', desc: '蝕みが、手番ごとに2減る' },
+  seed:   { c: 2, ic: '種', name: '光の種', desc: '戦闘の始めに、その戦闘だけの光を1枚手札に' },
+  dusk:   { c: 2, ic: '影', name: '闇の種', desc: '戦闘の始めに、その戦闘だけの闇を1枚手札に' },
+  eye:    { c: 1, ic: '眼', name: '先見の眼', desc: '次の次の予告まで見える' },
+  echo:   { c: 1, ic: '響', name: '残響の器', desc: '戦闘に勝つたび、器を4回復' },
+  pure:   { c: 1, ic: '浄', name: '浄き水晶', desc: '降ってくる無垢が、手番ごとに1つ減る' },
+  lamp:   { c: 1, ic: '灯', name: '真理の灯', desc: '坩堝にあなたの真理が生まれるたび、器を5回復' },
+  mirror: { c: 2, ic: '鏡', name: '迎えの鏡', desc: '敵の番に起きた対消滅（逃げ場のない混沌）の調律力×2' },
+  linger: { c: 1, next: 'linger3', ic: '余', name: '余韻の音叉', desc: '〈残す〉に2枚まで置ける（次の手番に持ち越す）' },
+  linger3:{ c: 2, ic: '韻', name: '長き余韻', desc: '〈残す〉に3枚まで置ける（次の手番に持ち越す）', boss: true },
+  veil:   { c: 1, ic: '殻', name: '殻の音叉', desc: '無垢〈包む〉を1手番に2枚まで使える（2枚目は器−2）' },
+  deep:   { c: 3, ic: '懐', name: '深い懐', desc: '手札+1', boss: true },
+  tall:   { c: 2, ic: '底', name: '深い坩堝', desc: '坩堝の高さ+1（6段）', boss: true },
+  swift:  { c: 3, ic: '迅', name: '迅き手', desc: '手数+1', boss: true },
   // 掌の音叉：第一幕・第二幕の主を鎮めると必ず授かる（ほかの報酬・市には並ばない）。手札で錬成した札は、その戦闘だけ
-  palm:   { ic: '掌', name: '掌の音叉', desc: '手札の中で錬成・昇華・反転ができる（手数を使わない・1手番に1回・その戦闘だけ）', gift: true },
-  palm2:  { ic: '双', name: '双掌の音叉', desc: '手札の中での錬成・昇華・反転が、1手番に2回になる', gift: true },
+  palm:   { c: 1, next: 'palm2', ic: '掌', name: '掌の音叉', desc: '手札の中で錬成・昇華・反転ができる（手数を使わない・1手番に1回・その戦闘だけ）', gift: true },
+  palm2:  { c: 2, ic: '双', name: '双掌の音叉', desc: '手札の中での錬成・昇華・反転が、1手番に2回になる', gift: true },
   // 天秤の音叉：天秤の札そのものが姿を変える（山札に天秤があるときだけ並ぶ。変革は兆しのあと、幕の主の報酬で）
-  bal2:   { ic: '兆', name: '兆しの音叉', desc: '天秤が〈兆しの天秤〉に姿を変える ― 同じ行か同じ列の欠片と入れ替えられる', need: 'bal', bal: 2 },
-  bal3:   { ic: '革', name: '変革の音叉', desc: '天秤が〈変革の天秤〉に姿を変える ― 坩堝のどこの欠片とでも入れ替えられる', need: 'bal', after: 'bal2', boss: true, bal: 3 },
+  bal2:   { c: 1, next: 'bal3', ic: '兆', name: '兆しの音叉', desc: '天秤が〈兆しの天秤〉に姿を変える ― 同じ行か同じ列の欠片と入れ替えられる', need: 'bal', bal: 2 },
+  bal3:   { c: 2, ic: '革', name: '変革の音叉', desc: '天秤が〈変革の天秤〉に姿を変える ― 坩堝のどこの欠片とでも入れ替えられる', need: 'bal', after: 'bal2', boss: true, bal: 3 },
 };
 // 顕現（相手）：pat は予告の並び（手番ごとに順に巡る）。'火1' 元素と段階／'乱2' 元素は無作為／'無' 無垢／'撃5' 器を直接削る／'染' あなたのいちばん大きな欠片を混沌に染める
 // pers：降らせ方の性格（bury あなたの欠片を埋める・tall 高く積む・even 低い列へ散らす・heavy 大きな欠片を埋める）。pat2 は体力が半分を切ってから
@@ -11107,7 +11133,16 @@ let AIM = null; // 相手を選んでいる列 { col }（落ちる先で反応�
 let SWAP = null; // 天秤：1つめに選んだ欠片の id（このあと、光っている2つめを押す）
 // 反応の最中は入力を受けない（画面の data-busy にも映す）
 function setBusy(v) { BUSY = v; const a = document.getElementById('a2'); if (a) a.dataset.busy = v ? '1' : ''; }
-const has = id => !!R && R.relics.includes(id);
+const has = id => !!R && (R.equip || []).includes(id); // 台座に付けている音叉だけが鳴る
+const relicCap = () => (R ? [0, 3, 6, 9][R.act] || 9 : 0);   // 台座の数（幕ごと）
+const equipCost = () => (R && R.equip ? R.equip.reduce((n, id) => n + RELICS[id].c, 0) : 0);
+// 台座に付ける・外す。重い器は付けているあいだだけ器の最大+12（付け外しで回復はしない）
+function setEquip(id, on) {
+  if (on === R.equip.includes(id)) return true;
+  if (on) { if (equipCost() + RELICS[id].c > relicCap()) return false; R.equip.push(id); if (id === 'heavy') R.maxHp += 12; }
+  else { R.equip = R.equip.filter(k => k !== id); if (id === 'heavy') { R.maxHp -= 12; R.hp = Math.min(R.hp, R.maxHp); } }
+  return true;
+}
 const pick = a => a[Math.floor(rand() * a.length)];
 const save = () => { if (R && !R.tut) store.set('a2.run', R); }; // 練習（チュートリアル）は保存しない
 const H = () => CFG.H + (has('tall') ? 1 : 0);
@@ -11154,7 +11189,7 @@ function heal(n) { const b = R.hp; R.hp = Math.min(R.maxHp, R.hp + n); return R.
 
 /* ---------- 冒険 ---------- */
 function newRun() {
-  R = { v: 1, act: 1, hp: CFG.HP, maxHp: CFG.HP, echo: 0, nid: 1, deck: [], relics: [], map: null, pos: null, path: [], removeCost: 50, lastFoe: null,
+  R = { v: 1, act: 1, hp: CFG.HP, maxHp: CFG.HP, echo: 0, nid: 1, deck: [], relics: [], equip: [], map: null, pos: null, path: [], removeCost: 50, lastFoe: null,
     stats: { wins: 0, maxChain: 0, maxHit: 0, dmg: 0, truths: 0, releases: 0, steals: 0, silences: 0, steps: 0 }, phase: 'map', battle: null, reward: null, rest: null, shop: null, event: null, end: null };
   for (let e = 0; e < 4; e++) for (let i = 0; i < 3; i++) R.deck.push(mk('el', e, 1));
   R.map = genMap(); B = null; save();
@@ -11194,7 +11229,11 @@ function enterNode(nid) {
   SFX.tap();
   R.pos = nid; R.path.push(nid); R.stats.steps++;
   const n = R.map[nid];
-  if (n.type === 'fight' || n.type === 'elite' || n.type === 'boss') startBattle(n.type);
+  if (n.type === 'fight' || n.type === 'elite' || n.type === 'boss') { // 音叉を持っていれば、戦いの前に付け替えの画面（顕現のことも少しわかる）
+    const key = chooseFoe(n.type);
+    if (!R.relics.length) startBattle(n.type, key);
+    else { R.phase = 'prep'; R.prep = { kind: n.type, key }; save(); render(); }
+  }
   else if (n.type === 'rest') { R.phase = 'rest'; R.rest = { done: null }; save(); render(); }
   else if (n.type === 'shop') { R.phase = 'shop'; R.shop = genShop(); save(); render(); }
   else { R.phase = 'event'; R.event = { key: pick(Object.keys(EVENTS)), done: null }; save(); render(); }
@@ -11214,7 +11253,7 @@ function offer(n, act, up = 0, cap = CARD_MAX) {
 }
 // 音叉のしるし。天秤の音叉は、変わったあとの天秤の絵
 const relicIc = id => (RELICS[id].bal ? `<span class="oi a2-bal im-bal-${RELICS[id].bal}" aria-hidden="true"></span>` : RELICS[id].ic);
-const relicOk = k => { const D = RELICS[k]; return !D.gift && (!D.need || R.deck.some(c => c.k === D.need)) && (!D.after || R.relics.includes(D.after)); };
+const relicOk = k => { const D = RELICS[k]; return !D.gift && !(D.next && R.relics.includes(D.next)) && (!D.need || R.deck.some(c => c.k === D.need)) && (!D.after || R.relics.includes(D.after)); };
 function relicOffer(n, boss) {
   const free = Object.keys(RELICS).filter(k => !R.relics.includes(k) && (boss || !RELICS[k].boss) && relicOk(k));
   const pri = boss ? free.filter(k => RELICS[k].boss) : [];
@@ -11223,8 +11262,13 @@ function relicOffer(n, boss) {
 }
 function gainRelic(id) {
   if (R.relics.includes(id)) return;
+  // 育つ音叉（掌→双掌・兆し→変革・余韻→長き余韻）は、前の段を上書きする（付けていれば、入るならそのまま付け替える）
+  const prev = Object.keys(RELICS).find(k => RELICS[k].next === id && R.relics.includes(k)), wasOn = !!prev && R.equip.includes(prev);
+  if (prev) { setEquip(prev, false); R.relics = R.relics.filter(k => k !== prev); }
   R.relics.push(id);
-  if (id === 'heavy') { R.maxHp += 12; heal(12); }
+  const on = setEquip(id, true);
+  if (id === 'heavy' && on) heal(12);
+  if (!on) { toast(`音叉〈${RELICS[id].name}〉を鞄に入れた ― 台座が足りない（戦闘の前に付け替えられる）${wasOn ? `。〈${RELICS[prev].name}〉は育って外れた` : ''}`); SFX.harmony(); return; }
   if (RELICS[id].gift) { SFX.harmony(); return; } // 主から授かる音叉は、報酬の画面で説明する
   if (RELICS[id].bal) { toast(`音叉〈${RELICS[id].name}〉が鳴り、天秤が〈${BAL[balLv()].name}〉に姿を変えた ― 届くのは${BAL[balLv()].reach}`); SFX.harmony(); return; }
   toast(`音叉〈${RELICS[id].name}〉― ${RELICS[id].desc}`);
@@ -11252,8 +11296,8 @@ function chooseFoe(kind) {
   if (pool.length > 1 && key === R.lastFoe) key = pick(pool.filter(k => k !== R.lastFoe));
   return key;
 }
-function startBattle(kind) {
-  const key = chooseFoe(kind), D = FOES[key];
+function startBattle(kind, key = chooseFoe(kind)) {
+  const D = FOES[key];
   R.lastFoe = key;
   B = R.battle = { kind, key, en: { hp: D.hp, max: D.hp, step: 0, ph: 1 }, S: { cols: Array.from({ length: CFG.W }, () => []), nid: 1, salt: 0 },
     draw: shuffle(R.deck.map(c => ({ ...c }))), hand: [], disc: [], plays: 0, turn: 0, bell: false, intents: [], st: { maxk: 0, dealt: 0, rel: 0, steals: 0 } };
@@ -11309,7 +11353,7 @@ function startTurn() {
   render(); save();
 }
 // 予測：いまの坩堝のまま敵の番が来たら
-const forecast = () => A2E.enemyTurn(A2E.clone({ ...B.S, salt: B.S.salt + 1 }), B.intents[0], ctx(null, true));
+const forecast = () => A2E.enemyTurn(A2E.clone({ ...B.S, salt: B.S.salt + 1 }), B.seal ? [] : B.intents[0], ctx(null, true));
 function previewDrop(c, card, hint) {
   if (!A2E.canDrop(B.S, c, card, H())) return null;
   const s2 = A2E.clone(B.S);
@@ -11355,6 +11399,7 @@ async function useCard(target, hint) {
   } else B.plays--;
   PICK = null;
   await play(frames, 'you');
+  if (r.ev.some(v => v.t === 'anni' && v.tier === 4) && !B.seal) { B.seal = true; toast('真理解放 ― 次の敵の番の予告を封じた（降らない・撃たない・染めない。蝕みは残る）'); }
   const steals = r.ev.filter(v => v.t === 'merge' && v.steal).length;
   B.st.steals += steals; R.stats.steals += steals;
   if (steals && has('steal')) { drawN(steals); toast(`奪いの手 ― ${steals}枚引く`); }
@@ -11381,9 +11426,11 @@ async function endTurn() {
   B.hand = kept; B.keep = kept.map(c => c.id); render();
   await sleep(STEP);
   B.S.salt++;
-  const frames = [];
-  const out = A2E.enemyTurn(B.S, B.intents[0], ctx(frames, true));
+  const frames = [], sealed = !!B.seal; B.seal = false; // 真理解放で封じた予告は、降らない（蝕みは起きる）
+  const out = A2E.enemyTurn(B.S, sealed ? [] : B.intents[0], ctx(frames, true));
+  if (sealed) toast('封じられた予告 ― この番、混沌は降らない');
   await play(frames, 'foe');
+  if (out.ev.some(v => v.t === 'anni' && v.tier === 4)) { B.seal = true; toast('真理解放 ― 次の敵の番の予告を封じた'); } // 逃げ場なしの真理解放も
   if (B.en.hp <= 0) return win();
   if (R.hp <= 0) return lose();
   phaseCheck();
@@ -11581,7 +11628,7 @@ async function win() {
     stat: { turns: B.turn, maxk: B.st.maxk, dealt: B.st.dealt, steals: B.st.steals, rel: B.st.rel } };
   // 第一幕の主で〈掌の音叉〉、第二幕の主で〈双掌の音叉〉を必ず授かる
   const gift = kind === 'boss' ? (R.act === 1 ? 'palm' : R.act === 2 ? 'palm2' : null) : null;
-  if (gift && !has(gift)) { if (gift === 'palm2' && !has('palm')) gainRelic('palm'); gainRelic(gift); R.reward.gift = gift; }
+  if (gift && !R.relics.includes(gift)) { gainRelic(gift); R.reward.gift = gift; }
   R.battle = null; B = null; R.phase = 'reward'; setBusy(false);
   SFX.win(); save(); render();
 }
@@ -11652,7 +11699,9 @@ function renderTop() {
   q('a2Where').textContent = `第${ACT_KAN[R.act]}幕`;
   q('a2Echo').textContent = R.echo;
   q('a2DeckN').textContent = R.deck.length;
-  q('a2Relics').innerHTML = R.relics.map(id => `<button type="button" class="al-relic" data-relic="${id}" title="${RELICS[id].name}：${RELICS[id].desc}">${relicIc(id)}</button>`).join('');
+  const eq = R.equip || [], bag = R.relics.filter(id => !eq.includes(id));
+  q('a2Relics').innerHTML = (R.relics.length ? `<span class="a2-capn" title="音叉の台座（使っている数／台座の数）">台座<b>${equipCost()}/${relicCap()}</b></span>` : '')
+    + eq.concat(bag).map(id => `<button type="button" class="al-relic${eq.includes(id) ? '' : ' off'}" data-relic="${id}" title="${RELICS[id].name}：${RELICS[id].desc}${eq.includes(id) ? '' : '（鞄の中）'}">${relicIc(id)}</button>`).join('');
   q('a2Sound').textContent = SFX.on ? '♪' : '×';
 }
 function render() {
@@ -11665,6 +11714,7 @@ function render() {
   if (R.phase === 'map') renderMap();
   else if (R.phase === 'battle') renderBattle();
   else if (R.phase === 'reward') renderReward();
+  else if (R.phase === 'prep') renderPrep();
   else if (R.phase === 'rest') renderRest();
   else if (R.phase === 'shop') renderShop();
   else if (R.phase === 'event') renderEvent();
@@ -11738,7 +11788,7 @@ function paintEnemy() {
   q('a2Enemy').innerHTML = `<div class="al-emblem">${iconOf(D.ic, 46)}</div>
     <div class="al-ename">${D.name}<small>${B.kind === 'boss' ? '幕の主' : B.kind === 'elite' ? '精鋭' : ''}${en.ph === 2 ? '・荒ぶる' : ''}</small></div>
     <div class="al-ehp"><div class="al-bar"><i id="a2EBar" style="width:${en.hp / en.max * 100}%"></i></div><b class="al-num" id="a2EHp">${en.hp}/${en.max}</b></div>
-    <div class="a2-int"><span class="lbl">次</span>${intentChips(next)}${later}<span class="lbl pers" style="margin-left:auto" title="混沌の降らせ方">${PERS[D.pers]}</span></div>`;
+    <div class="a2-int${B.seal ? ' sealed' : ''}"><span class="lbl">次</span>${B.seal ? '<span class="a2-chip seal" title="真理解放で封じた：この予告は降らない">封</span>' : ''}${intentChips(next)}${later}<span class="lbl pers" style="margin-left:auto" title="混沌の降らせ方">${PERS[D.pers]}</span></div>`;
 }
 function paintEnemyHp() {
   if (!B) return;
@@ -11913,14 +11963,14 @@ function renderReward() {
   const W = R.reward, S = W.stat;
   const cards = W.cards.map((c, i) => cardHTML(c, `data-take="${i}"`, W.took != null ? (W.took === i ? 'taken picked' : 'taken') : '')).join('');
   const rel = W.relics ? `<p class="eyebrow">Tuning fork</p><p>${W.relicTaken ? `音叉〈<em>${RELICS[W.relicTaken].name}</em>〉が鳴った` : '音叉を一つ選ぶ'}</p>
-    <div class="al-rel-offer">${W.relics.map(id => `<button type="button" class="al-rel-btn" data-rc="${id}" ${W.relicTaken ? 'disabled' : ''}><span class="al-relic">${relicIc(id)}</span><b>${RELICS[id].name}</b><small>${RELICS[id].desc}</small></button>`).join('')}</div>` : '';
+    <div class="al-rel-offer">${W.relics.map(id => `<button type="button" class="al-rel-btn" data-rc="${id}" ${W.relicTaken ? 'disabled' : ''}><span class="al-relic">${relicIc(id)}</span><b>${RELICS[id].name}<span class="a2-cost">台座${RELICS[id].c}</span></b><small>${RELICS[id].desc}</small></button>`).join('')}</div>` : '';
   q('a2Main').innerHTML = `<div class="al-page"><p class="eyebrow">Victory</p><h2>〈${W.name}〉を鎮めた</h2>
     ${W.silent ? '<span class="al-badge">完全なる静寂 ― 残響+10</span>' : ''}
     <p class="al-gain">残響 +${W.echo}</p>
     <p>${S.turns}手番・最長の連鎖 ${S.maxk}・取り込み ${S.steals}${S.rel ? `・真理解放 ${S.rel}` : ''}</p>
     ${W.gift ? `<div class="al-gift a2-newcard"><b><span class="al-relic">${RELICS[W.gift].ic}</span>音叉〈${RELICS[W.gift].name}〉を授かった</b><p>${W.gift === 'palm'
-      ? '手札の中で、<em>同じ札2枚を一段上の1枚に錬成</em>（光核まで）したり、<em>光で昇華・闇で反転</em>したりできる。<em>手数を使わない</em>・<em>1手番に1回</em>。札を選ぶと、組める手札の札に「錬成」「昇華」「反転」が出る（押すか、札をその札の上へドラッグ）。手札で錬成した札は、<em>その戦闘だけ</em>（戦闘が終われば元の札に戻る）。〈溜め〉は坩堝の中の合成でだけ溜まる。'
-      : '手札の中での錬成・昇華・反転が、<em>1手番に2回</em>になる。雫を輝石に、輝石を光核に――手札の中で、坩堝に落とす前に育てられる。'}</p></div>` : ''}
+      ? '台座を1つ使う。手札の中で、<em>同じ札2枚を一段上の1枚に錬成</em>（光核まで）したり、<em>光で昇華・闇で反転</em>したりできる。<em>手数を使わない</em>・<em>1手番に1回</em>。札を選ぶと、組める手札の札に「錬成」「昇華」「反転」が出る（押すか、札をその札の上へドラッグ）。手札で錬成した札は、<em>その戦闘だけ</em>（戦闘が終われば元の札に戻る）。〈溜め〉は坩堝の中の合成でだけ溜まる。'
+      : '掌の音叉の台座で育ち、台座を2つ使う。手札の中での錬成・昇華・反転が、<em>1手番に2回</em>になる。雫を輝石に、輝石を光核に――手札の中で、坩堝に落とす前に育てられる。'}</p></div>` : ''}
     ${rel}
     ${W.took == null && W.cards.some(c => c.k === 'pure') && !store.get('a2.shellTut', false) ? `<div class="al-gift a2-newcard"><b>${orbHTML({ k: 'pure', t: 1 })}新しい札〈無垢〉</b><p>坩堝の欠片を殻で包み、反応を一拍遅らせる札。はじめて並んだので、1手番だけ練習してみよう（この報酬の画面に戻ってくる）。</p>
       <div class="a2-newbtns"><button type="button" class="btn primary" id="a2ShellTut">練習する（1手番）</button><button type="button" class="btn" id="a2ShellSkip">とばす</button></div></div>` : ''}
@@ -11929,6 +11979,33 @@ function renderReward() {
     <p>${W.took != null ? '札を山札に加えた。' : '札を1枚選んで、山札に加える'}</p><div class="al-offer">${cards}</div>
     <div class="al-choices"><button type="button" class="btn primary" id="a2Leave">${W.kind === 'boss' ? (R.act >= 3 ? '旅の終わりへ' : '次の幕へ') : W.took != null ? '先へ' : '札を加えずに先へ'}</button></div>
     ${deckPanel()}</div>`;
+}
+// 戦いの前：顕現のことが少しわかり、音叉を台座に付け替えられる。混沌そのものは何もわからない
+function foeInfo(key) {
+  const D = FOES[key];
+  if (key === 'konton') return { name: '？？？', rows: [['乱れ', '？？？'], ['降らせ方', '？？？'], ['降らせるもの', '？？？']] };
+  const toks = [...D.pat, ...(D.pat2 || [])].join(' ').split(' ');
+  const els = [...new Set(toks.filter(t => ELK[t[0]] != null).map(t => ELK[t[0]]))].sort();
+  const maxT = Math.max(0, ...toks.filter(t => ELK[t[0]] != null || t[0] === '乱').map(t => +t.slice(1)));
+  const tricks = [toks.some(t => t[0] === '乱') && '乱（元素は無作為）', toks.includes('無') && '無垢', toks.some(t => t[0] === '撃') && '撃（器を直接削る）', toks.includes('染') && '染（大きな欠片を混沌に）'].filter(Boolean);
+  return { name: D.name, rows: [['乱れ', `${D.hp}`], ['降らせ方', PERS[D.pers]],
+    ['降らせるもの', `${els.map(e => orbIcon(e, 1, 16)).join('')}${els.length ? ' ' : ''}${tricks.join('・') || ''}${maxT ? `（最大 ${TI[maxT].name}）` : ''}`],
+    ...(D.pat2 ? [['荒ぶる', '乱れが半分を切ると、降らせ方が変わる']] : [])] };
+}
+function renderPrep() {
+  const P = R.prep, I = foeInfo(P.key), D = FOES[P.key], cap = relicCap(), used = equipCost();
+  const kind = P.kind === 'boss' ? '幕の主' : P.kind === 'elite' ? '精鋭' : '戦闘';
+  const slots = Array.from({ length: cap }, (_, i) => `<i class="${i < used ? 'on' : ''}"></i>`).join('');
+  const list = R.relics.slice().sort((a, b) => (R.equip.includes(b) - R.equip.includes(a)) || RELICS[b].c - RELICS[a].c).map(id => {
+    const on = R.equip.includes(id), fits = on || used + RELICS[id].c <= cap;
+    return `<button type="button" class="a2-eq${on ? ' on' : ''}${fits ? '' : ' full'}" data-eq="${id}"><span class="al-relic">${relicIc(id)}</span><b>${RELICS[id].name}<span class="a2-cost">台座${RELICS[id].c}</span></b><small>${RELICS[id].desc}</small><span class="a2-eqst">${on ? '付けている' : fits ? '鞄' : '入らない'}</span></button>`;
+  }).join('');
+  q('a2Main').innerHTML = `<div class="al-page a2-prep"><p class="eyebrow">Before the battle</p><h2>${kind}〈${I.name}〉</h2>
+    <div class="a2-foecard"><div class="al-emblem">${P.key === 'konton' ? '<span class="a2-unknown">？</span>' : iconOf(D.ic, 44)}</div><dl>${I.rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl></div>
+    <h3 class="al-sec">音叉の台座 <span class="a2-slots">${slots}</span> <b>${used}/${cap}</b></h3>
+    <p class="a2-prephint">押して付け外し。付けた音叉だけが鳴る（台座は第一幕3・第二幕6・第三幕9）。</p>
+    <div class="a2-eqlist">${list}</div>
+    <div class="al-choices"><button type="button" class="btn primary" id="a2Fight">この音叉で戦う</button></div></div>`;
 }
 function deckPanel() {
   const g = groupCards(R.deck);
@@ -11947,7 +12024,7 @@ function renderRest() {
 function renderShop() {
   const Sx = R.shop;
   const cards = Sx.cards.map((it, i) => `<div class="al-buy">${cardHTML(it.c, `data-buy="${i}"`, it.sold ? 'taken' : '')}<span class="al-price${R.echo < it.price && !it.sold ? ' no' : ''}">${it.sold ? '売約' : it.price}</span></div>`).join('');
-  const rels = Sx.relics.map((it, i) => `<button type="button" class="al-rel-btn" data-buyr="${i}" ${it.sold || R.echo < it.price ? 'disabled' : ''}><span class="al-relic">${relicIc(it.id)}</span><b>${RELICS[it.id].name}</b><small>${RELICS[it.id].desc}</small><span class="al-price">${it.sold ? '売約' : it.price}</span></button>`).join('');
+  const rels = Sx.relics.map((it, i) => `<button type="button" class="al-rel-btn" data-buyr="${i}" ${it.sold || R.echo < it.price ? 'disabled' : ''}><span class="al-relic">${relicIc(it.id)}</span><b>${RELICS[it.id].name}<span class="a2-cost">台座${RELICS[it.id].c}</span></b><small>${RELICS[it.id].desc}</small><span class="al-price">${it.sold ? '売約' : it.price}</span></button>`).join('');
   q('a2Main').innerHTML = `<div class="al-page"><p class="eyebrow">Market</p><h2>市</h2><p>残響 <em>${R.echo}</em> で、札や音叉と引き換えられる。</p>
     <div class="al-offer">${cards}</div><div class="al-rel-offer">${rels}</div>
     <div class="al-choices"><button type="button" class="btn" id="a2Remove" ${Sx.removed || R.echo < R.removeCost || R.deck.length <= 5 ? 'disabled' : ''}>札を1枚手放す（${Sx.removed ? '済み' : R.removeCost}）</button>
@@ -12060,6 +12137,11 @@ function onMain(e) {
     SFX.tap();
     if (c.pick) { const list = R.deck.filter(c.pick); if (!list.length) { toast('選べる札がない'); return; } pickCard(c.t, list, card => { E.done = c.go(card); save(); render(); }); }
     else { E.done = c.go(); save(); render(); }
+    return;
+  }
+  if (R.phase === 'prep') {
+    if (t.dataset.eq) { const id = t.dataset.eq, on = R.equip.includes(id); if (!setEquip(id, !on)) { toast(`台座が足りない ― ほかの音叉を外せば付けられる（台座${RELICS[id].c}）`); return; } SFX.tap(); save(); render(); return; }
+    if (t.id === 'a2Fight') { const P = R.prep; R.prep = null; SFX.tap(); startBattle(P.kind, P.key); }
     return;
   }
   if (R.phase === 'tutdone') {
@@ -12322,7 +12404,7 @@ function startTutorial(kind) {
   kind = typeof kind === 'string' ? kind : 'main';
   if (R && !R.tut) save();
   ['a2MenuOv', 'a2DeckOv', 'a2RulesOv', 'a2StartOv'].forEach(id => { q(id).hidden = true; });
-  R = { v: 1, tut: true, tutKind: kind, act: 1, hp: CFG.HP, maxHp: CFG.HP, echo: 0, nid: 1, deck: [], relics: [], map: null, pos: null, path: [], removeCost: 50, lastFoe: null,
+  R = { v: 1, tut: true, tutKind: kind, act: 1, hp: CFG.HP, maxHp: CFG.HP, echo: 0, nid: 1, deck: [], relics: [], equip: [], map: null, pos: null, path: [], removeCost: 50, lastFoe: null,
     stats: { wins: 0, maxChain: 0, maxHit: 0, dmg: 0, truths: 0, releases: 0, steals: 0, silences: 0, steps: 0 }, phase: 'battle', battle: null, reward: null, rest: null, shop: null, event: null, end: null };
   const D = FOES.renshu, Sx = { cols: [[], [], [], [], []], nid: 1, salt: 0 };
   const put = (c, e, own) => Sx.cols[c].push(A2E.frag(Sx, 'el', e, 1, own));
@@ -12407,6 +12489,12 @@ function show() {
     if (c.k === 'bal') c.t = 1; // 古い保存：段階つきの天秤の札は一種類に
     if (c.k === 'el' && c.t > CARD_MAX) c.t = CARD_MAX; // 古い保存：真理の札は光核に（真理は坩堝の中でだけ生まれる）
   }
+  if (R && !R.equip) { // 古い保存：台座がなかったころ。育った音叉の前の段を除き、入るだけ付けて、残りは鞄へ
+    R.relics = R.relics.filter(k => !(RELICS[k].next && R.relics.includes(RELICS[k].next)));
+    R.equip = [];
+    for (const id of R.relics) if (equipCost() + RELICS[id].c <= relicCap()) R.equip.push(id);
+    if (R.relics.includes('heavy') && !R.equip.includes('heavy')) { R.maxHp -= 12; R.hp = Math.min(R.hp, R.maxHp); }
+  }
   app.hidden = true; a2().hidden = false;
   S.screen = 'alch2'; S.paused = false;
   B = R.battle; setBusy(false); PICK = null; VIEW = null; FR.clear();
@@ -12479,7 +12567,7 @@ function init() {
     const t = e.target.closest('[data-pick]'); if (!t || !pickCb) return;
     const c = R.deck.find(d => d.id === +t.dataset.pick); const cb = pickCb; pickCb = null; q('a2DeckOv').hidden = true; if (c) cb(c);
   });
-  q('a2Relics').addEventListener('click', e => { const t = e.target.closest('[data-relic]'); if (t) toast(`〈${RELICS[t.dataset.relic].name}〉${RELICS[t.dataset.relic].desc}`); });
+  q('a2Relics').addEventListener('click', e => { const t = e.target.closest('[data-relic]'); if (t) { const id = t.dataset.relic; toast(`〈${RELICS[id].name}〉台座${RELICS[id].c}${has(id) ? '' : '・鞄の中'} ― ${RELICS[id].desc}`); } });
   q('a2Sound').addEventListener('click', () => { SFX.on = !SFX.on; store.set('sound', SFX.on); if (SFX.on) SFX.init(); updateSoundBtn(); renderTop(); });
   q('a2Toast').addEventListener('animationend', () => { q('a2Toast').classList.remove('show'); nextToast(); });
   for (const id of ['a2MenuOv', 'a2DeckOv', 'a2RulesOv']) q(id).addEventListener('click', e => { if (e.target.id === id) { q(id).hidden = true; if (id === 'a2DeckOv') pickCb = null; } });
