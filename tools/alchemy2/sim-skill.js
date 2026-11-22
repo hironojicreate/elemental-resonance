@@ -7,6 +7,7 @@
 //   BOTS=rule,chain,read  N=1体あたりの戦数  ONLY=fight,elite,boss  HPX=arashi:0.8（体力の倍率）  NOSEAL=1（封なし）
 // 山札は幕ごとの典型（DECKS）。1戦ごとに器50（重い器なら62）から。
 const { A2E: E, FOES } = require('./lib.js');
+if (process.env.FOEX) for (const [k, v] of Object.entries(JSON.parse(process.env.FOEX))) Object.assign(FOES[k], v); // 敵の表を一時的に書き換える（例 FOEX='{"shiki":{"pat2":["火3 風2"]}}'）
 if (process.env.HPX) for (const kv of process.env.HPX.split(',')) { const [k, x] = kv.split(':'); FOES[k].hp = Math.round(FOES[k].hp * +x); }
 const POOL = { 1: { fight: ['hiyura', 'doro', 'kiri', 'awa'], elite: ['muku', 'kaen'], boss: ['arashi'] }, 2: { fight: ['shaku', 'shinen', 'sajin', 'hyomu'], elite: ['kagami', 'hoshi'], boss: ['shiki'] }, 3: { fight: ['ryusei', 'kongo', 'senpu', 'kuro'], elite: ['hikari', 'futago'], boss: ['konton'] } };
 const ELK = { '火': 0, '水': 1, '風': 2, '土': 3 }, OPPE = [1, 0, 3, 2];
@@ -70,7 +71,7 @@ function bestTurn(B, intent, P) {
 }
 function battle(key, deck, P, hp0) {
   const D = FOES[key]; let hp = D.hp, ph = 1, si = 0, vessel = hp0, turn = 0, seal = false, extra = 0, bell = false, rels = 0;
-  const pat = () => (ph === 2 && D.pat2 ? D.pat2 : D.pat), nextI = () => parseIntent(D, pat()[si++ % pat().length], P);
+  const pat = () => (ph === 2 && D.pat2 ? D.pat2 : D.pat), nextI = () => parseIntent(ph === 2 && D.pers2 ? { ...D, pers: D.pers2 } : D, pat()[si++ % pat().length], P);
   const B = { S: { cols: [[], [], [], [], []], nid: 1, salt: 0, charge: 0 }, draw: shuffle(deck.map(c => ({ ...c }))), hand: [], disc: [] };
   let intents = [nextI(), nextI()];
   E.enemyTurn(B.S, intents[0].filter(a => a.k), ctx(P, true)); intents.shift(); intents.push(nextI());
@@ -105,7 +106,7 @@ const DECKS = {
   2: () => [...el(1, 3), C('el', 0, 2), C('el', 3, 2), C('el', 1, 2), C('el', 1, 3), C('light', -1, 0), C('dark', -1, 0), C('pure', -1, 1)],
   3: () => [...el(1, 2), ...el(2, 1), C('el', 0, 3), C('el', 2, 3), C('el', 3, 3), C('light', -1, 0), C('dark', -1, 0), C('pure', -1, 1), C('pure', -1, 2)],
 };
-const COST = { kyo: 2, fw: 1, we: 1, spoon: 2, steal: 2, bell: 2, heavy: 2, ward: 2, seed: 2, dusk: 2, eye: 1, echo: 1, pure: 1, lamp: 1, mirror: 2, linger: 1, linger3: 2, veil: 1, deep: 3, tall: 2, swift: 3, palm: 1, palm2: 2 };
+const COST = { kyo: 3, fw: 1, we: 1, spoon: 2, steal: 3, bell: 2, heavy: 2, ward: 2, seed: 2, dusk: 2, eye: 1, echo: 1, pure: 1, lamp: 1, mirror: 2, linger: 1, linger3: 2, veil: 1, deep: 3, tall: 2, swift: 2, palm: 1, palm2: 2 };
 const SETS = JSON.parse(process.env.SETS);
 const N = +(process.env.N || 6), bots = (process.env.BOTS || 'chain,read').split(','), only = (process.env.ONLY || 'fight,elite,boss').split(',');
 for (const [label, act, rel] of SETS) {

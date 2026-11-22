@@ -38,6 +38,7 @@ SETS='[["台座9・攻め",3,["swift","palm2","kyo","steal"]],["音叉なし",3,
 | `ONLY` | `fight,elite,boss` から |
 | `HPX` | 敵ごとの体力の倍率（例 `arashi:0.8,konton:0.8`） |
 | `NOSEAL=1` | 真理解放の封を入れない |
+| `FOEX` | 敵の表を一時的に書き換える（JSON。例 `{"shiki":{"pat2":["火3 風2 撃3"]}}`） |
 
 ## 画面の試験（Playwright）
 
