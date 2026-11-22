@@ -39,7 +39,10 @@ const ok = (c, m) => { console.log((c ? 'ok   ' : 'FAIL ') + m); if (!c) fails++
   ok(await run(() => S.bal) === 0, '風×土の雫で中央へ戻る');
   ok(await run(() => S.rhy) === 1, `交互に消すと律が1（${await run(() => S.rhy)}、コンボ${await run(() => S.combo)}）`);
   ok(await run(() => rhyMult()) === 1.1, '律1で×1.1');
-  // 傾ける：針を −16 に
+  // 基準：偏りの見返りは重力（端で半径3.0）、得点の上乗せなし
+  ok(await run(() => TUNE.balLean === 1 && TUNE.balGrav === 3), '基準：偏りの稼ぎなし・偏りの重力3.0');
+  // 傾ける：針を −16 に（ここからしばらく、得点の上乗せ〈偏りの稼ぎ〉×2 を入れて確かめる）
+  await run(() => { TUNE.balLean = 2; });
   await run(() => { S.bal = -16; });
   ok(await run(() => capTier()) === 2, '端では輝石まで');
   ok(await run(() => reactionOf(T.c1, T.c2)) === 'sealed', '端では光核どうしは合成できない（sealed）');
@@ -65,6 +68,7 @@ const ok = (c, m) => { console.log((c ? 'ok   ' : 'FAIL ') + m); if (!c) fails++
   ok(await run(() => leanGrav(0, 1) === .75), '半分の傾きで+0.75');
   await run(() => { TUNE.balGrav = 0; });
   ok(await run(() => leanGrav(0, 1) === 0), '「なし」なら広がらない');
+  await run(() => { TUNE.balGrav = 3; });
   // 端の見た目
   await run(() => { S.bal = -12; S.rhy = 3; });
   await p.waitForTimeout(400);
@@ -77,6 +81,8 @@ const ok = (c, m) => { console.log((c ? 'ok   ' : 'FAIL ') + m); if (!c) fails++
   const gain = await run(() => S.score - T.s), hm = await run(() => harmonyMult());
   ok(gain > 40 * 1.5, `端の火×水の雫：+${gain}（基本40、調和×${hm}）`);
   // 切り替え：なし
+  await run(() => { TUNE.balLean = 1; S.bal = -16; });
+  ok(await run(() => leanMult(0) === 1 && leanGrav(0, 1) === 1.5), '基準のまま：端の火水の雫は得点そのまま、重力は半径3.0');
   await run(() => { TUNE.balOn = 0; TUNE.rhyOn = 0; syncBalHud(); });
   await p.waitForTimeout(200);
   ok(await run(() => getComputedStyle(document.getElementById('bal')).display === 'none'), 'どちらも「なし」で帯が消える');
