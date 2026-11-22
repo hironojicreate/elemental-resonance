@@ -1,4 +1,4 @@
-// 報酬にはじめて無垢が並んだとき：案内 → 無垢の練習（4段）→ 報酬の画面に戻る・案内が二度と出ない
+// 報酬にはじめて無垢が並んだとき：案内 → 無垢〈足場〉の練習（4段）→ 報酬の画面に戻る・案内が二度と出ない
 // 使い方：node tools/alchemy2/test/shell-practice.js（スクリーンショットは OUT のフォルダへ。既定は一時フォルダ）
 const path = require('path'), os = require('os'), fs = require('fs');
 const INDEX = path.resolve(__dirname, '../../../index.html');

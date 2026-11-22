@@ -38,6 +38,8 @@ SETS='[["台座9・攻め",3,["swift","palm2","kyo","steal"]],["音叉なし",3,
 | `ONLY` | `fight,elite,boss` から |
 | `HPX` | 敵ごとの体力の倍率（例 `arashi:0.8,konton:0.8`） |
 | `NOSEAL=1` | 真理解放の封を入れない |
+| `DECKADD` | 幕の山札に足す札（`light,dark,pure,bal` から。1枚ずつ）。光・闇・足場・天秤を使った回数と、その手で与えた傷の割合も出す |
+| `A2SRC` | ほかの版の `index.html` を読む（前後の比べ。`git show <コミット>:index.html > old.html`） |
 | `FOEX` | 敵の表を一時的に書き換える（JSON。例 `{"shiki":{"pat2":["火3 風2 撃3"]}}`） |
 
 ## 画面の試験（Playwright）
@@ -51,12 +53,12 @@ node tools/alchemy2/test/tutorial.js
 | ファイル | 確かめること |
 |---|---|
 | `tutorial.js` | はじめのチュートリアル（27段）を最後まで。段ごとの乱れ・器・予報。`SHOTS=0` で撮らない |
-| `shell-practice.js` | 報酬にはじめて無垢が並ぶ → 無垢の練習 → 報酬に戻る |
+| `shell-practice.js` | 報酬にはじめて無垢が並ぶ → 無垢〈足場〉の練習 → 報酬に戻る |
 | `shell-break.js` | 殻が割れる演出の順番（ふつうの速さ） |
 | `modes.js` | ほかのモードが開けるか、保存・続きから |
 | `full-run.js` | 器600の写しで三幕を最後まで（単純なボット。戦いの前の画面はそのまま戦う。天秤は使わない） |
 | `keep.js` / `keep3.js` | 〈残す〉（1枚・〈長き余韻〉で3枚） |
-| `shell.js` / `scaffold.js` | 無垢〈包む〉・〈足場〉 |
+| `scaffold.js` | 無垢〈足場〉 |
 | `partner.js` | 反応させる相手を選ぶ |
 | `truth.js` | 真理の力の重なり |
 | `eye.js` | 〈先見の眼〉〈書の栞〉（台座に付けた音叉だけが鳴るので、試験では `R.equip` にも入れる） |

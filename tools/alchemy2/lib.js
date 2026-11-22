@@ -2,7 +2,7 @@
 // きまり（A2E）と顕現の表（FOES）を index.html からその場で読み出すので、ゲームと道具の数字がずれない。
 const fs = require('fs'), path = require('path');
 const ROOT = path.resolve(__dirname, '../..');
-const INDEX = path.join(ROOT, 'index.html');
+const INDEX = process.env.A2SRC || path.join(ROOT, 'index.html'); // A2SRC で、ほかの版の index.html を読める（前後の比べ）
 const src = fs.readFileSync(INDEX, 'utf8');
 // きまり：/*A2ENGINE*/ の直後の const A2E から /*/A2ENGINE*/ まで
 const ea = src.indexOf('const A2E = (() => {'), eb = src.indexOf('/*/A2ENGINE*/');
