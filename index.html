@@ -1585,6 +1585,87 @@ button{font:inherit;color:inherit}
   .rt>.al-coach{min-height:0}
   .rt-fore{min-height:0}
 }
+/* ================= 鳴り石 =================
+   上＝響き・残りの石／中＝二つの峰（29枚。表は覆いのない石だけ、ほかは混沌の覆い）／下＝山札・手の石・連鎖。変数は --nr… */
+.nr{position:fixed;inset:0;z-index:15;display:flex;flex-direction:column;gap:6px;overflow:hidden;
+  background-color:var(--ink);background-image:radial-gradient(120% 60% at 50% 0%,#1d1530 0%,var(--ink) 60%),radial-gradient(80% 40% at 50% 100%,#121838 0%,rgba(9,11,22,0) 70%);
+  padding-top:calc(env(safe-area-inset-top,0px) + 8px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 12px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.nr>.ks-top,.nr>.nr-field,.nr>.ks-info,.nr>.nr-bot,.nr>.al-coach{width:100%;max-width:720px;margin-inline:auto}
+.nr>.ks-top,.nr>.ks-info,.nr>.nr-bot,.nr>.al-coach{flex:none}
+.nr-field{flex:1 1 auto;min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:14px}
+.nr-stage{position:relative;width:100%;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.nr-cards{position:absolute;inset:0}
+.nr-fx{position:absolute;inset:0;pointer-events:none;z-index:30}
+.nr-fx>*{position:absolute}
+.nr-call{position:absolute;left:0;right:0;top:34%;height:0;z-index:31;pointer-events:none}
+/* 石（札） */
+.nr-card{position:absolute;left:0;top:0;border-radius:10px;will-change:transform;transition:transform .28s cubic-bezier(.2,.8,.3,1)}
+.nr-card .nr-face{position:absolute;inset:0;border-radius:inherit;display:flex;align-items:center;justify-content:center;padding-bottom:6px;box-sizing:border-box;
+  background:linear-gradient(180deg,#1c2148,#0f1229);border:1px solid var(--nrc,rgba(201,173,114,.4));box-shadow:0 3px 8px rgba(0,0,0,.55),inset 0 0 12px var(--nrg,rgba(0,0,0,0))}
+.nr-card .nr-face .oi,.nr-card .nr-face svg{display:block}
+.nr-card .pip{position:absolute;left:0;right:0;bottom:1px;text-align:center;font-style:normal;font-size:12px;line-height:1;letter-spacing:1px;color:#fff;opacity:.85;text-shadow:0 0 4px rgba(0,0,0,.95),0 0 2px rgba(0,0,0,.95)}
+/* 混沌の覆い（裏）：紅く沈んだ霧 */
+.nr-card.down .nr-face{border-color:rgba(255,82,114,.28);
+  background:radial-gradient(70% 55% at 50% 42%,rgba(150,30,60,.55),rgba(40,8,22,0) 70%),repeating-linear-gradient(135deg,rgba(255,82,114,.06) 0 3px,rgba(0,0,0,0) 3px 7px),linear-gradient(170deg,#2c0d1d,#140611);
+  box-shadow:0 3px 8px rgba(0,0,0,.6),inset 0 0 10px rgba(255,82,114,.12)}
+.nr-card.down .nr-face::after{content:"";width:34%;aspect-ratio:1;border-radius:50%;border:1px solid rgba(255,140,160,.22);box-shadow:0 0 10px rgba(255,82,114,.25),inset 0 0 6px rgba(255,82,114,.2)}
+/* 押せる石：合成は金・対消滅は菫・手が空いたら白 */
+.nr-card.can{cursor:pointer}
+.nr-card.can.m .nr-face{box-shadow:0 0 0 2px var(--lumen),0 0 14px rgba(255,227,160,.6),0 3px 8px rgba(0,0,0,.55)}
+.nr-card.can.a .nr-face{box-shadow:0 0 0 2px #e4dcff,0 0 16px rgba(185,163,255,.75),0 3px 8px rgba(0,0,0,.55)}
+.nr-card.can.p .nr-face{box-shadow:0 0 0 2px rgba(255,255,255,.7),0 0 12px rgba(255,255,255,.35),0 3px 8px rgba(0,0,0,.55)}
+.nr-card.open{cursor:pointer}
+.nr-card.can:hover .nr-face,.nr-card.open:hover .nr-face{filter:brightness(1.18)}
+.nr-card.tut .nr-face{animation:nrTut .9s ease-in-out infinite alternate}
+@keyframes nrTut{from{box-shadow:0 0 0 2px rgba(255,227,160,.35),0 3px 8px rgba(0,0,0,.55)}to{box-shadow:0 0 0 4px var(--lumen),0 0 24px rgba(255,227,160,.9),0 3px 8px rgba(0,0,0,.55)}}
+.nr-card:focus-visible{outline:2px solid var(--lumen);outline-offset:3px}
+/* 下の帯：山札｜手の石｜連鎖 */
+.nr-bot{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding-top:8px;border-top:1px solid var(--brass-faint);min-height:112px}
+.nr-stock{justify-self:start;display:flex;align-items:center;gap:10px;padding:6px 12px 6px 6px;border-radius:14px;border:1px solid var(--brass-dim);background:rgba(0,0,0,.22);color:var(--text);font:inherit;cursor:pointer;min-height:64px}
+.nr-stock:disabled{opacity:.42;cursor:default}
+.nr-stock .nr-sc{position:relative;width:38px;height:50px;flex:none}
+.nr-stock .nr-sc i{position:absolute;inset:0;border-radius:8px;border:1px solid rgba(255,82,114,.3);background:radial-gradient(70% 55% at 50% 42%,rgba(150,30,60,.55),rgba(40,8,22,0) 70%),linear-gradient(170deg,#2c0d1d,#140611);box-shadow:0 2px 6px rgba(0,0,0,.6)}
+.nr-stock .nr-sc i:nth-child(2){transform:translate(3px,-3px)}
+.nr-stock .nr-sc i:nth-child(3){transform:translate(6px,-6px)}
+.nr-stock .nr-sl{display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;text-align:left}
+.nr-stock .nr-sl b{font-family:var(--f-display);font-weight:800;font-size:15px}
+.nr-stock .nr-sl small{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.nr-stock .nr-sl small em{font-style:normal;font-family:var(--f-display);font-weight:800;font-size:15px;color:var(--text)}
+.nr-stock.need{border-color:var(--lumen);box-shadow:0 0 0 2px rgba(255,227,160,.35);animation:erTutC .9s ease-in-out infinite alternate}
+.nr-stock.tut{box-shadow:0 0 0 3px rgba(255,227,160,.5);animation:erTutC .9s ease-in-out infinite alternate}
+.nr-hand{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:118px}
+.nr-hslot{position:relative;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1.5px dashed rgba(201,173,114,.35);background:radial-gradient(circle,rgba(255,227,160,.06),rgba(0,0,0,0) 70%)}
+.nr-hslot.has{border-style:solid;border-color:var(--nrc,var(--brass-dim));box-shadow:0 0 24px var(--nrg,rgba(0,0,0,0)),inset 0 0 18px var(--nrg,rgba(0,0,0,0))}
+.nr-hslot.empty::after{content:"空き";font-size:12px;color:var(--muted);letter-spacing:.2em}
+.nr-hlbl{font-size:11.5px;color:var(--muted);white-space:nowrap;text-align:center}
+.nr-hlbl b{color:var(--text);font-weight:700}
+.nr-chain{justify-self:end;display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
+.nr-chain b{font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1.05;color:var(--text)}
+.nr-chain b.hot{color:var(--lumen);text-shadow:0 0 14px rgba(255,227,160,.45)}
+.nr-chain.bump b{animation:rtBump .35s ease-out}
+/* 演出 */
+.nr-fly{left:0;top:0;z-index:2;will-change:transform}
+.nr-fly .oi,.nr-fly svg{display:block;width:100% !important;height:100% !important}
+.nr-pts{transform:translate(-50%,-50%);font-family:var(--f-display);font-weight:800;font-size:16px;color:var(--lumen);white-space:nowrap;
+  text-shadow:0 0 10px rgba(0,0,0,.9),0 0 14px rgba(255,227,160,.5);animation:shPts 1s ease-out forwards;z-index:7}
+.nr-pts small{font-family:var(--f-latin);font-size:12px;color:#dcd0ff;margin-left:3px}
+.nr-tag{transform:translate(-50%,-100%);font-size:11px;font-weight:700;color:#e4dcff;white-space:nowrap;text-shadow:0 0 8px rgba(0,0,0,.9);animation:rtTag 1.2s ease-out forwards;z-index:7}
+.nr-stage.shake{animation:rtShake .45s ease}
+/* 結果 */
+.nr-res .res-sub{text-align:center}
+.nr-res .nr-why{font-size:13px;color:var(--muted);text-align:center;margin:4px 0 0}
+.nr-res .nr-why em{font-style:normal;color:var(--text);font-weight:700}
+.nr-rules .ks-mini{display:inline-flex;align-items:center;gap:3px;vertical-align:middle}
+.nr-rules .ks-mini .oi,.nr-rules .ks-mini svg{width:20px !important;height:20px !important}
+.nr-rules .nr-pair{display:inline-flex;align-items:center;gap:2px;vertical-align:middle;margin:0 2px}
+.nr-rules .nr-pair .oi,.nr-rules .nr-pair svg{width:20px !important;height:20px !important}
+.nr .al-coach .nr-tutbtns{flex-wrap:wrap;gap:8px}
+@media (prefers-reduced-motion:reduce){.nr-card{transition-duration:.08s}.nr-card.tut .nr-face,.nr-stock.need,.nr-stock.tut{animation:none}.nr-stage.shake{animation:none}}
+@media (max-width:480px){.nr>.ks-top .ks-name{display:none}.nr-hand{min-width:96px}.nr-chain b{font-size:22px}}
+@media (max-width:560px){.nr>.ks-top{flex-wrap:nowrap;gap:4px 10px}.nr>.ks-top .ks-stat b{font-size:16px}}
+@media (max-height:720px){.nr.tut>.ks-info{display:none}.nr-bot{min-height:96px}}
 </style>
 
 <div id="app" class="on-title">
@@ -1690,6 +1771,12 @@ button{font:inherit;color:inherit}
         <span class="mode-desc">山札を一枚ずつめくって一列に。同じ元素は引き合い、抜けた跡で両隣が響き合う。どこで止めて奉納するか、運と確率の勝負。</span>
         <span class="mode-best">記録 <b id="bestRetsu">—</b></span>
       </button>
+      <button class="mode" id="goNari" type="button">
+        <span class="mode-ic drops" id="icNari"></span>
+        <span class="mode-name">鳴り石<small>Chimestones</small></span>
+        <span class="mode-desc">手の石と響き合う石を押して、二つの峰を崩す。同じなら育ち、反対なら消える。1局2分の手軽な一人遊び。</span>
+        <span class="mode-best">記録 <b id="bestNari">—</b></span>
+      </button>
       <div class="links"><button class="link" id="goRules" type="button">あそびかた</button><button class="link" id="goTune" type="button">バランス調整</button></div>
     </div>
   </div>
@@ -1757,6 +1844,10 @@ button{font:inherit;color:inherit}
       <div>
         <h3>共鳴の列</h3>
         <p>山札34枚を一枚ずつめくり、一列に並べる運試し。<em>同じ元素の雫は列のどこからでも右端へ飛んできて合成し、抜けた跡では両隣が触れ合って連鎖する。</em>反対の元素は右端で対消滅。反応するたびに〈響き〉が貯まり、止めて奉納すると響き×列の束の数が得点。右端の輝石に反対の元素の雫が来ると〈ひずみ〉、束が7つを超えると混沌で、そのラウンドの響きは消える。予報で確率を見ながら、もう1枚めくるか決める。今日の山札・称号・チュートリアルつき。</p>
+      </div>
+      <div>
+        <h3>鳴り石</h3>
+        <p>下の<em>手の石</em>と響き合う石を、二つの峰（29枚）から一つずつ押して取る一人遊び。<em>同じ元素・同じ段階なら合成して手の石が育ち、反対の元素・同じ段階なら対消滅して両方消える。</em>手の石が消えたら表の石をどれでも一つ手に取れ、押せる石がなければ山札をめくる。光核どうしで真理を作ると、表に見えている反対の元素の石がすべて静まる。峰を崩しきれば〈静寂〉。1局2分ほど。チュートリアルつき。</p>
       </div>
       <div>
         <h3>四方の盤</h3>
@@ -2386,7 +2477,104 @@ button{font:inherit;color:inherit}
   </div>
 </section>
 
-<div class="ver" aria-hidden="true">v1.102.0</div>
+<section class="nr" id="nr" hidden aria-label="鳴り石">
+  <header class="ks-top">
+    <span class="ks-name">鳴り石</span>
+    <span id="nrStats" style="display:contents"></span>
+    <div class="ks-tbtns">
+      <button class="btn icon" id="nrRulesBtn" type="button" aria-label="あそびかた" title="あそびかた">?</button>
+      <button class="btn icon" id="nrSound" type="button" aria-label="音のオン・オフ">♪</button>
+      <button class="btn icon" id="nrMenuBtn" type="button" aria-label="メニュー">≡</button>
+    </div>
+  </header>
+  <main class="nr-field" id="nrField">
+    <div class="nr-stage" id="nrStage">
+      <div class="nr-cards" id="nrCards" role="group" aria-label="峰"></div>
+    </div>
+  </main>
+  <div id="nrCoach" hidden></div>
+  <p class="ks-info" id="nrInfo" role="status" aria-live="polite"></p>
+  <footer class="nr-bot" id="nrBot">
+    <button class="nr-stock" id="nrStock" type="button"><span class="nr-sc" aria-hidden="true"><i></i><i></i><i></i></span><span class="nr-sl"><b>めくる</b><small>山札 <em id="nrStockN">0</em>枚</small></span></button>
+    <div class="nr-hand" id="nrHand"><div class="nr-hslot" id="nrHslot"></div><div class="nr-hlbl" id="nrHlbl"></div></div>
+    <div class="nr-chain" id="nrChain"></div>
+  </footer>
+  <div class="nr-fx" id="nrFx" aria-hidden="true"></div>
+  <div class="nr-call" id="nrCall" aria-hidden="true"></div>
+
+  <section class="overlay" id="nrMenuOv" hidden>
+    <div class="panel pause" role="dialog" aria-modal="true" aria-labelledby="nrMenuH">
+      <p class="eyebrow">Chimestones</p>
+      <h2 id="nrMenuH">鳴り石</h2>
+      <div class="stack">
+        <button class="btn primary" id="nrResume" type="button">続ける</button>
+        <button class="btn" id="nrMenuRules" type="button">あそびかた</button>
+        <button class="btn" id="nrHint" type="button" aria-pressed="true">押せる石を光らせる：オン</button>
+        <button class="btn" id="nrRetrySame" type="button">同じ配りで最初から</button>
+        <button class="btn" id="nrRetryNew" type="button">新しい峰で始める</button>
+        <button class="btn" id="nrToTitle" type="button">タイトルへ（続きは保存される）</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="overlay" id="nrResOv" hidden>
+    <div class="panel result nr-res" role="dialog" aria-modal="true" aria-labelledby="nrResH">
+      <p class="eyebrow" id="nrResEy">Chimestones</p>
+      <h2 id="nrResH">峰が静まった</h2>
+      <div class="res-score"><b id="nrResPts">0</b><span class="badge" id="nrResRec" hidden>新記録</span></div>
+      <p class="nr-why" id="nrResWhy"></p>
+      <dl class="res-stats" id="nrResStats"></dl>
+      <div class="panel-btns">
+        <button class="btn" id="nrResSame" type="button">同じ配りでもう一度</button>
+        <button class="btn" id="nrResTitle" type="button">タイトルへ</button>
+        <button class="btn primary" id="nrResNew" type="button">新しい峰で</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="overlay" id="nrRulesOv" hidden>
+    <div class="panel rules al-rules nr-rules" role="dialog" aria-modal="true" aria-labelledby="nrRulesH">
+      <p class="eyebrow">How to play</p>
+      <h2 id="nrRulesH">鳴り石 あそびかた</h2>
+      <p class="rules-lede">下の<em>手の石</em>と響き合う石を、峰から一つずつ押して取っていく一人遊び。二つの峰をすべて崩せば〈静寂〉。1局2分ほど。</p>
+      <div class="al-tutcall"><span>実際に動かして覚えるなら</span><button class="btn primary" id="nrRulesTut" type="button">チュートリアルを始める</button></div>
+      <h3>きまりは三つ</h3>
+      <ol class="al-steps">
+        <li><b>押す</b>峰の表の石が、手の石と<em>同じ元素・同じ段階</em>なら<em>合成</em>：手の石が一段育つ。<em>反対の元素・同じ段階</em>なら<em>対消滅</em>：両方消える。反対の元素は<span id="nrRulesPairs"></span>。</li>
+        <li><b>選ぶ</b>手の石が消えたら、表の石を<em>どれでも一つ</em>手に取れる。</li>
+        <li><b>めくる</b>押せる石がなければ、<em>山札をめくって</em>手の石を取り替える（前の手の石は捨てる）。</li>
+      </ol>
+      <p>押せる石は光る（金＝合成・菫＝対消滅・白＝手に取れる）。光らせない遊び方は、メニューで選べる。</p>
+      <h3>峰と山札</h3>
+      <p>石は52枚：火・水・風・土が13枚ずつ（雫7・輝石4・光核2）。段階は <span id="nrRulesTiers"></span>。峰は二つで29枚、残りは山札。表なのは<em>上に何も重なっていない石</em>だけで、ほかは<em>混沌の覆い</em>の下にある。重なっている下の2つがなくなると、覆いがはれて表になる。</p>
+      <h3>真理</h3>
+      <p>手の光核に同じ元素の光核を合成すると<em>真理</em>になり、天へ昇る。そのとき、<em>表に見えている反対の元素の石が、段階を問わずすべて静まって消える</em>。そのあと手は空き、表の石をどれでも一つ手に取れる。</p>
+      <h3>連鎖と響き</h3>
+      <p>山札をめくらずに続けた合成・対消滅の数が<em>連鎖</em>。響き（得点）は、消えるときに鳴る：対消滅は<em>段階の響き（雫3・輝石8・光核20）× 連鎖</em>、真理は 50 × 連鎖、真理で静まった石も段階の響き × 連鎖。めくると連鎖は途切れる。押すたびに、連鎖の数だけ音が高くなっていく。</p>
+      <h3>終わりと記録</h3>
+      <p>峰をすべて崩せば<em>〈静寂〉</em>：+100と、残った山札1枚につき+20。山札が尽きて押せる石がなければ<em>〈詰み〉</em>。記録は、最高の響き・勝った数・連勝。</p>
+      <h3>コツ</h3>
+      <p>すぐ消せば次の石を自由に選べる。育てれば大きな響きと真理を狙えるが、相手は少なくなる。手が空いたら、<em>表に相手のいる石</em>を取ろう。</p>
+      <div class="panel-btns"><button class="btn primary" id="nrRulesClose" type="button">閉じる</button></div>
+    </div>
+  </section>
+</section>
+
+<section class="overlay" id="nrStartOv" hidden>
+  <div class="panel pause" role="dialog" aria-modal="true" aria-labelledby="nrStartH">
+    <p class="eyebrow">Chimestones</p>
+    <h2 id="nrStartH">鳴り石</h2>
+    <p class="res-sub" id="nrStartSub"></p>
+    <div class="stack">
+      <button class="btn primary" id="nrContinue" type="button">続きから</button>
+      <button class="btn" id="nrNew" type="button">新しい峰で始める</button>
+      <button class="btn" id="nrTutorial" type="button">チュートリアル</button>
+      <button class="btn" id="nrStartBack" type="button">戻る</button>
+    </div>
+  </div>
+</section>
+
+<div class="ver" aria-hidden="true">v1.103.0</div>
 
 <script id="genso-images">window.GENSO_IMAGES = {
   "fire-1": "data:image/jpeg;base64,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",
@@ -5317,7 +5505,7 @@ let rulesBack = null;
 function hideOverlays() { el.titleOv.hidden = el.rulesOv.hidden = el.pauseOv.hidden = el.resultOv.hidden = true; $('#tuneOv').hidden = true; $('#soundOv').hidden = true; }
 function showScreen() { hideOverlays(); app.classList.remove('on-title'); }
 function showTitle() {
-  A2.hide(); KS.hide(); ER.hide(); SH.hide(); RT.hide();
+  A2.hide(); KS.hide(); ER.hide(); SH.hide(); RT.hide(); NR.hide();
   S.token++; tweens.length = 0; S.screen = 'title'; S.paused = false; S.drag = null; S.orbs = [];
   FX.parts.length = FX.rings.length = FX.wells.length = FX.texts.length = FX.beams.length = 0;
   hideOverlays(); hideTip(); el.crit.hidden = true;
@@ -8511,6 +8699,588 @@ return { init, hide, esc };
 })();
 
 /* ================================================================
+   鳴り石（Chimestones）
+   手の石と響き合う石を、二つの峰（29枚）から一つずつ押して取る一人遊び。きまりは NRE（描画と切り離した純粋な計算。
+   tools/chimestone/ の早送りも、ここを読み出して使う）。
+   ① 峰の表の石が、手の石と同じ元素・同じ段階なら合成（手の石が一段育つ）、反対の元素・同じ段階なら対消滅（両方消える）。
+   ② 手の石が消えたら、表の石をどれでも一つ手に取れる。 ③ 押せる石がなければ山札をめくって手の石を取り替える（連鎖は途切れる）。
+   真理：手の光核に同じ元素の光核を合成すると真理になって天へ昇り、表に見えている反対の元素の石がすべて静まる。
+   状態 G はそのまま JSON で保存できる形に保つ
+   ================================================================ */
+/*NRENGINE*/
+const NRE = (() => {
+  // 元素 e：0火 1水 2風 3土（反対は e^1）。段階 t：1雫 2輝石 3光核 4真理
+  const VAL = [0, 3, 8, 20, 50], TRUTH = 50, PER = [7, 4, 2], ROWS = [2, 4, 6, 8, 9], CLEAR = 100, LEFT = 20;
+  // 二つの峰（高さ5）：上から 2・4・6・8・9 枚。いちばん下の段だけが初めから表。
+  // cov＝その石に重なっている（下の段の）2枚。x は下の段を 0〜8 とした横の位置、r は段
+  const SLOTS = (() => {
+    const H = ROWS.length, s = [], ids = [];
+    ROWS.forEach((n, r) => { ids.push([]); for (let i = 0; i < n; i++) { ids[r].push(s.length); s.push({ r, i, cov: [], x: 0 }); } });
+    for (let r = 0; r < H - 1; r++) {
+      const per = r + 1; // 峰ひとつあたりの枚数
+      ids[r].forEach((id, i) => {
+        const p = Math.floor(i / per), q = i % per, base = r < H - 2 ? p * (per + 1) + q : p * (H - 1) + q;
+        s[id].cov = [ids[r + 1][base], ids[r + 1][base + 1]];
+      });
+    }
+    for (let r = H - 1; r >= 0; r--) ids[r].forEach((id, i) => { s[id].x = r === H - 1 ? i : (s[s[id].cov[0]].x + s[s[id].cov[1]].x) / 2; });
+    return s;
+  })();
+  const N = SLOTS.length;
+  function deck() { const d = []; for (let e = 0; e < 4; e++) PER.forEach((n, ti) => { for (let k = 0; k < n; k++) d.push({ e, t: ti + 1 }); }); return d; }
+  // 配る：混ぜた52枚の先頭29枚が峰、残りが山札（末尾からめくる）。はじめの手の石は山札の末尾
+  function deal(rnd) {
+    const d = deck();
+    for (let i = d.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [d[i], d[j]] = [d[j], d[i]]; }
+    const stock = d.slice(N), hand = stock.pop();
+    return { cards: d.slice(0, N), stock, hand };
+  }
+  function react(h, c) { if (!h || !c || h.t !== c.t) return null; if (h.e === c.e) return h.t < 4 ? 'merge' : null; return (h.e ^ 1) === c.e ? 'anni' : null; }
+  const isOpen = (G, i) => !!G.cards[i] && SLOTS[i].cov.every(j => !G.cards[j]);
+  const open = G => { const a = []; for (let i = 0; i < N; i++) if (isOpen(G, i)) a.push(i); return a; };
+  const left = G => G.cards.reduce((n, c) => n + (c ? 1 : 0), 0);
+  function moves(G) {
+    const ex = open(G);
+    if (!G.hand) return ex.map(i => ({ i, kind: 'pick' }));
+    const m = []; for (const i of ex) { const k = react(G.hand, G.cards[i]); if (k) m.push({ i, kind: k }); } return m;
+  }
+  const bump = (G, k, n = 1) => { if (G.st) G.st[k] = (G.st[k] || 0) + n; };
+  function chainUp(G) { G.chain++; if (G.st && G.chain > (G.st.maxChain || 0)) G.st.maxChain = G.chain; }
+  // 覆いがはれた石を記録する（seen はそれまで表だった石）
+  function reveal(G, seen, log) { const ids = []; for (const i of open(G)) if (!seen.has(i)) { seen.add(i); ids.push(i); } if (ids.length && log) log.push({ k: 'reveal', ids }); }
+  // 表の石 i を押す。できなければ null。log に、見せる順の出来事を積む
+  function take(G, i, log) {
+    const c = G.cards[i]; if (!c || !isOpen(G, i)) return null;
+    const kind = G.hand ? react(G.hand, c) : 'pick'; if (!kind) return null;
+    const seen = new Set(open(G));
+    G.cards[i] = null;
+    const ev = { k: 'take', i, kind, c: { ...c } }; if (log) log.push(ev);
+    if (kind === 'pick') { G.hand = { ...c }; bump(G, 'picks'); reveal(G, seen, log); return ev; }
+    chainUp(G); ev.chain = G.chain;
+    if (kind === 'anni') { ev.pts = VAL[c.t] * G.chain; G.score += ev.pts; G.hand = null; bump(G, 'anni'); reveal(G, seen, log); return ev; }
+    G.hand = { ...G.hand, t: G.hand.t + 1 }; ev.t = G.hand.t; bump(G, 'merge');
+    reveal(G, seen, log);
+    if (G.hand.t === 4) truth(G, seen, log);
+    return ev;
+  }
+  // 真理：天へ昇り、表に見えている反対の元素の石が、段階を問わずすべて静まる
+  function truth(G, seen, log) {
+    const e = G.hand.e, pts = TRUTH * G.chain; G.score += pts; bump(G, 'truths');
+    if (log) log.push({ k: 'truth', e, pts, chain: G.chain });
+    const list = [];
+    for (const i of open(G)) if (G.cards[i].e === (e ^ 1)) list.push(i);
+    list.sort((a, b) => G.cards[a].t - G.cards[b].t || a - b); // 小さい段階から静まる（大きな響きが最後に鳴る）
+    const calm = list.map(i => { chainUp(G); const c = G.cards[i], p = VAL[c.t] * G.chain; G.score += p; G.cards[i] = null; bump(G, 'calm'); return { i, c: { ...c }, pts: p, chain: G.chain }; });
+    if (log) log.push({ k: 'calm', e: e ^ 1, list: calm });
+    G.hand = null;
+    reveal(G, seen, log);
+  }
+  // 山札をめくる：手の石を取り替える（前の手の石は捨てる）。連鎖は途切れる
+  function flip(G, log) {
+    if (!G.stock.length) return null;
+    const c = G.stock.pop(), ev = { k: 'flip', old: G.hand ? { ...G.hand } : null, c: { ...c } };
+    G.hand = { ...c }; G.chain = 0; bump(G, 'flips');
+    if (log) log.push(ev); return ev;
+  }
+  // 終わり：峰をすべて崩した（win）／山札が尽きて押せる石がない（stuck）
+  function over(G) { if (!left(G)) return 'win'; if (!G.stock.length && !moves(G).length) return 'stuck'; return null; }
+  const bonus = G => CLEAR + LEFT * G.stock.length;
+  return { VAL, TRUTH, PER, ROWS, CLEAR, LEFT, SLOTS, N, deck, deal, react, isOpen, open, left, moves, take, flip, over, bonus };
+})();
+/*/NRENGINE*/
+
+const NR = (() => {
+const q = id => document.getElementById(id);
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const T = RM ? { fly: 70, merge: 90, anni: 110, reveal: 90, truth1: 260, truth2: 120, calm: 90, end: 700 }
+             : { fly: 210, merge: 210, anni: 270, reveal: 280, truth1: 760, truth2: 420, calm: 230, end: 1500 };
+const KCLS = { merge: 'm', anni: 'a', pick: 'p' };
+const pname = p => `${EL[p.e].name}の${TI[p.t].name}`;
+const NOTE = c => SFX.note(4 + Math.min(Math.max(c, 0), 13)); // 連鎖の数だけ高くなる（民謡音階）
+let G = null, BUSY = false, TUT = null, MSG = null, GEO = null, HSZ = 72;
+let HV = null, HVON = false, DISP = 0, CHAINV = 0, GROW = false, HINT = true;
+const PIECES = new Map(), HOLD = new Set(), KEEP = new Map();
+
+/* ---------- 乱数（種と状態を G に持つので、同じ配りを再現でき、保存もできる）---------- */
+function rnd() { let t = G.rs = (G.rs + 0x6D2B79F5) | 0; t = Math.imul(t ^ t >>> 15, 1 | t); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+
+/* ---------- 新しい一局 ---------- */
+function blank(mode, seed) {
+  return { v: 1, mode, seed, rs: seed | 0, nid: 0, cards: [], stock: [], hand: null, chain: 0, score: 0, phase: 'play', result: null,
+    st: { merge: 0, anni: 0, picks: 0, flips: 0, truths: 0, calm: 0, maxChain: 0 } };
+}
+const withId = c => c ? { id: ++G.nid, e: c.e, t: c.t } : null;
+function newRun(seed, mode = 'run') {
+  if (seed == null) seed = Math.floor(Math.random() * 4294967296);
+  G = blank(mode, seed);
+  const d = NRE.deal(rnd);
+  G.cards = d.cards.map(withId); G.stock = d.stock.map(withId); G.hand = withId(d.hand);
+  TUT = null;
+}
+const playing = () => G && G.phase === 'play';
+const canAct = () => playing() && !BUSY;
+const handShown = () => HVON ? HV : G.hand;
+
+/* ---------- 押す・めくる ---------- */
+async function act(i) {
+  if (!canAct()) return;
+  if (!NRE.isOpen(G, i)) { toast('覆われている石は、まだ押せない。重なっている下の2つがなくなると表になる。'); return; }
+  const mv = NRE.moves(G).find(m => m.i === i);
+  if (!mv) return bad(i);
+  if (!tutOk('take', i)) return;
+  MSG = null;
+  const log = [];
+  HV = G.hand ? { ...G.hand } : null; HVON = true; BUSY = true;
+  NRE.take(G, i, log);
+  for (const x of log) { if (x.k === 'reveal') x.ids.forEach(j => HOLD.add(j)); if (x.k === 'calm') x.list.forEach(y => KEEP.set(y.i, y.c)); }
+  try { await playLog(log); } finally { BUSY = false; HVON = false; HOLD.clear(); KEEP.clear(); }
+  after();
+}
+async function flip() {
+  if (!canAct() || !G.stock.length) return;
+  if (!tutOk('flip')) return;
+  MSG = null;
+  const log = [];
+  HV = G.hand ? { ...G.hand } : null; HVON = true; BUSY = true;
+  NRE.flip(G, log);
+  try { await playLog(log); } finally { BUSY = false; HVON = false; }
+  after();
+}
+function bad(i) {
+  const h = G.hand, c = G.cards[i], el = PIECES.get(i);
+  if (el) el.firstElementChild.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-5px)' }, { transform: 'translateX(4px)' }, { transform: 'translateX(-2px)' }, { transform: 'translateX(0)' }], { duration: 300 });
+  SFX.tone(150, { type: 'triangle', dur: .12, gain: .04 });
+  if (!h || !c) return;
+  if (h.t !== c.t) toast(`段階が違う：手の石は${TI[h.t].name}、この石は${TI[c.t].name}。響き合うのは同じ段階どうし。`);
+  else toast(`${EL[h.e].name}と${EL[c.e].name}は響き合わない。同じ元素なら合成、反対の元素（火と水・風と土）なら対消滅。`);
+}
+function after() {
+  DISP = G.score; CHAINV = G.chain;
+  const o = NRE.over(G);
+  if (o && !TUT) return finish(o);
+  save(); render();
+  if (TUT) tutAfter();
+}
+
+/* ---------- 演出 ---------- */
+function relRect(el) { const a = el.getBoundingClientRect(), b = q('nr').getBoundingClientRect(); return { x: a.left - b.left, y: a.top - b.top, w: a.width, h: a.height }; }
+function fxEl(cls, x, y, size) {
+  const n = document.createElement('span'); n.className = cls;
+  n.style.width = n.style.height = size + 'px'; n.style.left = (x - size / 2) + 'px'; n.style.top = (y - size / 2) + 'px';
+  q('nrFx').appendChild(n); return n;
+}
+function anim(n, frames, o) { const a = n.animate(frames, o); a.onfinish = () => n.remove(); return a; }
+function burstMerge(x, y, s) {
+  anim(fxEl('ks-burst glow', x, y, s * 1.5), [{ opacity: 0, scale: .3 }, { opacity: 1, scale: 1, offset: .35 }, { opacity: 0, scale: 1.25 }], { duration: RM ? 200 : 520, easing: 'ease-out' });
+  anim(fxEl('ks-burst m', x, y, s), [{ opacity: .95, scale: .5 }, { opacity: 0, scale: 2.2 }], { duration: RM ? 200 : 560, easing: 'cubic-bezier(.2,.7,.3,1)' });
+}
+function burstAnni(x, y, ea, eb, s, t) {
+  anim(fxEl('ks-burst flash', x, y, s * 1.6), [{ opacity: 1, scale: .4 }, { opacity: .9, scale: 1, offset: .25 }, { opacity: 0, scale: 1.4 }], { duration: RM ? 200 : 420, easing: 'ease-out' });
+  anim(fxEl('ks-burst a', x, y, s), [{ opacity: 1, scale: .6 }, { opacity: 0, scale: 3 }], { duration: RM ? 220 : 620, easing: 'cubic-bezier(.15,.7,.3,1)' });
+  if (RM) return;
+  const cols = [EL[ea].color, EL[eb].color, '#ffffff'], n = 8 + (t || 1) * 3;
+  for (let i = 0; i < n; i++) {
+    const a = Math.PI * 2 * i / n + Math.random() * .4, d = s * (.8 + Math.random() * .8);
+    const sp = fxEl('ks-spark', x, y, 6); sp.style.background = cols[i % 3]; sp.style.boxShadow = `0 0 8px ${cols[i % 3]}`;
+    anim(sp, [{ translate: '0 0', opacity: 1, scale: 1 }, { translate: `${Math.cos(a) * d}px ${Math.sin(a) * d}px`, opacity: 0, scale: .3 }], { duration: 420 + Math.random() * 260, easing: 'cubic-bezier(.1,.7,.3,1)' });
+  }
+}
+function floatPts(x, y, pts, chain) {
+  if (!pts) return;
+  const n = document.createElement('span'); n.className = 'nr-pts';
+  n.innerHTML = `+${fmt(pts)}${chain >= 2 ? `<small>×${chain}</small>` : ''}`;
+  n.style.left = x + 'px'; n.style.top = y + 'px';
+  n.addEventListener('animationend', () => n.remove()); q('nrFx').appendChild(n);
+}
+function tag(x, y, text) {
+  const n = document.createElement('span'); n.className = 'nr-tag'; n.textContent = text;
+  n.style.left = x + 'px'; n.style.top = y + 'px';
+  n.addEventListener('animationend', () => n.remove()); q('nrFx').appendChild(n);
+}
+function call(text, sub, cls = '') {
+  const box = q('nrCall'); box.innerHTML = '';
+  const n = document.createElement('div'); n.className = 'al-call ' + cls;
+  n.innerHTML = `<b>${text}</b>${sub ? `<i>${sub}</i>` : ''}`;
+  n.addEventListener('animationend', () => n.remove()); box.appendChild(n);
+}
+function toast(m) { MSG = m; render(); setTimeout(() => { if (MSG === m) { MSG = null; if (G) render(); } }, 2800); }
+function bumpChain() { const c = q('nrChain'); c.classList.remove('bump'); void c.offsetWidth; c.classList.add('bump'); }
+// 石が峰から手へ飛ぶ（アイコンだけの写しを、上の層で動かす）
+async function fly(from, to, html, size) {
+  const n = document.createElement('div'); n.className = 'nr-fly'; n.innerHTML = html;
+  const s = Math.max(8, Math.min(from.w, from.h) * .8);
+  n.style.width = n.style.height = s + 'px';
+  q('nrFx').appendChild(n);
+  const fx = from.x + from.w / 2 - s / 2, fy = from.y + from.h / 2 - s / 2, tx = to.x + to.w / 2 - s / 2, ty = to.y + to.h / 2 - s / 2;
+  const a = n.animate([{ transform: `translate(${fx}px,${fy}px) scale(1)` }, { transform: `translate(${tx}px,${ty}px) scale(${size / s})` }], { duration: T.fly, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'forwards' });
+  await Promise.race([a.finished.catch(() => {}), wait(T.fly + 120)]);
+  n.remove();
+}
+const handCenter = () => { const r = relRect(q('nrHslot')); return { r, x: r.x + r.w / 2, y: r.y + r.h / 2 }; };
+// 出来事を順に見せる（G はもう動き終えた形。HV・HOLD・KEEP で途中の形を描く）
+async function playLog(log) {
+  for (const x of log) {
+    if (x.k === 'take') {
+      const el = PIECES.get(x.i), from = el ? relRect(el) : null, hc = handCenter();
+      render();
+      if (from) await fly(from, hc.r, orbIcon(x.c.e, x.c.t, 64), HSZ * .82);
+      if (x.kind === 'pick') { HV = x.c; GROW = true; render(); SFX.place(); SFX.tone(990, { dur: .07, gain: .025 }); await wait(T.merge * .5); }
+      else if (x.kind === 'merge') {
+        HV = { e: x.c.e, t: x.t }; CHAINV = x.chain; GROW = true; render(); bumpChain();
+        burstMerge(hc.x, hc.y, HSZ); SFX.bell(NOTE(x.chain), .09); SFX.spawn();
+        if (x.t < 4) tag(hc.x, hc.y - HSZ * .62, `合成 → ${TI[x.t].name}`);
+        await wait(T.merge);
+      } else {
+        const he = HV ? HV.e : x.c.e ^ 1;
+        CHAINV = x.chain; DISP += x.pts; HV = null; render(); bumpChain();
+        burstAnni(hc.x, hc.y, he, x.c.e, HSZ, x.c.t); floatPts(hc.x, hc.y - HSZ * .5, x.pts, x.chain);
+        if (SFX.breath) SFX.breath(x.c.t); SFX.bell(NOTE(x.chain), .09, .02);
+        if (x.c.t >= 3) SFX.tone(58, { dur: 1.1, gain: .14, lp: 240 });
+        if (x.chain >= 4 && x.chain % 2 === 0) call(`${x.chain}連鎖`, `×${x.chain}`, 'lv2');
+        await wait(T.anni);
+      }
+    } else if (x.k === 'reveal') {
+      x.ids.forEach(j => HOLD.delete(j)); render();
+      for (const j of x.ids) { const el = PIECES.get(j); if (el) el.firstElementChild.animate([{ transform: 'rotateY(90deg)', filter: 'brightness(2.2)' }, { transform: 'rotateY(0deg)', filter: 'brightness(1)' }], { duration: T.reveal, easing: 'cubic-bezier(.2,.8,.3,1)' }); }
+      if (x.ids.length) { SFX.tone(1320, { dur: .08, gain: .016 }); SFX.tone(1760, { dur: .06, gain: .01, at: .05 }); await wait(T.reveal * .7); }
+    } else if (x.k === 'truth') {
+      const hc = handCenter();
+      HV = { e: x.e, t: 4 }; CHAINV = x.chain; DISP += x.pts; GROW = true; render();
+      burstMerge(hc.x, hc.y, HSZ * 1.3); floatPts(hc.x, hc.y - HSZ * .6, x.pts, x.chain);
+      call('真理', `${EL[x.e].name}の真理、天へ`, 'lv3'); SFX.harmony();
+      await wait(T.truth1);
+      const ic = q('nrHslot').firstElementChild;
+      if (ic) await Promise.race([ic.animate([{ transform: 'translateY(0)', opacity: 1, filter: 'brightness(1)' }, { transform: `translateY(${-HSZ * 1.6}px) scale(1.25)`, opacity: 0, filter: 'brightness(2.4)' }], { duration: T.truth2, easing: 'cubic-bezier(.3,.1,.3,1)', fill: 'forwards' }).finished.catch(() => {}), wait(T.truth2 + 100)]);
+      HV = null; render();
+    } else if (x.k === 'calm') {
+      for (const y of x.list) {
+        const el = PIECES.get(y.i), r = el ? relRect(el) : null;
+        KEEP.delete(y.i); CHAINV = y.chain; DISP += y.pts; render(); bumpChain();
+        if (r) { const cx = r.x + r.w / 2, cy = r.y + r.h / 2; burstAnni(cx, cy, y.c.e, y.c.e ^ 1, r.w, y.c.t); floatPts(cx, cy - r.h * .4, y.pts, y.chain); }
+        SFX.bell(NOTE(y.chain), .08); if (SFX.breath) SFX.breath(1);
+        await wait(T.calm);
+      }
+      if (x.list.length) toast(`${EL[x.e].name}の石が${x.list.length}つ静まった。`);
+    } else if (x.k === 'flip') {
+      const hc = handCenter(), from = relRect(q('nrStock').querySelector('.nr-sc'));
+      const old = HV; HV = null; CHAINV = 0; render();
+      if (old) { const n = fxEl('nr-fly', hc.x, hc.y, HSZ * .82); n.innerHTML = orbIcon(old.e, old.t, 64); anim(n, [{ opacity: .9, translate: '0 0' }, { opacity: 0, translate: `0 ${HSZ * .5}px`, scale: .6 }], { duration: RM ? 120 : 360, easing: 'ease-in' }); }
+      SFX.place();
+      await fly(from, hc.r, orbIcon(x.c.e, x.c.t, 64), HSZ * .82);
+      HV = x.c; GROW = true; render(); SFX.tone(660, { dur: .08, gain: .03 });
+      await wait(T.merge * .4);
+    }
+  }
+}
+
+/* ---------- 一局の終わり ---------- */
+const recOf = () => Object.assign({ games: 0, wins: 0, streak: 0, bestStreak: 0, best: 0 }, store.get('nr.rec', null) || {});
+function finish(kind) {
+  const bonus = kind === 'win' ? NRE.bonus(G) : 0;
+  G.score += bonus; G.phase = 'end'; G.result = { kind, bonus, left: NRE.left(G), stock: G.stock.length };
+  DISP = G.score;
+  let rec = false;
+  if (G.mode === 'run') {
+    const r = recOf(); r.games++;
+    if (kind === 'win') { r.wins++; r.streak++; r.bestStreak = Math.max(r.bestStreak, r.streak); } else r.streak = 0;
+    if (G.score > r.best) { rec = r.best > 0; r.best = G.score; } // はじめての一局は「新記録」と出さない
+    G.result.streak = r.streak;
+    store.set('nr.rec', r);
+  }
+  store.set('nr.run', null);
+  render();
+  if (kind === 'win') { call('静寂', '峰が静まった', 'lv3'); SFX.win(); }
+  else { call('詰み', `あと${G.result.left}つ`, 'back'); SFX.over(); }
+  setTimeout(() => showResult(rec), T.end);
+}
+function showResult(rec) {
+  if (!G || G.phase !== 'end') return;
+  const R = G.result, s = G.st, win = R.kind === 'win';
+  q('nrResEy').textContent = G.mode === 'free' ? 'Chimestones・練習' : 'Chimestones';
+  q('nrResH').textContent = win ? '峰が静まった' : '詰み';
+  q('nrResPts').textContent = fmt(G.score);
+  q('nrResRec').hidden = !rec;
+  q('nrResWhy').innerHTML = win ? `〈静寂〉+${NRE.CLEAR}・残った山札 ${R.stock}枚 × ${NRE.LEFT} = <em>+${fmt(R.bonus)}</em>` + (R.streak > 1 ? `　<em>${R.streak}連勝</em>` : '')
+    : `山札が尽きて、押せる石がなくなった。峰の石は<em>あと${R.left}つ</em>だった。`;
+  q('nrResStats').innerHTML = [['最長の連鎖', s.maxChain], ['真理', s.truths], ['合成', s.merge], ['対消滅', s.anni], ['静まった', s.calm], ['めくった', s.flips]]
+    .map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+  q('nrResSame').textContent = G.mode === 'free' ? 'チュートリアルをもう一度' : '同じ配りでもう一度';
+  q('nrResOv').hidden = false; q('nrResNew').focus();
+}
+
+/* ---------- 位置 ---------- */
+function geo() {
+  const st = q('nrStage'), W = st.clientWidth, fh = q('nrField').clientHeight; if (!W) return null;
+  const gap = 1.06, byW = Math.floor(W / (8 * gap + 1)), byH = fh ? Math.floor(fh / 4.5) : byW;
+  const cw = Math.max(26, Math.min(70, byW, byH)), ch = Math.round(cw * 1.3), gx = cw * gap;
+  const dy = Math.round(Math.max(ch * .6, Math.min(ch * .78, ((fh || 0) * .85 - ch) / 4))); // 縦に余裕があれば峰を高く（重なりは2割以上残す）
+  HSZ = Math.max(56, Math.min(88, Math.round(cw * 1.6)));
+  return GEO = { W, cw, ch, dy, gx, x0: (W - (8 * gx + cw)) / 2, H: ch + 4 * dy, isz: Math.round(cw * .8) };
+}
+
+/* ---------- 描画 ---------- */
+function renderCards() {
+  const g = geo(); if (!g) return;
+  q('nrStage').style.height = g.H + 'px';
+  const mk = new Map(), tg = tutGoal();
+  if (!BUSY && playing()) for (const m of NRE.moves(G)) mk.set(m.i, m.kind);
+  const seen = new Set(), layer = q('nrCards');
+  for (let i = 0; i < NRE.N; i++) {
+    const c = G.cards[i] || KEEP.get(i); if (!c) continue;
+    seen.add(i);
+    const s = NRE.SLOTS[i], up = KEEP.has(i) || (NRE.isOpen(G, i) && !HOLD.has(i));
+    const x = g.x0 + s.x * g.gx, y = s.r * g.dy;
+    let el = PIECES.get(i);
+    if (!el) {
+      el = document.createElement('span'); el.className = 'nr-card'; el.dataset.i = i; el.innerHTML = '<span class="nr-face"></span>';
+      layer.appendChild(el); PIECES.set(i, el); el.style.transition = 'none';
+      el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`; void el.offsetWidth; el.style.transition = '';
+    }
+    el.style.width = g.cw + 'px'; el.style.height = g.ch + 'px'; el.style.zIndex = String(s.r + 1);
+    el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px)`;
+    const key = up ? `${c.e}|${c.t}|${g.isz}` : `d|${g.isz}`;
+    if (el.dataset.k !== key) {
+      el.dataset.k = key;
+      el.firstElementChild.innerHTML = up ? orbIcon(c.e, c.t, g.isz) + `<i class="pip">${'•'.repeat(c.t)}</i>` : '';
+      if (up) { el.style.setProperty('--nrc', rgba(EL[c.e].color, .65)); el.style.setProperty('--nrg', rgba(EL[c.e].color, .22)); }
+      else { el.style.removeProperty('--nrc'); el.style.removeProperty('--nrg'); }
+    }
+    const kind = mk.get(i), tut = tg && tg.act === 'take' && tg.i === i && !BUSY;
+    el.className = 'nr-card ' + (up ? 'up' : 'down') + (up && !BUSY && playing() ? ' open' : '') + (kind && (HINT || TUT) ? ' can ' + KCLS[kind] : '') + (tut ? ' tut' : '');
+    if (up && playing()) {
+      el.setAttribute('role', 'button'); el.setAttribute('tabindex', '0');
+      el.setAttribute('aria-label', pname(c) + (kind === 'merge' ? '（合成できる）' : kind === 'anni' ? '（対消滅できる）' : kind === 'pick' ? '（手に取れる）' : ''));
+    } else { el.removeAttribute('role'); el.removeAttribute('tabindex'); el.setAttribute('aria-label', up ? pname(c) : '混沌に覆われた石'); }
+  }
+  for (const [i, el] of PIECES) if (!seen.has(i)) { el.remove(); PIECES.delete(i); }
+}
+function clearPieces() { for (const el of PIECES.values()) el.remove(); PIECES.clear(); }
+function renderHand() {
+  const h = handShown(), slot = q('nrHslot'), sz = HSZ;
+  slot.style.width = slot.style.height = sz + 'px';
+  const key = h ? `${h.e}|${h.t}|${sz}` : `none|${sz}`;
+  if (slot.dataset.k !== key) {
+    slot.dataset.k = key;
+    slot.innerHTML = h ? orbIcon(h.e, h.t, Math.round(sz * .82)) : '';
+    slot.className = 'nr-hslot ' + (h ? 'has' : 'empty');
+    if (h) { slot.style.setProperty('--nrc', rgba(EL[h.e].color, .75)); slot.style.setProperty('--nrg', rgba(EL[h.e].color, .32)); }
+    if (h && GROW && slot.firstElementChild) slot.firstElementChild.animate([{ scale: .35, opacity: .3, filter: 'brightness(2.4)' }, { scale: 1.18, opacity: 1, filter: 'brightness(1.5)', offset: .6 }, { scale: 1, filter: 'brightness(1)' }], { duration: RM ? 120 : 420, easing: 'cubic-bezier(.2,.8,.3,1)' });
+  }
+  GROW = false;
+  slot.setAttribute('aria-label', h ? `手の石：${pname(h)}` : '手の石：空き');
+  q('nrHlbl').innerHTML = h ? `手の石 <b>${pname(h)}</b>` : playing() ? '手が空いた' : '';
+}
+function renderBot() {
+  const stuck = canAct() && G.hand && !NRE.moves(G).length && G.stock.length, tg = tutGoal();
+  const sb = q('nrStock');
+  sb.disabled = !canAct() || !G.stock.length || (TUT && !(tg && tg.act === 'flip'));
+  sb.className = 'nr-stock' + (stuck && !TUT ? ' need' : '') + (tg && tg.act === 'flip' && !BUSY ? ' tut' : '');
+  q('nrStockN').textContent = G.stock.length;
+  sb.setAttribute('aria-label', `山札をめくる（残り${G.stock.length}枚）`);
+  const c = CHAINV;
+  q('nrChain').innerHTML = `<span>連鎖</span><b class="${c >= 3 ? 'hot' : ''}">${c}</b><span>${playing() ? `次の対消滅 ×${c + 1}` : ''}</span>`;
+}
+function renderTop() {
+  let s;
+  if (G.mode === 'tut') s = `<span class="ks-stat">チュートリアル</span><span class="ks-stat pts">響き<b>${fmt(DISP)}</b></span>`;
+  else {
+    s = `<span class="ks-stat pts">響き<b>${fmt(DISP)}</b></span><span class="ks-stat">峰<b>${NRE.left(G)}</b></span>`;
+    if (G.mode === 'free') s += `<span class="ks-stat">練習</span>`;
+    else { const r = recOf(); if (r.streak) s += `<span class="ks-stat">連勝<b>${r.streak}</b></span>`; }
+  }
+  q('nrStats').innerHTML = s;
+}
+function infoText() {
+  if (MSG) return MSG;
+  if (G.phase === 'end') return G.result && G.result.kind === 'win' ? '峰が静まった。' : '押せる石がなくなった。';
+  const h = G.hand;
+  if (!h) return '手が空いた。表の石をどれでも一つ手に取れる。表に相手のいる石を選ぼう。';
+  const mv = NRE.moves(G);
+  if (!mv.length) return G.stock.length ? '響き合う石が表にない。山札をめくろう（連鎖は途切れる）。' : '';
+  const same = h.t < 4 ? `${pname(h)}（合成）` : '', opp = `${EL[h.e ^ 1].name}の${TI[h.t].name}（対消滅）`;
+  return `${pname(h)}と響き合うのは、${[same, opp].filter(Boolean).join('と')}。`;
+}
+function render() {
+  if (!G) return;
+  q('nr').classList.toggle('tut', !!TUT); q('nr').dataset.busy = BUSY ? '1' : '';
+  if (!BUSY) { DISP = G.score; CHAINV = G.chain; }
+  renderCards(); renderHand(); renderBot(); renderTop();
+  if (!BUSY || MSG) q('nrInfo').textContent = infoText();
+  if (TUT) renderCoach(); else q('nrCoach').hidden = true;
+}
+
+/* ---------- 入力 ---------- */
+function onStage(e) {
+  const el = e.target.closest('.nr-card'); if (!el || !canAct()) return;
+  if (TUT && !NRE.isOpen(G, +el.dataset.i)) { nudge(); return; }
+  act(+el.dataset.i);
+}
+function onKey(e) {
+  if (S.screen !== 'nari' || !G || e.repeat) return;
+  if (!q('nrMenuOv').hidden || !q('nrRulesOv').hidden || !q('nrResOv').hidden) return;
+  const tgt = e.target && e.target.closest && e.target.closest('button,input,select,textarea,[role="button"]');
+  if ((e.key === ' ' || e.key === 'Enter') && !tgt) { e.preventDefault(); if (playing()) flip(); }
+}
+
+/* ---------- チュートリアル ----------
+   決まった配りで、合成 → 対消滅 → 手が空いて選ぶ → 覆いがはれる → 対消滅 → 相手のいない石を取って山札をめくる → 真理、を順に動かす。
+   峰の番号：上の段から 0〜1・2〜5・6〜11・12〜19・20〜28（いちばん下の段） */
+const TFIX = { 20: 'W2', 21: 'A1', 22: 'F1', 23: 'E2', 24: 'E1', 25: 'W3', 26: 'F3', 27: 'A2', 28: 'E3', 12: 'W2', 13: 'W1' }, THAND = 'F1', TTOP = 'F3';
+const TSTEPS = [
+  { say: '<em>鳴り石</em>へようこそ。下の大きな石が<em>手の石</em>（いまは火の雫）。峰の表の石のうち、手の石と響き合うものが光る。光っている<em>火の雫</em>を押そう。', go: { act: 'take', i: 22 }, do: '火の雫を押す' },
+  { say: '<em>同じ元素・同じ段階</em>なので<em>合成</em>。手の石が一段育って<em>火の輝石</em>になった。今度は<em>反対の元素</em>（火と水、風と土が対）。光っている<em>水の輝石</em>を押そう。', go: { act: 'take', i: 20 }, do: '水の輝石を押す' },
+  { say: '<em>反対の元素・同じ段階</em>なので<em>対消滅</em>。両方消えて響きが鳴った（輝石8 × 連鎖2）。手が空いたら、<em>表の石をどれでも一つ</em>手に取れる。表に土の雫があるので、<em>風の雫</em>を取ろう。', go: { act: 'take', i: 21 }, do: '風の雫を取る' },
+  { say: '重なっていた下の2つがなくなると、<em>混沌の覆いがはれて</em>、石が表になる（いま、2つ表になった）。押せるのは表の石だけ。', go: 'next' },
+  { say: '手の風の雫と、反対の<em>土の雫</em>で対消滅しよう。山札をめくらずに続けた数が<em>連鎖</em>。これで3つ目なので、響きは×3。', go: { act: 'take', i: 24 }, do: '土の雫を押す' },
+  { say: '手が空いた。今度は、表に相手のいない石を取るとどうなるか見てみよう。表になったばかりの<em>水の雫</em>を取る。', go: { act: 'take', i: 13 }, do: '水の雫を取る' },
+  { say: '水の雫と響き合う石（水の雫・火の雫）が表にない。こういうときは<em>山札をめくる</em>。手の石は入れ替わり、<em>連鎖は途切れる</em>。だから手が空いたら、相手のいる石を取るのがコツ。', go: { act: 'flip' }, do: 'めくる' },
+  { say: 'めくった石は<em>火の光核</em>。峰にも火の光核がある。光核どうしを合成すると…押してみよう。', go: { act: 'take', i: 26 }, do: '火の光核を押す' },
+  { say: '<em>真理</em>が生まれて天へ昇り、表に見えていた<em>反対の元素（水）の石がすべて静まった</em>。峰をすべて崩せば<em>〈静寂〉</em>、山札が尽きて押せる石がなくなれば<em>〈詰み〉</em>。続きは、このまま自由に崩してみよう。', go: 'final' },
+];
+const TK = s => ({ e: 'FWAE'.indexOf(s[0]), t: +s[1] });
+function tutDeal() {
+  G = blank('tut', 20261123);
+  const pool = NRE.deck(), use = s => { const c = TK(s), k = pool.findIndex(x => x.e === c.e && x.t === c.t); pool.splice(k, 1); return c; };
+  const fixed = {}; for (const k in TFIX) fixed[k] = use(TFIX[k]);
+  const hand = use(THAND), top = use(TTOP);
+  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  const cards = []; for (let i = 0; i < NRE.N; i++) cards.push(fixed[i] || pool.pop());
+  G.cards = cards.map(withId); G.stock = pool.concat([top]).map(withId); G.hand = withId(hand);
+}
+function tutStep() { return TUT && TSTEPS[TUT.i]; }
+function tutGoal() { const st = tutStep(); return st && typeof st.go === 'object' ? st.go : null; }
+function startTutorial() {
+  SFX.init(); tutDeal(); TUT = { i: 0 }; show();
+}
+function nudge() { const c = q('nrCoach'); c.classList.remove('nudge'); void c.offsetWidth; c.classList.add('nudge'); SFX.tap(); }
+function tutOk(act, i) {
+  if (!TUT) return true;
+  const g = tutGoal();
+  if (g && g.act === act && (act !== 'take' || g.i === i)) return true;
+  nudge(); return false;
+}
+function tutAfter() { if (!TUT) return; TUT.i++; render(); }
+function freePlay() { if (!G) return; TUT = null; G.mode = 'free'; MSG = null; render(); toast('練習の一局。記録には残らない。'); }
+function renderCoach() {
+  const box = q('nrCoach'), st = tutStep();
+  if (!st) { box.hidden = true; return; }
+  box.hidden = false;
+  const btns = st.go === 'next' ? `<div class="row end"><button type="button" class="btn primary" id="nrTutNext" ${BUSY ? 'disabled' : ''}>次へ</button></div>`
+    : st.go === 'final' ? '<div class="row end nr-tutbtns"><button type="button" class="btn" id="nrTutAgain">もう一度</button><button type="button" class="btn" id="nrTutFree">このまま続ける</button><button type="button" class="btn primary" id="nrTutPlay">新しい峰へ</button></div>' : '';
+  const h = `<div class="row"><span class="ey">Tutorial ${TUT.i + 1} / ${TSTEPS.length}</span>${st.do ? `<span class="do">${st.do}</span>` : ''}</div><p>${st.say}</p>${btns}`;
+  if (box.dataset.h !== h) { box.innerHTML = h; box.dataset.h = h; }
+  box.className = 'al-coach';
+}
+function onCoach(e) {
+  const b = e.target.closest('button'); if (!b || b.disabled) return;
+  if (b.id === 'nrTutNext') { if (BUSY) return; SFX.tap(); TUT.i++; render(); }
+  else if (b.id === 'nrTutAgain') startTutorial();
+  else if (b.id === 'nrTutFree') { store.set('nr.tutDone', true); freePlay(); }
+  else if (b.id === 'nrTutPlay') { store.set('nr.tutDone', true); begin(); }
+}
+
+/* ---------- 保存 ---------- */
+function save() { if (G && G.mode === 'run' && G.phase === 'play' && !BUSY) store.set('nr.run', G); }
+function loadRun() { const r = store.get('nr.run', null); return r && r.v === 1 && r.mode === 'run' && r.phase === 'play' && Array.isArray(r.cards) && r.cards.length === NRE.N && Array.isArray(r.stock) ? r : null; }
+
+/* ---------- 画面の出入り ---------- */
+function show() {
+  hideOverlays(); q('nrStartOv').hidden = true; ['nrMenuOv', 'nrResOv', 'nrRulesOv'].forEach(id => q(id).hidden = true);
+  app.hidden = true; q('nr').hidden = false; S.screen = 'nari'; S.paused = false; BUSY = false; MSG = null; HVON = false; HOLD.clear(); KEEP.clear();
+  q('nrCall').innerHTML = ''; q('nrFx').innerHTML = ''; clearPieces(); q('nrHslot').dataset.k = ''; q('nrCoach').dataset.h = '';
+  DISP = G.score; CHAINV = G.chain;
+  menuBtns(); render();
+  if (playing() && !TUT && NRE.over(G)) setTimeout(() => { if (G && playing() && !BUSY && NRE.over(G)) finish(NRE.over(G)); }, 300); // 念のため：もう終わっている形を開いたとき
+}
+function menuBtns() {
+  const tut = !!TUT || (G && G.mode === 'free');
+  q('nrRetrySame').textContent = tut ? 'チュートリアルを最初から' : '同じ配りで最初から';
+  q('nrHint').textContent = `押せる石を光らせる：${HINT ? 'オン' : 'オフ'}`; q('nrHint').setAttribute('aria-pressed', String(HINT));
+}
+function begin(seed) { SFX.init(); newRun(seed); show(); save(); }
+function bestText() {
+  const r = recOf(); if (!r.games) return '—';
+  return `${r.wins}勝・最高${fmt(r.best)}`;
+}
+function open() {
+  SFX.init();
+  const run = loadRun(), first = !store.get('nr.tutDone', false), r = recOf();
+  q('nrContinue').hidden = !run;
+  q('nrStartSub').textContent = run ? `遊びかけ：峰の残り${NRE.left(run)}・山札${run.stock.length}枚・響き${fmt(run.score)}`
+    : first ? 'はじめてなら、まずチュートリアルで（約1分）。手の石と響き合う石を押していく、手軽な一人遊び。'
+    : r.games ? `最高 ${fmt(r.best)}・${r.wins}勝 / ${r.games}局・いまの連勝 ${r.streak}（最長 ${r.bestStreak}）` : '手の石と響き合う石を押して、二つの峰を崩そう。';
+  q('nrTutorial').className = 'btn' + (first && !run ? ' primary' : '');
+  q('nrNew').className = 'btn' + (!first && !run ? ' primary' : '');
+  el.titleOv.hidden = true; q('nrStartOv').hidden = false;
+  (run ? q('nrContinue') : first ? q('nrTutorial') : q('nrNew')).focus();
+}
+function openRules() { q('nrRulesOv').hidden = false; q('nrRulesOv').querySelector('.panel').scrollTop = 0; q('nrRulesClose').focus({ preventScroll: true }); }
+function hideGame() {
+  q('nr').hidden = true; ['nrMenuOv', 'nrResOv', 'nrRulesOv'].forEach(id => q(id).hidden = true);
+  if (G && G.mode === 'run' && G.phase === 'play') save();
+  G = null; TUT = null; BUSY = false; app.hidden = false;
+}
+function hide() {
+  if (!q('nr')) return;
+  hideGame(); q('nrStartOv').hidden = true;
+  const b = q('bestNari'); if (b) b.textContent = loadRun() ? '遊びかけ' : bestText();
+}
+function esc() {
+  if (!q('nrStartOv').hidden) { q('nrStartOv').hidden = true; el.titleOv.hidden = false; return true; }
+  if (S.screen !== 'nari') return false;
+  if (!q('nrRulesOv').hidden) q('nrRulesOv').hidden = true;
+  else if (!q('nrMenuOv').hidden) q('nrMenuOv').hidden = true;
+  else if (!q('nrResOv').hidden) q('nrResOv').hidden = true;
+  else { menuBtns(); q('nrMenuOv').hidden = false; }
+  return true;
+}
+function updateSound() { const b = q('nrSound'); b.classList.toggle('off', !SFX.on); b.setAttribute('aria-pressed', String(SFX.on)); }
+function retrySame() {
+  if (BUSY) return; q('nrMenuOv').hidden = true; q('nrResOv').hidden = true;
+  if (TUT || (G && G.mode === 'free')) return startTutorial();
+  begin(G ? G.seed : undefined);
+}
+function init() {
+  HINT = store.get('nr.hint', true) !== false;
+  const ic = q('icNari');
+  if (ic) ic.innerHTML = orbIcon(0, 2, 20) + orbIcon(0, 1, 18) + orbIcon(1, 2, 20);
+  q('nrRulesTiers').innerHTML = [1, 2, 3, 4].map(t => `<span class="ks-mini">${orbIcon(0, t, 20)}${TI[t].name}</span>`).join(' → ');
+  q('nrRulesPairs').innerHTML = `<span class="nr-pair">${orbIcon(0, 1, 20)}火⇔水${orbIcon(1, 1, 20)}</span>・<span class="nr-pair">${orbIcon(2, 1, 20)}風⇔土${orbIcon(3, 1, 20)}</span>`;
+  q('goNari').addEventListener('click', open);
+  q('nrContinue').addEventListener('click', () => { const r = loadRun(); if (!r) return open(); SFX.init(); G = r; TUT = null; show(); toast('続きから'); });
+  q('nrNew').addEventListener('click', () => begin());
+  q('nrTutorial').addEventListener('click', startTutorial);
+  q('nrStartBack').addEventListener('click', () => { q('nrStartOv').hidden = true; el.titleOv.hidden = false; });
+  q('nrStage').addEventListener('click', onStage);
+  q('nrStage').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { const c = e.target.closest('.nr-card'); if (c) { e.preventDefault(); onStage(e); } } });
+  q('nrStock').addEventListener('click', () => { if (TUT && !(tutGoal() && tutGoal().act === 'flip')) { nudge(); return; } flip(); });
+  q('nrCoach').addEventListener('click', onCoach);
+  document.addEventListener('keydown', onKey);
+  q('nrMenuBtn').addEventListener('click', () => { SFX.tap(); menuBtns(); q('nrMenuOv').hidden = false; q('nrResume').focus(); });
+  q('nrResume').addEventListener('click', () => { q('nrMenuOv').hidden = true; });
+  q('nrMenuRules').addEventListener('click', () => { q('nrMenuOv').hidden = true; openRules(); });
+  q('nrHint').addEventListener('click', () => { HINT = !HINT; store.set('nr.hint', HINT); menuBtns(); render(); });
+  q('nrRulesBtn').addEventListener('click', () => { SFX.tap(); openRules(); });
+  q('nrRulesClose').addEventListener('click', () => { q('nrRulesOv').hidden = true; });
+  q('nrRulesTut').addEventListener('click', () => { if (BUSY) return; if (G && G.mode === 'run') save(); startTutorial(); });
+  q('nrRetrySame').addEventListener('click', retrySame);
+  q('nrRetryNew').addEventListener('click', () => { if (BUSY) return; begin(); });
+  q('nrToTitle').addEventListener('click', () => { if (BUSY) return; showTitle(); });
+  q('nrResNew').addEventListener('click', () => { q('nrResOv').hidden = true; begin(); });
+  q('nrResSame').addEventListener('click', retrySame);
+  q('nrResTitle').addEventListener('click', showTitle);
+  q('nrSound').addEventListener('click', () => { SFX.on = !SFX.on; store.set('sound', SFX.on); if (SFX.on) SFX.init(); updateSound(); updateSoundBtn(); });
+  for (const id of ['nrMenuOv', 'nrRulesOv']) q(id).addEventListener('click', e => { if (e.target.id === id) q(id).hidden = true; });
+  const relayout = () => { if (S.screen === 'nari' && G && !BUSY) render(); };
+  if (window.ResizeObserver) new ResizeObserver(relayout).observe(q('nr'));
+  else window.addEventListener('resize', relayout);
+  updateSound();
+  hide();
+}
+return { init, hide, esc };
+})();
+
+/* ================================================================
    錬成の書 ― もとの錬成の書（一列7マスの坩堝）を一から設計し直したもの。v1.102.0 で、もとの錬成の書と試しの対局を削除し、こちらを錬成の書とした（内部の名前・保存の名前は a2 のまま）
    札＝元素の欠片を坩堝に落とす呪文。坩堝は5列×5段のます目で、欠片は下に積もる。
    きまり：落ちた・動いた・変わった欠片は、触れている欠片と反応する（同じ元素・同じ段階は合成、反対の元素・同じ段階は対消滅）。
@@ -10336,7 +11106,7 @@ function frame(t) {
   let dt = t - lastT; lastT = t;
   if (S.screen === 'play' && !document.hidden) perfTick(dt);
   if (dt > 50) dt = 50; if (dt < 0) dt = 0;
-  if (S.screen === 'alch2' || S.screen === 'kasane' || S.screen === 'erosion' || S.screen === 'shiho' || S.screen === 'retsu') { requestAnimationFrame(frame); return; } // 錬成の書・重ね札・侵食・四方の盤・共鳴の列：盤は描かない
+  if (S.screen === 'alch2' || S.screen === 'kasane' || S.screen === 'erosion' || S.screen === 'shiho' || S.screen === 'retsu' || S.screen === 'nari') { requestAnimationFrame(frame); return; } // 錬成の書・重ね札・侵食・四方の盤・共鳴の列・鳴り石：盤は描かない
   const stop = performance.now() < (S.hitStop || 0); // ヒットストップ：時間が止まる
   const clock = (S.screen === 'play' || S.screen === 'result') && !S.paused && !stop;
   if (clock) S.now += dt;
@@ -10402,6 +11172,7 @@ function bindUI() {
     if (ER.esc()) return;
     if (SH.esc()) return;
     if (RT.esc()) return;
+    if (NR.esc()) return;
     if (!el.rulesOv.hidden) closeRules();
     else if (!$('#tuneOv').hidden) closeTune();
     else if (!$('#soundOv').hidden) closeSound();
@@ -10426,6 +11197,7 @@ function start(data) {
   ER.init();
   SH.init();
   RT.init();
+  NR.init();
   fillRules();
   updateSoundBtn();
   if (data && data.v === 1 && data.screen === 'play' && Array.isArray(data.orbs) && data.orbs.length) restore(data);

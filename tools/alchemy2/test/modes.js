@@ -1,4 +1,4 @@
-// もとの錬成の書・試しの対局が消えていること、ほかのモード（重ね札・侵食・四方の盤・共鳴の列・クラシック）が開けること、錬成の書（内部の名前は a2）の保存・続きから・全体のあそびかた
+// もとの錬成の書・試しの対局が消えていること、ほかのモード（重ね札・侵食・四方の盤・共鳴の列・鳴り石・クラシック）が開けること、錬成の書（内部の名前は a2）の保存・続きから・全体のあそびかた
 // 使い方：node tools/alchemy2/test/modes.js（スクリーンショットは OUT のフォルダへ。既定は一時フォルダ）
 const path = require('path'), os = require('os'), fs = require('fs');
 const INDEX = path.resolve(__dirname, '../../../index.html');
@@ -18,9 +18,9 @@ const { chromium } = require('playwright');
   // もとの錬成の書・試しの対局は v1.102.0 で削除した：タイトルにも画面にも残っていないこと
   const gone = await p.evaluate(() => !document.getElementById('goAlchemy') && !document.getElementById('alch') && !document.getElementById('du') && !document.getElementById('alStartOv'));
   const titleName = await p.evaluate(() => document.querySelector('#goAlchemy2 .mode-name').textContent);
-  // ほかのモードが開いて、タイトルへ戻れるか（重ね札・侵食・四方の盤・共鳴の列）
+  // ほかのモードが開いて、タイトルへ戻れるか（重ね札・侵食・四方の盤・共鳴の列・鳴り石）
   const others = {};
-  for (const [btn, sec] of [['goKasane', 'ks'], ['goErosion', 'er'], ['goShiho', 'sh'], ['goRetsu', 'rt']]) {
+  for (const [btn, sec] of [['goKasane', 'ks'], ['goErosion', 'er'], ['goShiho', 'sh'], ['goRetsu', 'rt'], ['goNari', 'nr']]) {
     await p.click('#' + btn); await p.waitForTimeout(300);
     const start = await p.evaluate(() => [...document.querySelectorAll('section.overlay')].find(o => !o.hidden && o.id !== 'titleOv'));
     others[btn] = await p.evaluate(() => { const o = [...document.querySelectorAll('section.overlay')].find(x => !x.hidden && x.id !== 'titleOv'); return o ? o.id : (document.querySelector('section[aria-label]:not([hidden])') || {}).id || 'none'; });
