@@ -1,4 +1,4 @@
-// 鳴り石のチュートリアルを最後まで：段ごとに、決まった石を押し・めくり、手の石・響き・連鎖・覆いがはれた数を確かめる。
+// 鳴り石のチュートリアルを最後まで：段ごとに、決まった石を押し・めくり（めくった石が響き合って連鎖が続く）、手の石・響き・連鎖・覆いがはれた数を確かめる。
 // そのあと「このまま続ける」で練習の一局を最後まで遊び、結果の画面（記録に残らない）まで。
 // 使い方：node tools/chimestone/test/tutorial.js（スクリーンショットは OUT のフォルダへ。既定は一時フォルダ）
 const path = require('path'), os = require('os'), fs = require('fs');
@@ -31,7 +31,7 @@ const { chromium } = require('playwright');
   await p.evaluate(() => document.querySelector('.nr-card[data-i="21"]').click()); await idle();
   const blocked = (await state()).step;
   // 段ごとに：光っている（tut）石かめくるを押す。「次へ」はそのまま
-  for (let k = 0; k < 9; k++) {
+  for (let k = 0; k < 12; k++) {
     const s = await state(); log.push(s);
     if (await p.$('#nrTutNext')) { await p.click('#nrTutNext'); await idle(); continue; }
     if (await p.$('#nrTutFree')) break;
@@ -39,9 +39,10 @@ const { chromium } = require('playwright');
     else if (s.tut) await p.evaluate(i => document.querySelector(`.nr-card[data-i="${i}"]`).click(), s.tut);
     else break;
     await idle();
-    if (k === 7) await p.screenshot({ path: OUT + '/tut-truth.png' });
+    if (s.tut === 'stock') await p.screenshot({ path: OUT + '/tut-flip.png' });
   }
   const last = await state(); log.push(last);
+  if (errs.length) console.log('errors so far:', errs.join(' / '));
   for (const s of log) console.log(`${s.step} | 手：${s.hand} | 響き ${s.score} | 連鎖 ${s.chain} | 表 ${s.up} | 目標 ${s.tut}`);
   await p.screenshot({ path: OUT + '/tut-final.png' });
   // このまま続ける：練習の一局を最後まで（光る石があれば押す、なければめくる）

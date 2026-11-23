@@ -19,7 +19,7 @@ node tools/chimestone/sim.js
 | `N` | でたらめ・直感の局数（既定 1000） |
 | `NM` | 読むボットの局数（既定 200。遅いので少なめ） |
 | `K` | 読むボットが1手ごとに試す回数（既定 8） |
-| `PER` | 各元素の雫,輝石,光核の枚数（例 `PER=6,4,2`。既定はゲームと同じ 7,4,2） |
+| `PER` | 各元素の雫,輝石,光核の枚数（例 `PER=6,4,2`。既定はゲームと同じ 5,4,2） |
 | `NRSRC` | ほかの版の index.html を読む（前後の比べ） |
 
 ## 画面の試験
@@ -30,6 +30,10 @@ node tools/chimestone/test/tutorial.js
 
 ```bash
 node tools/chimestone/test/play.js
+```
+
+```bash
+node tools/chimestone/test/flip.js
 ```
 
 ```bash
