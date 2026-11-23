@@ -93,11 +93,13 @@ function battle(key, deck, P, hp0) {
     if (n.rel && P.seal) { seal = true; rels++; }
     if (hp <= 0) return { win: 1, loss: hp0 - vessel, turn, rels };
     if (ph === 1 && D.pat2 && hp <= D.hp / 2) { ph = 2; si = 0; intents = [nextI(), nextI()]; }
+    // 手番の終わり：蝕み → 慈雨の回復（ゲームと同じ順）。そのあと敵の番
+    vessel -= E.bite(B.S, ctx(P, true)); if (vessel <= 0) return { win: 0, loss: hp0, turn, rels };
     vessel = Math.min(hp0, vessel + 3 * truthPow(B.S)[1]);
     if (has(P, 'bell') && B.S.cols.every(c => !c.length)) bell = true;
     B.S.salt++;
-    const out = E.enemyTurn(B.S, seal ? [] : intents[0], ctx(P, true)); seal = false;
-    vessel -= out.bite + out.over + out.strike; hp -= out.dmg;
+    const out = E.enemyTurn(B.S, seal ? [] : intents[0], { ...ctx(P, true), noBite: true }); seal = false;
+    vessel -= out.over + out.strike; hp -= out.dmg;
     if (P.seal && out.ev.some(v => v.t === 'anni' && v.tier === 4)) { seal = true; rels++; }
     if (vessel <= 0) return { win: 0, loss: hp0, turn, rels };
     if (hp <= 0) return { win: 1, loss: hp0 - vessel, turn, rels };
