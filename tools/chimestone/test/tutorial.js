@@ -1,8 +1,9 @@
-// 鳴り石のチュートリアルを最後まで：段ごとに、決まった石を押し・めくり（めくった石が響き合って連鎖が続く）、手の石・響き・連鎖・覆いがはれた数を確かめる。
+// 鳴り石のチュートリアルを最後まで：段ごとに、決まった石を押し・めくり（めくった石が響き合って連鎖が続く）・光を使い、手の石・響き・連鎖・覆いがはれた数・光と闇の数を確かめる。
+// NRSRC で、ほかの index.html（たとえば光と闇のノブを切ったもの）を読める。
 // そのあと「このまま続ける」で練習の一局を最後まで遊び、結果の画面（記録に残らない）まで。
 // 使い方：node tools/chimestone/test/tutorial.js（スクリーンショットは OUT のフォルダへ。既定は一時フォルダ）
 const path = require('path'), os = require('os'), fs = require('fs');
-const INDEX = path.resolve(__dirname, '../../../index.html');
+const INDEX = process.env.NRSRC || path.resolve(__dirname, '../../../index.html');
 const OUT = process.env.OUT || fs.mkdtempSync(path.join(os.tmpdir(), 'nr-'));
 const { chromium } = require('playwright');
 (async () => {
@@ -24,18 +25,20 @@ const { chromium } = require('playwright');
     score: document.querySelector('#nrStats .pts b').textContent,
     chain: document.querySelector('#nrChain b').textContent,
     up: document.querySelectorAll('.nr-card.up').length,
-    tut: [...document.querySelectorAll('.nr-card.tut')].map(n => n.dataset.i).join(',') || (document.getElementById('nrStock').classList.contains('tut') ? 'stock' : ''),
+    tut: [...document.querySelectorAll('.nr-card.tut')].map(n => n.dataset.i).join(',') || (document.getElementById('nrStock').classList.contains('tut') ? 'stock' : '') || ((document.querySelector('.nr-tool.tut') || {}).id || ''),
+    tools: ['nrToolL', 'nrToolD'].map(id => { const b = document.getElementById(id); return b.hidden ? '-' : b.querySelector('b').textContent; }).join('/'),
   }));
   const log = [];
   // 違う石を押しても進まない（揺れるだけ）
   await p.evaluate(() => document.querySelector('.nr-card[data-i="21"]').click()); await idle();
   const blocked = (await state()).step;
   // 段ごとに：光っている（tut）石かめくるを押す。「次へ」はそのまま
-  for (let k = 0; k < 12; k++) {
+  for (let k = 0; k < 20; k++) {
     const s = await state(); log.push(s);
     if (await p.$('#nrTutNext')) { await p.click('#nrTutNext'); await idle(); continue; }
     if (await p.$('#nrTutFree')) break;
     if (s.tut === 'stock') await p.click('#nrStock');
+    else if (s.tut.startsWith('nrTool')) await p.click('#' + s.tut);
     else if (s.tut) await p.evaluate(i => document.querySelector(`.nr-card[data-i="${i}"]`).click(), s.tut);
     else break;
     await idle();
@@ -43,14 +46,15 @@ const { chromium } = require('playwright');
   }
   const last = await state(); log.push(last);
   if (errs.length) console.log('errors so far:', errs.join(' / '));
-  for (const s of log) console.log(`${s.step} | 手：${s.hand} | 響き ${s.score} | 連鎖 ${s.chain} | 表 ${s.up} | 目標 ${s.tut}`);
+  for (const s of log) console.log(`${s.step} | 手：${s.hand} | 響き ${s.score} | 連鎖 ${s.chain} | 表 ${s.up} | 光/闇 ${s.tools} | 目標 ${s.tut}`);
   await p.screenshot({ path: OUT + '/tut-final.png' });
   // このまま続ける：練習の一局を最後まで（光る石があれば押す、なければめくる）
   await p.click('#nrTutFree'); await idle();
   for (let k = 0; k < 200; k++) {
     if (await p.evaluate(() => !document.getElementById('nrResOv').hidden)) break;
-    const c = await p.$('.nr-card.can.a') || await p.$('.nr-card.can');
-    if (c) await c.click(); else if (await p.evaluate(() => !document.getElementById('nrStock').disabled)) await p.click('#nrStock'); else await p.waitForTimeout(300);
+    const c = await p.$('.nr-tool.hot') || await p.$('.nr-card.can.a') || await p.$('.nr-card.can');
+    if (c) await c.click(); else if (await p.evaluate(() => !document.getElementById('nrStock').disabled)) await p.click('#nrStock');
+    else if (await p.$('.nr-tool.L.can')) await p.click('.nr-tool.L.can'); else await p.waitForTimeout(300);
     await idle();
   }
   await p.waitForTimeout(900);

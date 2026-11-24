@@ -16,9 +16,10 @@ const { chromium } = require('playwright');
   await p.evaluate(() => { localStorage.clear(); localStorage.setItem('genso.nr.tutDone', 'true'); }); await p.reload(); await p.waitForTimeout(500);
   const idle = async () => { for (let i = 0; i < 80; i++) { if (!(await p.evaluate(() => document.getElementById('nr').dataset.busy === '1'))) break; await p.waitForTimeout(50); } await p.waitForTimeout(80); };
   const run = () => p.evaluate(() => JSON.parse(localStorage.getItem('genso.nr.run')));
-  const step = async () => { // 対消滅を優先、なければ合成・手に取る、なければめくる
-    const c = await p.$('.nr-card.can.a') || await p.$('.nr-card.can');
-    if (c) await c.click(); else if (await p.evaluate(() => !document.getElementById('nrStock').disabled)) await p.click('#nrStock'); else return false;
+  const step = async () => { // 脈打つ光・闇があれば使う、対消滅を優先、なければ合成・手に取る、なければめくる、それもだめなら使える光
+    const c = await p.$('.nr-tool.hot') || await p.$('.nr-card.can.a') || await p.$('.nr-card.can');
+    if (c) await c.click(); else if (await p.evaluate(() => !document.getElementById('nrStock').disabled)) await p.click('#nrStock');
+    else if (await p.$('.nr-tool.L.can')) await p.click('.nr-tool.L.can'); else return false;
     await idle(); return true;
   };
   await p.click('#goNari'); await p.waitForTimeout(150);
